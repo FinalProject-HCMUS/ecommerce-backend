@@ -1,31 +1,21 @@
-[0;32m[INFO][0m Stopping any running containers...
-time="2025-03-22T11:40:24+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
- Container ecommerce-backend-app-1  Stopping
- Container ecommerce-backend-app-1  Stopped
- Container ecommerce-backend-app-1  Removing
- Container ecommerce-backend-app-1  Removed
- Container ecommerce-backend-postgres-1  Stopping
- Container ecommerce-backend-postgres-1  Stopped
- Container ecommerce-backend-postgres-1  Removing
- Container ecommerce-backend-postgres-1  Removed
- Network ecommerce-backend_ecommerce-network  Removing
- Network ecommerce-backend_ecommerce-network  Removed
-[0;32m[INFO][0m Building services...
-time="2025-03-22T11:40:25+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+[INFO] Stopping any running containers...
+time="2025-03-22T23:04:32+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+[INFO] Building services...
+time="2025-03-22T23:04:33+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
 #0 building with "desktop-linux" instance using docker driver
 
 #1 [app internal] load build definition from Dockerfile
-#1 transferring dockerfile: 699B done
-#1 DONE 0.0s
+#1 transferring dockerfile: 699B 0.0s done
+#1 DONE 0.1s
 
 #2 [app internal] load metadata for docker.io/library/eclipse-temurin:17-jre-alpine
 #2 ...
 
 #3 [app internal] load metadata for docker.io/library/maven:3.9.8-eclipse-temurin-17
-#3 DONE 1.2s
+#3 DONE 2.7s
 
 #2 [app internal] load metadata for docker.io/library/eclipse-temurin:17-jre-alpine
-#2 DONE 1.2s
+#2 DONE 2.7s
 
 #4 [app internal] load .dockerignore
 #4 transferring context: 2B done
@@ -38,8 +28,8 @@ time="2025-03-22T11:40:25+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 #6 DONE 0.0s
 
 #7 [app internal] load build context
-#7 transferring context: 20.85kB 0.0s done
-#7 DONE 0.0s
+#7 transferring context: 53.22kB 0.0s done
+#7 DONE 0.1s
 
 #8 [app build 2/9] WORKDIR /app
 #8 CACHED
@@ -63,46 +53,46 @@ time="2025-03-22T11:40:25+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 #14 DONE 0.1s
 
 #15 [app build 9/9] RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests
-#15 1.631 [INFO] Scanning for projects...
-#15 1.866 [INFO] 
-#15 1.866 [INFO] --------------------< com.hcmus:ecommerce-backend >---------------------
-#15 1.866 [INFO] Building ecommerce-backend 0.0.1-SNAPSHOT
-#15 1.866 [INFO]   from pom.xml
-#15 1.866 [INFO] --------------------------------[ jar ]---------------------------------
-#15 2.522 [INFO] 
-#15 2.522 [INFO] --- clean:3.4.1:clean (default-clean) @ ecommerce-backend ---
-#15 2.582 [INFO] 
-#15 2.583 [INFO] --- resources:3.3.1:resources (default-resources) @ ecommerce-backend ---
-#15 2.743 [INFO] Copying 1 resource from src/main/resources to target/classes
-#15 2.776 [INFO] Copying 0 resource from src/main/resources to target/classes
-#15 2.778 [INFO] 
-#15 2.778 [INFO] --- compiler:3.13.0:compile (default-compile) @ ecommerce-backend ---
-#15 2.927 [INFO] Recompiling the module because of changed source code.
-#15 2.937 [INFO] Compiling 23 source files with javac [debug parameters release 17] to target/classes
-#15 6.950 [INFO] 
-#15 6.950 [INFO] --- resources:3.3.1:testResources (default-testResources) @ ecommerce-backend ---
-#15 6.955 [INFO] skip non existing resourceDirectory /app/src/test/resources
-#15 6.955 [INFO] 
-#15 6.955 [INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ecommerce-backend ---
-#15 6.972 [INFO] Recompiling the module because of changed dependency.
-#15 6.973 [INFO] Compiling 1 source file with javac [debug parameters release 17] to target/test-classes
-#15 7.378 [INFO] 
-#15 7.378 [INFO] --- surefire:3.5.2:test (default-test) @ ecommerce-backend ---
-#15 7.549 [INFO] Tests are skipped.
-#15 7.550 [INFO] 
-#15 7.550 [INFO] --- jar:3.4.2:jar (default-jar) @ ecommerce-backend ---
-#15 7.909 [INFO] Building jar: /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar
-#15 7.998 [INFO] 
-#15 7.998 [INFO] --- spring-boot:3.4.3:repackage (repackage) @ ecommerce-backend ---
-#15 8.479 [INFO] Replacing main artifact /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
-#15 8.480 [INFO] The original artifact has been renamed to /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar.original
-#15 8.480 [INFO] ------------------------------------------------------------------------
-#15 8.481 [INFO] BUILD SUCCESS
-#15 8.481 [INFO] ------------------------------------------------------------------------
-#15 8.483 [INFO] Total time:  6.870 s
-#15 8.483 [INFO] Finished at: 2025-03-22T04:40:36Z
-#15 8.484 [INFO] ------------------------------------------------------------------------
-#15 DONE 8.7s
+#15 3.173 [INFO] Scanning for projects...
+#15 3.476 [INFO] 
+#15 3.477 [INFO] --------------------< com.hcmus:ecommerce-backend >---------------------
+#15 3.477 [INFO] Building ecommerce-backend 0.0.1-SNAPSHOT
+#15 3.477 [INFO]   from pom.xml
+#15 3.477 [INFO] --------------------------------[ jar ]---------------------------------
+#15 4.201 [INFO] 
+#15 4.201 [INFO] --- clean:3.4.1:clean (default-clean) @ ecommerce-backend ---
+#15 4.299 [INFO] 
+#15 4.300 [INFO] --- resources:3.3.1:resources (default-resources) @ ecommerce-backend ---
+#15 4.451 [INFO] Copying 1 resource from src/main/resources to target/classes
+#15 4.475 [INFO] Copying 0 resource from src/main/resources to target/classes
+#15 4.476 [INFO] 
+#15 4.476 [INFO] --- compiler:3.13.0:compile (default-compile) @ ecommerce-backend ---
+#15 4.640 [INFO] Recompiling the module because of changed source code.
+#15 4.654 [INFO] Compiling 34 source files with javac [debug parameters release 17] to target/classes
+#15 8.448 [INFO] 
+#15 8.448 [INFO] --- resources:3.3.1:testResources (default-testResources) @ ecommerce-backend ---
+#15 8.453 [INFO] skip non existing resourceDirectory /app/src/test/resources
+#15 8.453 [INFO] 
+#15 8.453 [INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ecommerce-backend ---
+#15 8.465 [INFO] Recompiling the module because of changed dependency.
+#15 8.465 [INFO] Compiling 1 source file with javac [debug parameters release 17] to target/test-classes
+#15 8.795 [INFO] 
+#15 8.795 [INFO] --- surefire:3.5.2:test (default-test) @ ecommerce-backend ---
+#15 8.926 [INFO] Tests are skipped.
+#15 8.927 [INFO] 
+#15 8.927 [INFO] --- jar:3.4.2:jar (default-jar) @ ecommerce-backend ---
+#15 9.141 [INFO] Building jar: /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar
+#15 9.204 [INFO] 
+#15 9.204 [INFO] --- spring-boot:3.4.3:repackage (repackage) @ ecommerce-backend ---
+#15 10.18 [INFO] Replacing main artifact /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+#15 10.18 [INFO] The original artifact has been renamed to /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar.original
+#15 10.18 [INFO] ------------------------------------------------------------------------
+#15 10.18 [INFO] BUILD SUCCESS
+#15 10.18 [INFO] ------------------------------------------------------------------------
+#15 10.18 [INFO] Total time:  7.037 s
+#15 10.18 [INFO] Finished at: 2025-03-22T16:04:47Z
+#15 10.18 [INFO] ------------------------------------------------------------------------
+#15 DONE 10.3s
 
 #16 [app stage-1 2/3] WORKDIR /app
 #16 CACHED
@@ -113,11 +103,11 @@ time="2025-03-22T11:40:25+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 #18 [app] exporting to image
 #18 exporting layers
 #18 exporting layers 0.3s done
-#18 writing image sha256:7234f008a9d73677df5f5049797194dfd0f51e20597323ac68560d5dd3b07f9e done
+#18 writing image sha256:ecbde6349d3b87991d4e36679df41a0f6df91cf42fda508efd2d0c844c36d28a done
 #18 naming to docker.io/library/ecommerce-backend-app done
 #18 DONE 0.3s
-[0;32m[INFO][0m Starting services...
-time="2025-03-22T11:40:37+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+[INFO] Starting services...
+time="2025-03-22T23:04:48+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
  Network ecommerce-backend_ecommerce-network  Creating
  Network ecommerce-backend_ecommerce-network  Created
  Container ecommerce-backend-postgres-1  Creating
@@ -128,11 +118,11 @@ time="2025-03-22T11:40:37+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
  Container ecommerce-backend-postgres-1  Started
  Container ecommerce-backend-app-1  Starting
  Container ecommerce-backend-app-1  Started
-[0;32m[INFO][0m Services started successfully
-[0;32m[INFO][0m E-commerce application is running at http://localhost:8080
-[0;32m[INFO][0m PostgreSQL is available at localhost:5432
-[0;32m[INFO][0m Container status:
-time="2025-03-22T11:40:38+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+[INFO] Services started successfully
+[INFO] E-commerce application is running at http://localhost:8080
+[INFO] PostgreSQL is available at localhost:5432
+[INFO] Container status:
+time="2025-03-22T23:04:49+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
 NAME                           IMAGE                   COMMAND                  SERVICE    CREATED        STATUS                  PORTS
 ecommerce-backend-app-1        ecommerce-backend-app   "java -jar app.jar"      app        1 second ago   Up Less than a second   0.0.0.0:8080->8080/tcp
-ecommerce-backend-postgres-1   postgres:latest         "docker-entrypoint.s…"   postgres   1 second ago   Up 1 second             0.0.0.0:5432->5432/tcp
+ecommerce-backend-postgres-1   postgres:latest         "docker-entrypoint.s…"   postgres   1 second ago   Up Less than a second   0.0.0.0:5432->5432/tcp
