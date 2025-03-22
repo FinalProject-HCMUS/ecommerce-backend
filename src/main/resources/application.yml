@@ -16,6 +16,29 @@ logging:
   level:
     root: ERROR
     com.hcmus: INFO
+    org:
+      hibernate:
+        SQL: OFF
+      springframework:
+        web: DEBUG
+        data: DEBUG
+        boot:
+          autoconfigure:
+            data:
+              rest: DEBUG
+            orm: DEBUG
+        security: DEBUG
     
 server:
   port: 8080
+
+# SpringDoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tagsSorter: alpha
+    operationsSorter: method
+  packages-to-scan: com.hcmus.ecommerce_backend
+  paths-to-match: /api/**
