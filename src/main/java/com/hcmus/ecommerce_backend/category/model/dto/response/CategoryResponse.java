@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Response object containing category information")
-public class    CategoryResponse {
+public class CategoryResponse {
     
     @Schema(description = "Unique identifier of the category", example = "550e8400-e29b-41d4-a716-446655440000")
     private String id;
