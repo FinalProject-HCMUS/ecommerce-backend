@@ -21,6 +21,10 @@ public interface ProductMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "averageRating", ignore = true)
+    @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "reviewCount", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "category", source = "categoryId", qualifiedByName = "categoryIdToCategory")
     Product toEntity(CreateProductRequest request);
 
