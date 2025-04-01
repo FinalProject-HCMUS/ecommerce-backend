@@ -17,7 +17,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "product_image")
+@Table(name = "product_images")
 @Getter
 @Setter
 @SuperBuilder

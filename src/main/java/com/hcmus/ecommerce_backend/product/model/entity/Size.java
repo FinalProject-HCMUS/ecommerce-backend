@@ -15,7 +15,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "size")
+@Table(name = "sizes")
 @Getter
 @Setter
 @SuperBuilder
