@@ -1,6 +1,5 @@
 package com.hcmus.ecommerce_backend.product.model.mapper;
 
-import com.hcmus.ecommerce_backend.category.model.entity.Category;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductImageResponse;
