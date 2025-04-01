@@ -1,10 +1,10 @@
 package com.hcmus.ecommerce_backend.review.model.entity;
 
+import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "review")
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Review {
+public class Review extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,10 +28,6 @@ public class Review {
 
     @Column(name = "rating")
     private Integer rating;
-
-    @Builder.Default
-    @Column(name = "review_time")
-    private LocalDateTime reviewTime = LocalDateTime.now();
 
     @Column(name = "order_id")
     private String orderId; //Reference to Order entity
