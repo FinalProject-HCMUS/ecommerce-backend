@@ -53,14 +53,14 @@ public class ProductResponse {
     private String categoryId;
 
     @Schema(description = "Date and time when the product was created")
-    private String createdTime;
+    private String createdAt;
 
     @Schema(description = "Date and time when the product was last updated")
-    private String updateTime;
+    private String updatedAt;
 
-    @Schema(description = "User who created the category", example = "admin")
+    @Schema(description = "User who created the product", example = "admin")
     private String createdBy;
 
-    @Schema(description = "User who last updated the category", example = "admin")
+    @Schema(description = "User who last updated the product", example = "admin")
     private String updatedBy;
 }

@@ -15,7 +15,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "color")
+@Table(name = "colors")
 @Getter
 @Setter
 @SuperBuilder

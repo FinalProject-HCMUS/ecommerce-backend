@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,30 +17,23 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "sizes")
+@Table(name = "product_images")
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Size  extends BaseEntity {
+public class ProductImage extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private String id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "url", nullable = false)
+    private String url;
 
-    @Column(name = "min_height", nullable = false)
-    private int minHeight;
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;  
 
-    @Column(name = "max_height", nullable = false)
-    private int maxHeight;
-
-    @Column(name = "min_weight", nullable = false)
-    private int minWeight;
-
-    @Column(name = "max_weight", nullable = false)
-    private int maxWeight;
 }

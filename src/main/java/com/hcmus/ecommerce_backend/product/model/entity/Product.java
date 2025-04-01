@@ -1,18 +1,23 @@
 package com.hcmus.ecommerce_backend.product.model.entity;
 
 import com.hcmus.ecommerce_backend.category.model.entity.Category;
+import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "product")
-@Data
+@Table(name = "products")
+@Getter
+@Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product {
+public class Product extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
