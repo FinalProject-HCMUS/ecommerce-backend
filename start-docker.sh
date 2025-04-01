@@ -4,7 +4,7 @@
 set -e
 
 # Log file
-LOG_FILE="ecommerce-docker.log"
+LOG_FILE="start-docker.log"
 
 # Simple logging functions without colors
 info() {

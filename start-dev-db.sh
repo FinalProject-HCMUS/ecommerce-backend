@@ -4,7 +4,7 @@
 set -e
 
 # Log file
-LOG_FILE="dev-postgres.log"
+LOG_FILE="start-dev-db.log"
 
 # Function to display colored output
 GREEN='\033[0;32m'

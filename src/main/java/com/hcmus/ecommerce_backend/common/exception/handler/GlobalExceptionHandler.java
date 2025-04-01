@@ -3,6 +3,10 @@ package com.hcmus.ecommerce_backend.common.exception.handler;
 import com.hcmus.ecommerce_backend.category.exception.CategoryAlreadyExistsException;
 import com.hcmus.ecommerce_backend.category.exception.CategoryNotFoundException;
 import com.hcmus.ecommerce_backend.common.model.dto.CustomError;
+import com.hcmus.ecommerce_backend.order.exception.CartItemAlreadyExistsException;
+import com.hcmus.ecommerce_backend.order.exception.CartItemNotFoundException;
+import com.hcmus.ecommerce_backend.order.exception.OrderAlreadyExistsException;
+import com.hcmus.ecommerce_backend.order.exception.OrderNotFoundException;
 import com.hcmus.ecommerce_backend.product.exception.ProductAlreadyExistsException;
 import com.hcmus.ecommerce_backend.product.exception.ProductNotFoundException;
 
@@ -188,6 +192,74 @@ public class GlobalExceptionHandler {
          */
         @ExceptionHandler(ProductAlreadyExistsException.class)
         protected ResponseEntity<Object> handleProductAlreadyExistsException(final ProductAlreadyExistsException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.CONFLICT)
+                                .header(CustomError.Header.ALREADY_EXIST.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
+        }
+
+        /**
+         * Handles OrderNotFoundException thrown when an order is not found.
+         *
+         * @param ex The OrderNotFoundException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(OrderNotFoundException.class)
+        protected ResponseEntity<Object> handleOrderNotFoundException(final OrderNotFoundException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND)
+                                .header(CustomError.Header.NOT_FOUND.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+        }
+
+        /**
+         * Handles OrderAlreadyExistsException thrown when an order already exists.
+         *
+         * @param ex The OrderAlreadyExistsException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(OrderAlreadyExistsException.class)
+        protected ResponseEntity<Object> handleOrderAlreadyExistsException(final OrderAlreadyExistsException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.CONFLICT)
+                                .header(CustomError.Header.ALREADY_EXIST.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
+        }
+
+        /**
+         * Handles CartItemNotFoundException thrown when a cart item is not found.
+         * 
+         * @param ex The CartItemNotFoundException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(CartItemNotFoundException.class)
+        protected ResponseEntity<Object> handleCartItemNotFoundException(final CartItemNotFoundException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND)
+                                .header(CustomError.Header.NOT_FOUND.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+        }
+
+        /**
+         * Hanldes CartItemAlreadyExistsException thrown when a cart item already exists.
+         * 
+         * @param ex The CartItemAlreadyExistsException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(CartItemAlreadyExistsException.class)
+        protected ResponseEntity<Object> handleCartItemAlreadyExistsException(final CartItemAlreadyExistsException ex) {
                 CustomError customError = CustomError.builder()
                                 .httpStatus(HttpStatus.CONFLICT)
                                 .header(CustomError.Header.ALREADY_EXIST.getName())

@@ -1,7 +1,6 @@
 package com.hcmus.ecommerce_backend.product.service.impl;
 
 import com.hcmus.ecommerce_backend.product.exception.SizeAlreadyExistsException;
-import com.hcmus.ecommerce_backend.product.exception.SizeAlreadyExistsException;
 import com.hcmus.ecommerce_backend.product.exception.SizeNotFoundException;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateSizeRequest;
