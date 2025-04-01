@@ -16,5 +16,5 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
     
     Optional<Review> findByOrderIdAndRatingGreaterThan(String orderId, Integer rating);
     
-    List<Review> findByRatingBetweenOrderByReviewTimeDesc(Integer minRating, Integer maxRating);
+    List<Review> findByRatingBetweenOrderByCreateAtDesc(Integer minRating, Integer maxRating);
 }

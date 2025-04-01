@@ -3,12 +3,18 @@ package com.hcmus.ecommerce_backend.common.exception.handler;
 import com.hcmus.ecommerce_backend.category.exception.CategoryAlreadyExistsException;
 import com.hcmus.ecommerce_backend.category.exception.CategoryNotFoundException;
 import com.hcmus.ecommerce_backend.common.model.dto.CustomError;
+import com.hcmus.ecommerce_backend.message.exception.MessageAlreadyExistsException;
+import com.hcmus.ecommerce_backend.message.exception.MessageNotFoundException;
 import com.hcmus.ecommerce_backend.order.exception.CartItemAlreadyExistsException;
 import com.hcmus.ecommerce_backend.order.exception.CartItemNotFoundException;
 import com.hcmus.ecommerce_backend.order.exception.OrderAlreadyExistsException;
 import com.hcmus.ecommerce_backend.order.exception.OrderNotFoundException;
+import com.hcmus.ecommerce_backend.order.exception.OrderTrackAlreadyExistsException;
+import com.hcmus.ecommerce_backend.order.exception.OrderTrackNotFoundException;
 import com.hcmus.ecommerce_backend.product.exception.ProductAlreadyExistsException;
 import com.hcmus.ecommerce_backend.product.exception.ProductNotFoundException;
+import com.hcmus.ecommerce_backend.review.exception.ReviewAlreadyExistsException;
+import com.hcmus.ecommerce_backend.review.exception.ReviewNotFoundException;
 
 import jakarta.validation.ConstraintViolationException;
 import org.apache.commons.lang3.StringUtils;
@@ -253,13 +259,115 @@ public class GlobalExceptionHandler {
         }
 
         /**
-         * Hanldes CartItemAlreadyExistsException thrown when a cart item already exists.
+         * Handles CartItemAlreadyExistsException thrown when a cart item already exists.
          * 
          * @param ex The CartItemAlreadyExistsException instance.
          * @return ResponseEntity with CustomError containing details of the exception.
          */
         @ExceptionHandler(CartItemAlreadyExistsException.class)
         protected ResponseEntity<Object> handleCartItemAlreadyExistsException(final CartItemAlreadyExistsException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.CONFLICT)
+                                .header(CustomError.Header.ALREADY_EXIST.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
+        }
+
+        /**
+         * Handles OrderTrackNotFoundException thrown when an order track is not found.
+         *
+         * @param ex The OrderTrackNotFoundException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(OrderTrackNotFoundException.class)
+        protected ResponseEntity<Object> handleOrderTrackNotFoundException(final OrderTrackNotFoundException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND)
+                                .header(CustomError.Header.NOT_FOUND.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+        }
+
+        /**
+         * Handles OrderTrackAlreadyExistsException thrown when an order track already exists.
+         * 
+         * @param ex The OrderTrackAlreadyExistsException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(OrderTrackAlreadyExistsException.class)
+        protected ResponseEntity<Object> handleOrderTrackAlreadyExistsException(final OrderTrackAlreadyExistsException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.CONFLICT)
+                                .header(CustomError.Header.ALREADY_EXIST.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
+        }
+
+        /**
+         * Handles ReviewNotFoundException thrown when a review is not found.
+         *
+         * @param ex The ReviewNotFoundException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(ReviewNotFoundException.class)
+        protected ResponseEntity<Object> handleReviewNotFoundException(final ReviewNotFoundException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND)
+                                .header(CustomError.Header.NOT_FOUND.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+        }
+
+        /**
+         * Handles ReviewAlreadyExistsException thrown when a review already exists.
+         *
+         * @param ex The ReviewAlreadyExistsException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(ReviewAlreadyExistsException.class)
+        protected ResponseEntity<Object> handleReviewAlreadyExistsException(final ReviewAlreadyExistsException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.CONFLICT)
+                                .header(CustomError.Header.ALREADY_EXIST.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
+        }
+
+        /**
+         * Handles MessageNotFoundException thrown when a message is not found.
+         *
+         * @param ex The MessageNotFoundException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(MessageNotFoundException.class)
+        protected ResponseEntity<Object> handleMessageNotFoundException(final MessageNotFoundException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND)
+                                .header(CustomError.Header.NOT_FOUND.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+        }
+
+        /**
+         * Handles MessageAlreadyExistsException thrown when a message already exists.
+         *
+         * @param ex The MessageAlreadyExistsException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(MessageAlreadyExistsException.class)
+        protected ResponseEntity<Object> handleMessageAlreadyExistsException(final MessageAlreadyExistsException ex) {
                 CustomError customError = CustomError.builder()
                                 .httpStatus(HttpStatus.CONFLICT)
                                 .header(CustomError.Header.ALREADY_EXIST.getName())

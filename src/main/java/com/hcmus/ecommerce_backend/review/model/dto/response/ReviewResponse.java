@@ -28,7 +28,7 @@ public class ReviewResponse {
     private Integer rating;
     
     @Schema(description = "Time when the review was submitted", example = "2023-05-15T15:30:00")
-    private LocalDateTime reviewTime;
+    private LocalDateTime createdAt;
     
     @Schema(description = "ID of the order this review is for", example = "550e8400-e29b-41d4-a716-446655440000")
     private String orderId;
