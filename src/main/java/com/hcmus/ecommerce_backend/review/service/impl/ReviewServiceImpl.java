@@ -141,7 +141,7 @@ public class ReviewServiceImpl implements ReviewService {
     public List<ReviewResponse> getReviewsByRatingRange(Integer minRating, Integer maxRating) {
         log.info("ReviewServiceImpl | getReviewsByRatingRange | minRating: {}, maxRating: {}", minRating, maxRating);
         try {
-            List<ReviewResponse> reviews = reviewRepository.findByRatingBetweenOrderByReviewTimeDesc(minRating, maxRating)
+            List<ReviewResponse> reviews = reviewRepository.findByRatingBetweenOrderByCreatedAtDesc(minRating, maxRating)
                     .stream()
                     .map(reviewMapper::toResponse)
                     .collect(Collectors.toList());
