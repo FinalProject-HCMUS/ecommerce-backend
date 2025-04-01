@@ -22,7 +22,7 @@ public class CreateOrderTrackRequest {
     private String notes;
     
     @NotNull(message = "Status is required")
-    @Schema(description = "Status of the order at this tracking point", example = "SHIPPED", required = true)
+    @Schema(description = "Status of the order at this tracking point", example = "NEW", required = true)
     private Status status;
     
     @Builder.Default

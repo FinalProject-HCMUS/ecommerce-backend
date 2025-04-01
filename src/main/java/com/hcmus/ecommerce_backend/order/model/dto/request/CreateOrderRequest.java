@@ -36,7 +36,7 @@ public class CreateOrderRequest {
     private LocalDateTime deliveryDate;
     
     @NotNull(message = "Payment method is required")
-    @Schema(description = "Payment method for the order", example = "CREDIT_CARD")
+    @Schema(description = "Payment method for the order", example = "COD")
     private PaymentMethod paymentMethod;
     
     @NotNull(message = "Shipping cost is required")

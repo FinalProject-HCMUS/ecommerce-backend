@@ -33,7 +33,7 @@ public class UpdateOrderRequest {
     @Schema(description = "Expected delivery date", example = "2023-05-15T15:30:00")
     private LocalDateTime deliveryDate;
     
-    @Schema(description = "Payment method for the order", example = "CREDIT_CARD")
+    @Schema(description = "Payment method for the order", example = "VNPAY")
     private PaymentMethod paymentMethod;
     
     @PositiveOrZero(message = "Shipping cost must be zero or positive")
