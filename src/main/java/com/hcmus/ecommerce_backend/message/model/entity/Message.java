@@ -28,6 +28,9 @@ public class Message extends BaseEntity {
     @Column(name = "role_chat")
     private RoleChat roleChat;
 
+    @Column(name = "customer_id")
+    private String customerId; // References Users entity
+
     @Column(name = "admin_id")
     private String adminId; // References Users entity
 }
