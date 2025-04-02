@@ -104,7 +104,7 @@ public class BlogServiceImpl implements BlogService {
 
             // check if blog with the title and user id exists
             if (!blog.getTitle().equals(request.getTitle())) {
-                checkTitleBlogAndUserIdExists(request.getTitle(), blog.getUser().getId());
+                checkTitleBlogAndUserIdExists(request.getTitle(), blog.getUserId());
             }
 
             blogMapper.updateEntity(request, blog);

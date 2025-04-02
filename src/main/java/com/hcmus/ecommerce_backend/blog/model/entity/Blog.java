@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
-import com.hcmus.ecommerce_backend.user.model.entity.User;
 
 @Entity
 @Table(name = "blogs")
@@ -30,7 +29,6 @@ public class Blog extends BaseEntity {
     @Column(name = "image")
     private String image;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private String userId; // References Users entity
 }
