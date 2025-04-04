@@ -66,7 +66,4 @@ public class Order extends BaseEntity{
     // Relationships
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderTrack> orderTracks;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<CartItems> cartItems;
 }

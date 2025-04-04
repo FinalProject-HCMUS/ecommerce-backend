@@ -60,9 +60,6 @@ public class OrderResponse {
     @Schema(description = "List of order tracks")
     private List<OrderTrackResponse> orderTracks;
     
-    @Schema(description = "List of cart items in the order")
-    private List<CartItemResponse> cartItems;
-    
     @Schema(description = "Date and time when the order was created")
     private LocalDateTime createdAt;
     
