@@ -11,8 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -62,7 +60,4 @@ public class CreateOrderRequest {
     @NotBlank(message = "Customer ID is required")
     @Schema(description = "ID of the customer", example = "550e8400-e29b-41d4-a716-446655440000")
     private String customerId;
-    
-    @Schema(description = "List of cart items to be ordered")
-    private List<String> cartItemIds;
 }
