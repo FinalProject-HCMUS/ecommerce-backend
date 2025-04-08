@@ -19,7 +19,7 @@ public interface ProductService {
     
     void deleteProduct(String id);
 
-    List<ProductResponse> getTopSellingProducts(int page, int size);
+    // List<ProductResponse> getTopSellingProducts(int page, int size);
 
-    List<ProductResponse> getTopTrendingProducts(int page, int size);
+    // List<ProductResponse> getTopTrendingProducts(int page, int size);
 }
