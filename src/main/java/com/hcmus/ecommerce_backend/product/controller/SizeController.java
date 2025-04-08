@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/sizes")
+@RequestMapping("/sizes")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Size", description = "Size management APIs")

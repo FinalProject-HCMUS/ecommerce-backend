@@ -6,8 +6,9 @@ public enum Status {
     PROCESSING ("processing"),
     PACKAGED ("packaged"),
     PICKED ("picked"),
-    SHIPPING ("shipping");
-
+    SHIPPING ("shipping"),
+    DELIVERED ("delivered"),
+    REFUNDED ("refunded");
     private final String value;
 
     Status(String value) {

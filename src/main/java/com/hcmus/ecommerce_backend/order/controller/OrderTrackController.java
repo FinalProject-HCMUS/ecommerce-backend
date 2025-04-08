@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/order-tracks")
+@RequestMapping("/order-tracks")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Order Track", description = "Order Track management APIs")

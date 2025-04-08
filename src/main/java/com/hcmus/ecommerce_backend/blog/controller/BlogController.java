@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
-@RequestMapping("/api/blogs")
+@RequestMapping("/blogs")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Blog", description = "Blog management APIs")

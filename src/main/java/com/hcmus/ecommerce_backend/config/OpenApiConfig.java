@@ -16,6 +16,9 @@ public class OpenApiConfig {
 
     @Value("${server.port}")
     private String serverPort;
+    
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
 
     @Bean
     public OpenAPI customOpenAPI() {
@@ -33,7 +36,7 @@ public class OpenApiConfig {
                                 .url("https://opensource.org/licenses/MIT")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:" + serverPort)
+                                .url("http://localhost:" + serverPort + contextPath)
                                 .description("Development Server")
                 ));
     }

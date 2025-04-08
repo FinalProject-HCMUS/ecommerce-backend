@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/product-color-sizes")
+@RequestMapping("/product-color-sizes")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Product Color Size", description = "APIs for managing product color and size combinations")
