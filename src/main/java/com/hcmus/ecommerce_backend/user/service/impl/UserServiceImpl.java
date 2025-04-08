@@ -2,6 +2,7 @@ package com.hcmus.ecommerce_backend.user.service.impl;
 
 import com.hcmus.ecommerce_backend.user.exception.UserAlreadyExistsException;
 import com.hcmus.ecommerce_backend.user.exception.UserNotFoundException;
+import com.hcmus.ecommerce_backend.user.model.dto.request.ChangePasswordRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.CreateUserRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.UpdateUserRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.response.UserResponse;
@@ -12,6 +13,7 @@ import com.hcmus.ecommerce_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -73,6 +76,7 @@ public class UserServiceImpl implements UserService {
             checkUserPhoneNumExists(request.getPhoneNum());
 
             User user = userMapper.toEntity(request);
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
             User savedUser = userRepository.save(user);
             log.info("UserServiceImpl | createUser | Created user with id: {}", savedUser.getId());
             return userMapper.toResponse(savedUser);
@@ -141,6 +145,46 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             log.error("UserServiceImpl | deleteUser | Unexpected error deleting user with id '{}': {}", 
                     id, e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(String userId, ChangePasswordRequest request) {
+        log.info("UserServiceImpl | changePassword | Changing password for user with id: {}", userId);
+        
+        try {
+            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                throw new IllegalArgumentException("New password and confirm password do not match");
+            }
+            
+            User user = findUserById(userId);
+            
+            // Check if the current password is correct
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                log.error("UserServiceImpl | changePassword | Current password is incorrect for user id: {}", userId);
+                throw new IllegalArgumentException("Current password is incorrect");
+            }
+            
+            // Set the new password
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            
+            // Increment token version to invalidate all existing tokens
+            user.setTokenVersion(user.getTokenVersion() + 1);
+            
+            userRepository.save(user);
+            log.info("UserServiceImpl | changePassword | Password changed successfully for user with id: {}", userId);
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (IllegalArgumentException e) {
+            log.error("UserServiceImpl | changePassword | Validation error: {}", e.getMessage());
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("UserServiceImpl | changePassword | Database error: {}", e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("UserServiceImpl | changePassword | Unexpected error: {}", e.getMessage(), e);
             throw e;
         }
     }

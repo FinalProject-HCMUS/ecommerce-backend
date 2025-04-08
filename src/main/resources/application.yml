@@ -4,6 +4,7 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
     properties:
@@ -11,6 +12,14 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+    sql:
+      init:
+        mode: always
+        platform: postgres
+        encoding: UTF-8
+        separator: ";"
+        continue-on-error: false
+        data-locations: classpath:data.sql
 
 logging:
   level:
@@ -20,6 +29,7 @@ logging:
       hibernate:
         SQL: OFF
       springframework:
+        jdbc: DEBUG
         web: DEBUG
         data: DEBUG
         boot:
@@ -31,6 +41,8 @@ logging:
     
 server:
   port: 8080
+  servlet:
+    context-path: /api/v1
 
 # SpringDoc OpenAPI Configuration
 springdoc:
@@ -40,5 +52,13 @@ springdoc:
     path: /swagger-ui.html
     tagsSorter: alpha
     operationsSorter: method
+    display-request-duration: true
+    doc-expansion: none
   packages-to-scan: com.hcmus.ecommerce_backend
-  paths-to-match: /api/**
+  paths-to-match: /**
+  
+
+auth:
+  keys:
+    public-key-path: classpath:keys/public.pem
+    private-key-path: classpath:keys/private.pem

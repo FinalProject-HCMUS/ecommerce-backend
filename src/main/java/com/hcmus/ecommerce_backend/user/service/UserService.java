@@ -1,5 +1,6 @@
 package com.hcmus.ecommerce_backend.user.service;
 
+import com.hcmus.ecommerce_backend.user.model.dto.request.ChangePasswordRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.CreateUserRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.UpdateUserRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.response.UserResponse;
@@ -17,4 +18,6 @@ public interface UserService {
     UserResponse updateUser(String id, UpdateUserRequest request);
 
     void deleteUser(String id);
+    
+    void changePassword(String userId, ChangePasswordRequest request);
 }

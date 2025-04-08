@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/cart-items")
+@RequestMapping("/cart-items")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Cart Items", description = "Cart Items management APIs")

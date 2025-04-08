@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/colors")
+@RequestMapping("/colors")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Color", description = "Color management APIs")

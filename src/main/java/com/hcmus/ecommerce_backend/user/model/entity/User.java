@@ -1,11 +1,14 @@
 package com.hcmus.ecommerce_backend.user.model.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.hcmus.ecommerce_backend.auth.model.enums.TokenClaims;
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
 import com.hcmus.ecommerce_backend.user.model.enums.Role;
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -58,4 +61,23 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+
+    @Builder.Default
+    @Column(name = "token_version", nullable = false)
+    private int tokenVersion = 0;
+
+    public Map<String, Object> getClaims() {
+
+        final Map<String, Object> claims = new HashMap<>();
+
+        claims.put(TokenClaims.USER_ID.getValue(), this.id);
+        claims.put(TokenClaims.USER_ROLE.getValue(), this.role);
+        claims.put(TokenClaims.USER_FIRST_NAME.getValue(), this.firstName);
+        claims.put(TokenClaims.USER_LAST_NAME.getValue(), this.lastName);
+        claims.put(TokenClaims.USER_EMAIL.getValue(), this.email);
+        claims.put(TokenClaims.USER_PHONE_NUMBER.getValue(), this.phoneNum);
+
+        return claims;
+
+    }
 }

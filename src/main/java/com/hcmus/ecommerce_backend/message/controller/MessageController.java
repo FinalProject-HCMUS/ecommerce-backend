@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("/messages")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Message", description = "Message management APIs")

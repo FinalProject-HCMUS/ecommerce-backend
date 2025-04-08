@@ -3,13 +3,10 @@ package com.hcmus.ecommerce_backend.blog.model.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
-
 import com.hcmus.ecommerce_backend.blog.model.dto.request.CreateBlogRequest;
 import com.hcmus.ecommerce_backend.blog.model.dto.request.UpdateBlogRequest;
 import com.hcmus.ecommerce_backend.blog.model.dto.response.BlogResponse;
 import com.hcmus.ecommerce_backend.blog.model.entity.Blog;
-import com.hcmus.ecommerce_backend.user.model.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface BlogMapper {

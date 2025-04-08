@@ -1,4 +1,4 @@
-package com.hcmus.ecommerce_backend.common.security;
+package com.hcmus.ecommerce_backend.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
