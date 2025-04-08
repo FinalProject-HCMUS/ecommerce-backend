@@ -20,7 +20,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -119,4 +122,44 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.ok(CustomResponse.SUCCESS);
     }
+
+    @Operation(summary = "Get top products", description = "Retrieves top-selling and top-trending products with pagination")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved top products"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class)))
+    })
+    @GetMapping("/top-products")
+    public ResponseEntity<CustomResponse<Map<String, Object>>> getTopProducts(
+        @Parameter(description = "Page number for pagination", example = "0") @RequestParam(defaultValue = "0") int page,
+        @Parameter(description = "Page size for pagination", example = "10") @RequestParam(defaultValue = "10") int size) {
+        log.info("ProductController | getTopProducts | page: {}, size: {}", page, size);
+
+        // Top-selling products
+        List<ProductResponse> topSelling = productService.getTopSellingProducts(page, size);
+
+        // Top-trending products
+        List<ProductResponse> topTrending = productService.getTopTrendingProducts(page, size);
+
+        // Build response
+        Map<String, Object> response = new HashMap<>();
+        response.put("topProducts", Arrays.asList(
+                Map.of(
+                        "title", "TOP SELLING",
+                        "data", topSelling
+                ),
+                Map.of(
+                        "title", "TOP TRENDING",
+                        "data", topTrending
+                )
+        ));
+        response.put("pagination", Map.of(
+                "totalItems", topSelling.size(),
+                "totalPages", (int) Math.ceil((double) topSelling.size() / size),
+                "currentPage", page
+        ));
+
+        return ResponseEntity.ok(CustomResponse.successOf(response));
+        }
 }
