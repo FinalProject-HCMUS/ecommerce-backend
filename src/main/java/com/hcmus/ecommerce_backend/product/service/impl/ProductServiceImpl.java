@@ -13,13 +13,19 @@ import com.hcmus.ecommerce_backend.product.repository.ProductRepository;
 import com.hcmus.ecommerce_backend.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.hibernate.query.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -181,5 +187,45 @@ public class ProductServiceImpl implements ProductService {
             log.error("ProductServiceImpl | validateCategory | Category not found with id: {}", categoryId);
             throw new CategoryNotFoundException(categoryId);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getTopTrendingProducts(int page, int size) {
+        log.info("ProductServiceImpl | getTopTrendingProducts | page: {}, size: {}", page, size);
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Query to calculate review count and average rating for each product
+        List<Object[]> results = productRepository.findTopTrendingProducts(pageable);
+
+        // Map results to ProductResponse
+        return results.stream()
+                .map(row -> ProductResponse.builder()
+                        .id((String) row[0])
+                        .name((String) row[1])
+                        .averageRating((Double) row[2]) // Assuming average rating is calculated
+                        .reviewCount((Double) row[3])  // Assuming review count is calculated
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getTopSellingProducts(int page, int size) {
+        log.info("ProductServiceImpl | getTopSellingProducts | page: {}, size: {}", page, size);
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Query to calculate order count for each product
+        List<Object[]> results = productRepository.findTopSellingProducts(pageable);
+
+        // Map results to ProductResponse
+        return results.stream()
+                .map(row -> ProductResponse.builder()
+                        .id((String) row[0])
+                        .name((String) row[1])
+                        .averageRating((Double) row[2]) // Assuming average rating is calculated
+                        .reviewCount((Double) row[3])  // Assuming review count is calculated
+                        .build())
+                .collect(Collectors.toList());
     }
 }
