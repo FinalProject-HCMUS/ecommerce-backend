@@ -5,7 +5,6 @@ import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductReques
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductResponse;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ProductService {
     

@@ -106,7 +106,7 @@ public class ProductController {
         ProductResponse updatedProduct = productService.updateProduct(id, request);
         return ResponseEntity.ok(CustomResponse.successOf(updatedProduct));
     }
-    
+
     @Operation(summary = "Delete a product", description = "Deletes a product by its ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Product successfully deleted"),
@@ -161,5 +161,5 @@ public class ProductController {
         ));
 
         return ResponseEntity.ok(CustomResponse.successOf(response));
-        }
+    }
 }
