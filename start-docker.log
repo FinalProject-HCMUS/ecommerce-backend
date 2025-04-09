@@ -1,7 +1,17 @@
 [INFO] Stopping any running containers...
-time="2025-04-08T22:09:26+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+time="2025-04-09T23:36:14+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+ Container ecommerce-backend-app-1  Stopping
+ Container ecommerce-backend-app-1  Stopped
+ Container ecommerce-backend-app-1  Removing
+ Container ecommerce-backend-app-1  Removed
+ Container ecommerce-backend-postgres-1  Stopping
+ Container ecommerce-backend-postgres-1  Stopped
+ Container ecommerce-backend-postgres-1  Removing
+ Container ecommerce-backend-postgres-1  Removed
+ Network ecommerce-backend_ecommerce-network  Removing
+ Network ecommerce-backend_ecommerce-network  Removed
 [INFO] Building services...
-time="2025-04-08T22:09:26+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+time="2025-04-09T23:36:16+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
 #0 building with "desktop-linux" instance using docker driver
 
 #1 [app internal] load build definition from Dockerfile
@@ -18,41 +28,41 @@ time="2025-04-08T22:09:26+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 #4 transferring context: 2B done
 #4 DONE 0.0s
 
-#5 [app stage-1 1/3] FROM docker.io/library/eclipse-temurin:17-jre-alpine@sha256:865cca6d0b31f284a5fc4e8cbd8f9375f470fd07cf6e909cea62f2790d4187fe
+#5 [app build 1/9] FROM docker.io/library/maven:3.9.8-eclipse-temurin-17@sha256:d62e34e458c64b13e7a38ec055264082b4235a1ea2c3b3d881ad04d6ca20311e
 #5 DONE 0.0s
 
-#6 [app build 1/9] FROM docker.io/library/maven:3.9.8-eclipse-temurin-17@sha256:d62e34e458c64b13e7a38ec055264082b4235a1ea2c3b3d881ad04d6ca20311e
+#6 [app stage-1 1/3] FROM docker.io/library/eclipse-temurin:17-jre-alpine@sha256:865cca6d0b31f284a5fc4e8cbd8f9375f470fd07cf6e909cea62f2790d4187fe
 #6 DONE 0.0s
 
 #7 [app internal] load build context
 #7 transferring context: 30.69kB 0.0s done
 #7 DONE 0.0s
 
-#8 [app build 9/9] RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests
+#8 [app build 5/9] COPY src ./src
 #8 CACHED
 
-#9 [app build 4/9] RUN --mount=type=cache,target=/root/.m2 mvn dependency:go-offline
+#9 [app build 2/9] WORKDIR /app
 #9 CACHED
 
-#10 [app build 8/9] COPY mvnw.cmd .
+#10 [app build 3/9] COPY pom.xml .
 #10 CACHED
 
-#11 [app build 6/9] COPY .mvn ./.mvn
+#11 [app stage-1 2/3] WORKDIR /app
 #11 CACHED
 
-#12 [app build 3/9] COPY pom.xml .
+#12 [app build 9/9] RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests
 #12 CACHED
 
-#13 [app stage-1 2/3] WORKDIR /app
+#13 [app build 7/9] COPY mvnw .
 #13 CACHED
 
-#14 [app build 5/9] COPY src ./src
+#14 [app build 4/9] RUN --mount=type=cache,target=/root/.m2 mvn dependency:go-offline
 #14 CACHED
 
-#15 [app build 2/9] WORKDIR /app
+#15 [app build 6/9] COPY .mvn ./.mvn
 #15 CACHED
 
-#16 [app build 7/9] COPY mvnw .
+#16 [app build 8/9] COPY mvnw.cmd .
 #16 CACHED
 
 #17 [app stage-1 3/3] COPY --from=build /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar app.jar
@@ -60,15 +70,13 @@ time="2025-04-08T22:09:26+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 
 #18 [app] exporting to image
 #18 exporting layers done
-#18 writing image sha256:f2de41243fe9fe1849ad81607331b3c4c9b8df23b304b6625c516974b9268379 done
+#18 writing image sha256:9017eb22f6b108e32c6c6ffcfb319eb64b7679e57838a5cbf11ccfddfdcb72ae done
 #18 naming to docker.io/library/ecommerce-backend-app done
 #18 DONE 0.0s
 [INFO] Starting services...
-time="2025-04-08T22:09:28+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+time="2025-04-09T23:36:18+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
  Network ecommerce-backend_ecommerce-network  Creating
  Network ecommerce-backend_ecommerce-network  Created
- Volume "ecommerce-backend_postgres-data"  Creating
- Volume "ecommerce-backend_postgres-data"  Created
  Container ecommerce-backend-postgres-1  Creating
  Container ecommerce-backend-postgres-1  Created
  Container ecommerce-backend-app-1  Creating
@@ -81,7 +89,7 @@ time="2025-04-08T22:09:28+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 [INFO] E-commerce application is running at http://localhost:8080
 [INFO] PostgreSQL is available at localhost:5432
 [INFO] Container status:
-time="2025-04-08T22:09:30+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
-NAME                           IMAGE                   COMMAND                  SERVICE    CREATED         STATUS                  PORTS
-ecommerce-backend-app-1        ecommerce-backend-app   "java -jar app.jar"      app        1 second ago    Up Less than a second   0.0.0.0:8080->8080/tcp
-ecommerce-backend-postgres-1   postgres:latest         "docker-entrypoint.s…"   postgres   2 seconds ago   Up Less than a second   0.0.0.0:5432->5432/tcp
+time="2025-04-09T23:36:19+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+NAME                           IMAGE                   COMMAND                  SERVICE    CREATED        STATUS                  PORTS
+ecommerce-backend-app-1        ecommerce-backend-app   "java -jar app.jar"      app        1 second ago   Up Less than a second   0.0.0.0:8080->8080/tcp
+ecommerce-backend-postgres-1   postgres:latest         "docker-entrypoint.s…"   postgres   1 second ago   Up Less than a second   0.0.0.0:5432->5432/tcp
