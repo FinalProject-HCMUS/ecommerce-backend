@@ -189,43 +189,43 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    // @Override
-    // @Transactional(readOnly = true)
-    // public List<ProductResponse> getTopTrendingProducts(int page, int size) {
-    //     log.info("ProductServiceImpl | getTopTrendingProducts | page: {}, size: {}", page, size);
-    //     Pageable pageable = PageRequest.of(page, size);
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getTopTrendingProducts(int page, int size) {
+        log.info("ProductServiceImpl | getTopTrendingProducts | page: {}, size: {}", page, size);
+        Pageable pageable = PageRequest.of(page, size);
 
-    //     // Query to calculate review count and average rating for each product
-    //     List<Object[]> results = productRepository.findTopTrendingProducts(pageable);
+        // Query to calculate review count and average rating for each product
+        List<Object[]> results = productRepository.findTopTrendingProducts(pageable);
 
-    //     // Map results to ProductResponse
-    //     return results.stream()
-    //             .map(row -> ProductResponse.builder()
-    //                     .id((String) row[0])
-    //                     .name((String) row[1])
-    //                     .averageRating((Double) row[2]) // Assuming average rating is calculated
-    //                     .reviewCount((Double) row[3])  // Assuming review count is calculated
-    //                     .build())
-    //             .collect(Collectors.toList());
-    // }
+        // Map results to ProductResponse
+        return results.stream()
+                .map(row -> ProductResponse.builder()
+                        .id((String) row[0])
+                        .name((String) row[1])
+                        .averageRating((Double) row[2]) // Assuming average rating is calculated
+                        .reviewCount((Double) row[3])  // Assuming review count is calculated
+                        .build())
+                .collect(Collectors.toList());
+    }
 
-    // @Override
-    // @Transactional(readOnly = true)
-    // public List<ProductResponse> getTopSellingProducts(int page, int size) {
-    //     log.info("ProductServiceImpl | getTopSellingProducts | page: {}, size: {}", page, size);
-    //     Pageable pageable = PageRequest.of(page, size);
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getTopSellingProducts(int page, int size) {
+        log.info("ProductServiceImpl | getTopSellingProducts | page: {}, size: {}", page, size);
+        Pageable pageable = PageRequest.of(page, size);
 
-    //     // Query to calculate order count for each product
-    //     List<Object[]> results = productRepository.findTopSellingProducts(pageable);
+        // Query to calculate order count for each product
+        List<Object[]> results = productRepository.findTopSellingProducts(pageable);
 
-    //     // Map results to ProductResponse
-    //     return results.stream()
-    //             .map(row -> ProductResponse.builder()
-    //                     .id((String) row[0])
-    //                     .name((String) row[1])
-    //                     .averageRating((Double) row[2]) // Assuming average rating is calculated
-    //                     .reviewCount((Double) row[3])  // Assuming review count is calculated
-    //                     .build())
-    //             .collect(Collectors.toList());
-    // }
+        // Map results to ProductResponse
+        return results.stream()
+                .map(row -> ProductResponse.builder()
+                        .id((String) row[0])
+                        .name((String) row[1])
+                        .averageRating((Double) row[2]) // Assuming average rating is calculated
+                        .reviewCount((Double) row[3])  // Assuming review count is calculated
+                        .build())
+                .collect(Collectors.toList());
+    }
 }
