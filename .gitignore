@@ -33,5 +33,5 @@ build/
 .vscode/
 
 .env
-
-.log
+dev-postgres.log
+start-docker.log
