@@ -1,6 +1,5 @@
 package com.hcmus.ecommerce_backend.product.model.entity;
 
-import com.hcmus.ecommerce_backend.category.model.entity.Category;
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
 
 import jakarta.persistence.*;
@@ -62,7 +61,6 @@ public class Product extends BaseEntity {
     @Column(name = "update_time", nullable = false)
     private String updateTime;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;  
+    @Column(name = "category_id", nullable = false)
+    private String categoryId;  
 }

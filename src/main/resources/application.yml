@@ -6,20 +6,19 @@ spring:
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
-    sql:
-      init:
-        mode: always
-        platform: postgres
-        encoding: UTF-8
-        separator: ";"
-        continue-on-error: false
-        data-locations: classpath:data.sql
+  sql:
+    init:
+      mode: always
+      platform: postgres
+      encoding: UTF-8
+      separator: ";"
+      continue-on-error: true
 
 logging:
   level:
@@ -29,7 +28,7 @@ logging:
       hibernate:
         SQL: OFF
       springframework:
-        jdbc: DEBUG
+        # jdbc: DEBUG
         web: DEBUG
         data: DEBUG
         boot:

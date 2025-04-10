@@ -13,7 +13,6 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
-    @Mapping(target = "categoryId", source = "category", qualifiedByName = "categoryToCategoryId")
     ProductResponse toResponse(Product product);
     
     @Mapping(target = "id", ignore = true)
@@ -25,7 +24,6 @@ public interface ProductMapper {
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "reviewCount", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
-    @Mapping(target = "category", source = "categoryId", qualifiedByName = "categoryIdToCategory")
     Product toEntity(CreateProductRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -37,7 +35,6 @@ public interface ProductMapper {
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "reviewCount", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
-    @Mapping(target = "category", source = "categoryId", qualifiedByName = "categoryIdToCategory")
     void updateEntity(UpdateProductRequest request, @MappingTarget Product product);
 
     @Named("categoryIdToCategory")

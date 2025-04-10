@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -21,6 +22,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class User extends BaseEntity {
 
     @Id
@@ -76,6 +78,7 @@ public class User extends BaseEntity {
         claims.put(TokenClaims.USER_LAST_NAME.getValue(), this.lastName);
         claims.put(TokenClaims.USER_EMAIL.getValue(), this.email);
         claims.put(TokenClaims.USER_PHONE_NUMBER.getValue(), this.phoneNum);
+        claims.put(TokenClaims.TOKEN_VERSION.getValue(), this.tokenVersion);
 
         return claims;
 
