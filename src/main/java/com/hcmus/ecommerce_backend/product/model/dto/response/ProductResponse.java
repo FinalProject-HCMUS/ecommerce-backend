@@ -47,7 +47,7 @@ public class ProductResponse {
     private double averageRating;
 
     @Schema(description = "Number of reviews of the product", example = "100")
-    private double reviewCount;
+    private long reviewCount;
 
     @Schema(description = "ID of the category this product belongs to", example = "550e8400-e29b-41d4-a716-446655440000")
     private String categoryId;

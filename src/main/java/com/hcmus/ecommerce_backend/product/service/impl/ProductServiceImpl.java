@@ -191,17 +191,23 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getTopTrendingProducts(int page, int size) {
         log.info("ProductServiceImpl | getTopTrendingProducts | page: {}, size: {}", page, size);
         Pageable pageable = PageRequest.of(page, size);
-
-        // Query to calculate review count and average rating for each product
+    
         List<Object[]> results = productRepository.findTopTrendingProducts(pageable);
-
-        // Map results to ProductResponse
+    
         return results.stream()
                 .map(row -> ProductResponse.builder()
                         .id((String) row[0])
                         .name((String) row[1])
-                        .averageRating((Double) row[2]) // Assuming average rating is calculated
-                        .reviewCount((Double) row[3])  // Assuming review count is calculated
+                        .description((String) row[2])
+                        .cost((Double) row[3])
+                        .total((Integer) row[4])
+                        .price((Double) row[5])
+                        .discountPercent((Double) row[6])
+                        .enable((Boolean) row[7])
+                        .inStock((Boolean) row[8])
+                        .mainImageUrl((String) row[9])
+                        .averageRating(row[10] != null ? ((Number) row[10]).doubleValue() : 0.0)
+                        .reviewCount(row[11] != null ? ((Number) row[11]).longValue() : 0L)
                         .build())
                 .collect(Collectors.toList());
     }
@@ -211,17 +217,23 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getTopSellingProducts(int page, int size) {
         log.info("ProductServiceImpl | getTopSellingProducts | page: {}, size: {}", page, size);
         Pageable pageable = PageRequest.of(page, size);
-
-        // Query to calculate order count for each product
+    
         List<Object[]> results = productRepository.findTopSellingProducts(pageable);
-
-        // Map results to ProductResponse
+    
         return results.stream()
                 .map(row -> ProductResponse.builder()
                         .id((String) row[0])
                         .name((String) row[1])
-                        .averageRating((Double) row[2]) // Assuming average rating is calculated
-                        .reviewCount((Double) row[3])  // Assuming review count is calculated
+                        .description((String) row[2])
+                        .cost((Double) row[3])
+                        .total((Integer) row[4])
+                        .price((Double) row[5])
+                        .discountPercent((Double) row[6])
+                        .enable((Boolean) row[7])
+                        .inStock((Boolean) row[8])
+                        .mainImageUrl((String) row[9])
+                        .averageRating(row[10] != null ? ((Number) row[10]).doubleValue() : 0.0)
+                        .reviewCount(row[11] != null ? ((Number) row[11]).longValue() : 0L)
                         .build())
                 .collect(Collectors.toList());
     }
