@@ -1,6 +1,7 @@
 package com.hcmus.ecommerce_backend.user.service.impl;
 
 import com.hcmus.ecommerce_backend.user.exception.UserAlreadyExistsException;
+import com.hcmus.ecommerce_backend.user.exception.UserNotAuthorizedException;
 import com.hcmus.ecommerce_backend.user.exception.UserNotFoundException;
 import com.hcmus.ecommerce_backend.user.model.dto.request.ChangePasswordRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.CreateUserRequest;
@@ -12,7 +13,11 @@ import com.hcmus.ecommerce_backend.user.repository.UserRepository;
 import com.hcmus.ecommerce_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -96,6 +101,19 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse updateUser(String id, UpdateUserRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            String authenticatedUserId = jwt.getClaimAsString("userId");
+            log.info("UserServiceImpl | updateUser | Authenticated user id: {}", authenticatedUserId);
+
+            // Check if the authenticated user ID matches the ID being updated
+            if (!authenticatedUserId.equals(id)) {
+                log.error("UserServiceImpl | updateUser | Authenticated user id '{}' does not match the target user id '{}'", authenticatedUserId, id);
+                throw new UserNotAuthorizedException(id);
+            }
+        }
+
         log.info("UserServiceImpl | updateUser | Updating user with id: {}", id);
         try {
             User user = findUserById(id);
