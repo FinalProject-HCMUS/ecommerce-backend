@@ -207,7 +207,7 @@ public class ProductServiceImpl implements ProductService {
                         .inStock((Boolean) row[8])
                         .mainImageUrl((String) row[9])
                         .averageRating(row[10] != null ? ((Number) row[10]).doubleValue() : 0.0)
-                        .reviewCount(row[11] != null ? ((Number) row[11]).longValue() : 0L)
+                        .reviewCount(row[11] != null ? ((Number) row[11]).doubleValue() : 0.0)
                         .build())
                 .collect(Collectors.toList());
     }
@@ -233,7 +233,7 @@ public class ProductServiceImpl implements ProductService {
                         .inStock((Boolean) row[8])
                         .mainImageUrl((String) row[9])
                         .averageRating(row[10] != null ? ((Number) row[10]).doubleValue() : 0.0)
-                        .reviewCount(row[11] != null ? ((Number) row[11]).longValue() : 0L)
+                        .reviewCount(row[11] != null ? ((Number) row[11]).doubleValue() : 0.)
                         .build())
                 .collect(Collectors.toList());
     }
