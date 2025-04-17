@@ -1,5 +1,6 @@
 package com.hcmus.ecommerce_backend.product.service.impl;
 
+import com.hcmus.ecommerce_backend.product.exception.MaxProductImagesExceededException;
 import com.hcmus.ecommerce_backend.product.exception.ProductImageAlreadyExistsException;
 import com.hcmus.ecommerce_backend.product.exception.ProductImageNotFoundException;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductImageRequest;
@@ -63,8 +64,9 @@ public class ProductImageServiceImpl implements ProductImageService {
     public ProductImageResponse createProductImage(CreateProductImageRequest request) {
         log.info("ProductImageServiceImpl | createProductImage | Creating product image for productId: {}", request.getProductId());
         try {
+            validateProductImageLimit(request.getProductId());
             checkProductImageExists(request.getUrl(), request.getProductId());
-
+    
             ProductImage productImage = productImageMapper.toEntity(request);
             ProductImage savedImage = productImageRepository.save(productImage);
             log.info("ProductImageServiceImpl | createProductImage | Created product image with id: {}", savedImage.getId());
@@ -123,6 +125,25 @@ public class ProductImageServiceImpl implements ProductImageService {
         }
     }
 
+    @Override
+    public List<ProductImageResponse> getProductImagesByProductId(String productId) {
+        log.info("ProductImageServiceImpl | getProductImagesByProductId | Retrieving product images for productId: {}", productId);
+        try {
+            List<ProductImage> productImages = findProductImagesByProductId(productId);
+            log.info("ProductImageServiceImpl | getProductImagesByProductId | Found {} product images for productId: {}", 
+                    productImages.size(), productId);
+            return productImages.stream()
+                    .map(productImageMapper::toResponse)
+                    .collect(Collectors.toList());
+        } catch (ProductImageNotFoundException e) {
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("ProductImageServiceImpl | getProductImagesByProductId | Database error for productId {}: {}", 
+                    productId, e.getMessage(), e);
+            throw e;
+        }
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     private ProductImage findProductImageById(String id) {
         return productImageRepository.findById(id)
@@ -130,6 +151,16 @@ public class ProductImageServiceImpl implements ProductImageService {
                     log.error("ProductImageServiceImpl | findProductImageById | Product image not found with id: {}", id);
                     return new ProductImageNotFoundException(id);
                 });
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
+    private List<ProductImage> findProductImagesByProductId(String productId) {
+        List<ProductImage> productImages = productImageRepository.findByProductId(productId);
+        if (productImages.isEmpty()) {
+            log.error("ProductImageServiceImpl | findProductImagesByProductId | Product images not found for productId: {}", productId);
+            throw new ProductImageNotFoundException(productId);
+        }
+        return productImages;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
@@ -142,6 +173,15 @@ public class ProductImageServiceImpl implements ProductImageService {
         if (productImageRepository.existsByUrlAndProductId(url, productId)) {
             log.error("ProductImageServiceImpl | checkProductImageExists | Product image already exists with URL: {} and productId: {}", url, productId);
             throw new ProductImageAlreadyExistsException(url, productId);
+        }
+    }
+    
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
+    private void validateProductImageLimit(String productId) {
+        long imageCount = productImageRepository.countByProductId(productId);
+        if (imageCount >= 3) {
+            log.error("ProductImageServiceImpl | validateProductImageLimit | Product with id {} already has 3 images.", productId);
+            throw new MaxProductImagesExceededException(productId);
         }
     }
 }

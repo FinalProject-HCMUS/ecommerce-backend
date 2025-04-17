@@ -17,4 +17,6 @@ public interface ProductImageService {
     ProductImageResponse updateProductImage(String id, UpdateProductImageRequest request);
 
     void deleteProductImage(String id);
+
+    List<ProductImageResponse> getProductImagesByProductId(String productId);
 }

@@ -115,4 +115,20 @@ public class ProductImageController {
         productImageService.deleteProductImage(id);
         return ResponseEntity.ok(CustomResponse.SUCCESS);
     }
+
+    @Operation(summary = "Get product images by product ID", description = "Retrieves all product images for a specific product")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Product images found"),
+        @ApiResponse(responseCode = "404", description = "Product not found",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class)))
+    })
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<CustomResponse<List<ProductImageResponse>>> getProductImagesByProductId(
+            @Parameter(description = "ID of the product to retrieve images for", required = true)
+            @PathVariable String productId) {
+        log.info("ProductImageController | getProductImagesByProductId | productId: {}", productId);
+        List<ProductImageResponse> images = productImageService.getProductImagesByProductId(productId);
+        return ResponseEntity.ok(CustomResponse.successOf(images));
+    }
 }
