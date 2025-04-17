@@ -20,4 +20,8 @@ public interface UserService {
     void deleteUser(String id);
     
     void changePassword(String userId, ChangePasswordRequest request);
+
+    public boolean confirmEmail(String token);
+
+    void resendConfirmationEmail(String email);
 }

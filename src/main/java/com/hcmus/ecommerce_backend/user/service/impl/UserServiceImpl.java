@@ -1,5 +1,7 @@
 package com.hcmus.ecommerce_backend.user.service.impl;
 
+import com.hcmus.ecommerce_backend.common.service.EmailService;
+import com.hcmus.ecommerce_backend.user.exception.EmailAlreadyConfirmedException;
 import com.hcmus.ecommerce_backend.user.exception.UserAlreadyExistsException;
 import com.hcmus.ecommerce_backend.user.exception.UserNotAuthorizedException;
 import com.hcmus.ecommerce_backend.user.exception.UserNotFoundException;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -84,15 +88,22 @@ public class UserServiceImpl implements UserService {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
             User savedUser = userRepository.save(user);
             log.info("UserServiceImpl | createUser | Created user with id: {}", savedUser.getId());
+
+            // Send email confirmation
+            String token = savedUser.getConfirmationToken();
+            emailService.sendEmailConfirmation(savedUser.getEmail(),
+                    savedUser.getFirstName() + ' ' + savedUser.getLastName(), token);
+            log.info("UserServiceImpl | createUser | Email confirmation sent to {}", savedUser.getEmail());
+
             return userMapper.toResponse(savedUser);
         } catch (UserAlreadyExistsException e) {
             throw e;
         } catch (DataAccessException e) {
-            log.error("UserServiceImpl | createUser | Database error creating user '{}': {}", 
+            log.error("UserServiceImpl | createUser | Database error creating user '{}': {}",
                     request.getEmail(), e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("UserServiceImpl | createUser | Unexpected error creating user '{}': {}", 
+            log.error("UserServiceImpl | createUser | Unexpected error creating user '{}': {}",
                     request.getEmail(), e.getMessage(), e);
             throw e;
         }
@@ -109,7 +120,9 @@ public class UserServiceImpl implements UserService {
 
             // Check if the authenticated user ID matches the ID being updated
             if (!authenticatedUserId.equals(id)) {
-                log.error("UserServiceImpl | updateUser | Authenticated user id '{}' does not match the target user id '{}'", authenticatedUserId, id);
+                log.error(
+                        "UserServiceImpl | updateUser | Authenticated user id '{}' does not match the target user id '{}'",
+                        authenticatedUserId, id);
                 throw new UserNotAuthorizedException(id);
             }
         }
@@ -133,11 +146,11 @@ public class UserServiceImpl implements UserService {
         } catch (UserNotFoundException | UserAlreadyExistsException e) {
             throw e;
         } catch (DataAccessException e) {
-            log.error("UserServiceImpl | updateUser | Database error updating user with id '{}': {}", 
+            log.error("UserServiceImpl | updateUser | Database error updating user with id '{}': {}",
                     id, e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("UserServiceImpl | updateUser | Unexpected error updating user with id '{}': {}", 
+            log.error("UserServiceImpl | updateUser | Unexpected error updating user with id '{}': {}",
                     id, e.getMessage(), e);
             throw e;
         }
@@ -157,11 +170,11 @@ public class UserServiceImpl implements UserService {
         } catch (UserNotFoundException e) {
             throw e;
         } catch (DataAccessException e) {
-            log.error("UserServiceImpl | deleteUser | Database error deleting user with id '{}': {}", 
+            log.error("UserServiceImpl | deleteUser | Database error deleting user with id '{}': {}",
                     id, e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("UserServiceImpl | deleteUser | Unexpected error deleting user with id '{}': {}", 
+            log.error("UserServiceImpl | deleteUser | Unexpected error deleting user with id '{}': {}",
                     id, e.getMessage(), e);
             throw e;
         }
@@ -171,26 +184,26 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void changePassword(String userId, ChangePasswordRequest request) {
         log.info("UserServiceImpl | changePassword | Changing password for user with id: {}", userId);
-        
+
         try {
             if (!request.getNewPassword().equals(request.getConfirmPassword())) {
                 throw new IllegalArgumentException("New password and confirm password do not match");
             }
-            
+
             User user = findUserById(userId);
-            
+
             // Check if the current password is correct
             if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
                 log.error("UserServiceImpl | changePassword | Current password is incorrect for user id: {}", userId);
                 throw new IllegalArgumentException("Current password is incorrect");
             }
-            
+
             // Set the new password
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-            
+
             // Increment token version to invalidate all existing tokens
             user.setTokenVersion(user.getTokenVersion() + 1);
-            
+
             userRepository.save(user);
             log.info("UserServiceImpl | changePassword | Password changed successfully for user with id: {}", userId);
         } catch (UserNotFoundException e) {
@@ -203,6 +216,77 @@ public class UserServiceImpl implements UserService {
             throw e;
         } catch (Exception e) {
             log.error("UserServiceImpl | changePassword | Unexpected error: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public boolean confirmEmail(String token) {
+        log.info("Confirming email with token: {}", token);
+
+        User user = userRepository.findByConfirmationToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid confirmation token"));
+
+        if (LocalDateTime.now().isAfter(user.getConfirmationTokenExpiry())) {
+            throw new RuntimeException("Confirmation token expired");
+        }
+
+        user.setEnabled(true);
+        user.setConfirmationToken(null);
+        user.setConfirmationTokenExpiry(null);
+        User savedUser = userRepository.save(user);
+
+        log.info("Email confirmed successfully for user: {}", savedUser.getId());
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public void resendConfirmationEmail(String email) {
+        log.info("UserServiceImpl | resendConfirmationEmail | Resending confirmation email to: {}", email);
+
+        try {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> {
+                        log.error("UserServiceImpl | resendConfirmationEmail | User not found with email: {}", email);
+                        return new UserNotFoundException("User not found with email: " + email);
+                    });
+
+            // Skip if user is already enabled
+            if (user.isEnabled()) {
+                log.info("UserServiceImpl | resendConfirmationEmail | Email already confirmed for user: {}", email);
+                throw new EmailAlreadyConfirmedException();
+            }
+
+            // Generate new confirmation token and update expiry
+            String newToken = java.util.UUID.randomUUID().toString();
+            user.setConfirmationToken(newToken);
+            user.setConfirmationTokenExpiry(LocalDateTime.now().plusHours(24));
+
+            User savedUser = userRepository.save(user);
+            log.info("UserServiceImpl | resendConfirmationEmail | Token refreshed for user: {}", savedUser.getId());
+
+            // Send email confirmation
+            emailService.sendEmailConfirmation(
+                    savedUser.getEmail(),
+                    savedUser.getFirstName() + ' ' + savedUser.getLastName(),
+                    newToken);
+            log.info("UserServiceImpl | resendConfirmationEmail | New email confirmation sent to {}",
+                    savedUser.getEmail());
+
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (EmailAlreadyConfirmedException e) {
+            log.warn("UserServiceImpl | resendConfirmationEmail | {}", e.getMessage());
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("UserServiceImpl | resendConfirmationEmail | Database error for email '{}': {}",
+                    email, e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("UserServiceImpl | resendConfirmationEmail | Unexpected error for email '{}': {}",
+                    email, e.getMessage(), e);
             throw e;
         }
     }
@@ -232,7 +316,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     private void checkUserPhoneNumExists(String phoneNum) {
         if (userRepository.existsByPhoneNum(phoneNum)) {
-            log.error("UserServiceImpl | checkUserPhoneNumExists | User already exists with phone number: {}", phoneNum);
+            log.error("UserServiceImpl | checkUserPhoneNumExists | User already exists with phone number: {}",
+                    phoneNum);
             throw new UserAlreadyExistsException(phoneNum, false);
         }
     }

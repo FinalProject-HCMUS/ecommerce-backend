@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce
+    url: jdbc:postgresql://localhost:5432/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
   jpa:
@@ -19,6 +19,14 @@ spring:
       encoding: UTF-8
       separator: ";"
       continue-on-error: true
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: ${MAIL_PROPERTIES_MAIL_SMTP_AUTH}
+      mail.smtp.starttls.enable: ${MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE}
 
 logging:
   level:
@@ -61,3 +69,6 @@ auth:
   keys:
     public-key-path: classpath:keys/public.pem
     private-key-path: classpath:keys/private.pem
+
+app:
+  frontend-url: ${FRONTEND_URL}

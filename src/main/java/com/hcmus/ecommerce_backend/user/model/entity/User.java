@@ -1,12 +1,22 @@
 package com.hcmus.ecommerce_backend.user.model.entity;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import com.hcmus.ecommerce_backend.auth.model.enums.TokenClaims;
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
 import com.hcmus.ecommerce_backend.user.model.enums.Role;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,8 +64,9 @@ public class User extends BaseEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Builder.Default
     @Column(name = "enabled", nullable = false)
-    private boolean enabled;
+    private boolean enabled = false;
 
     @Column(name = "photo")
     private String photo;
@@ -67,6 +78,14 @@ public class User extends BaseEntity {
     @Builder.Default
     @Column(name = "token_version", nullable = false)
     private int tokenVersion = 0;
+
+    @Builder.Default
+    @Column(name = "CONFIRMATION_TOKEN")
+    private String confirmationToken = UUID.randomUUID().toString();
+
+    @Builder.Default
+    @Column(name = "CONFIRMATION_TOKEN_EXPIRY")
+    private LocalDateTime confirmationTokenExpiry = LocalDateTime.now().plusHours(24);
 
     public Map<String, Object> getClaims() {
 

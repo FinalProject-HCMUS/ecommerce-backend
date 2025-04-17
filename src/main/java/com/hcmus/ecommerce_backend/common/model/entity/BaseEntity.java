@@ -1,5 +1,14 @@
 package com.hcmus.ecommerce_backend.common.model.entity;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+
+import com.hcmus.ecommerce_backend.auth.model.enums.TokenClaims;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
@@ -9,12 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -42,32 +45,42 @@ public class BaseEntity {
      */
     @PrePersist
     public void prePersist() {
-        this.createdBy = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-                .map(Authentication::getPrincipal)
-                .map(principal -> {
-                    if (principal instanceof UserDetails) {
-                        return ((UserDetails) principal).getUsername();
-                    } else {
-                        return principal.toString();
-                    }
-                })
-                .orElse("anonymousUser");
+        this.createdBy = getCurrentUserIdentifier();
         this.createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedBy = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+        this.updatedBy = getCurrentUserIdentifier();
+        this.updatedAt = LocalDateTime.now();
+    }
+    
+    /**
+     * Gets the current user identifier from the security context.
+     * Handles different authentication principal types.
+     * 
+     * @return the user identifier or "anonymousUser" if none is available
+     */
+    private String getCurrentUserIdentifier() {
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getPrincipal)
                 .map(principal -> {
-                    if (principal instanceof UserDetails) {
-                        return ((UserDetails) principal).getUsername();
+                    if (principal instanceof Jwt jwt) {
+                        try {
+                            String email = jwt.getClaimAsString(TokenClaims.USER_EMAIL.getValue());
+                            if (email != null && !email.isEmpty()) {
+                                return email;
+                            }
+                            // Fallback to subject if email claim is not available
+                            return jwt.getSubject();
+                        } catch (Exception e) {
+                            // Fallback to subject if there's an issue with the claim
+                            return jwt.getSubject();
+                        }
                     } else {
                         return principal.toString();
                     }
                 })
                 .orElse("anonymousUser");
-        this.updatedAt = LocalDateTime.now();
     }
-
 }

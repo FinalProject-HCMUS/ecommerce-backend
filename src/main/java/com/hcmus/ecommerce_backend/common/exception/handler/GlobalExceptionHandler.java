@@ -15,6 +15,7 @@ import com.hcmus.ecommerce_backend.product.exception.ProductAlreadyExistsExcepti
 import com.hcmus.ecommerce_backend.product.exception.ProductNotFoundException;
 import com.hcmus.ecommerce_backend.review.exception.ReviewAlreadyExistsException;
 import com.hcmus.ecommerce_backend.review.exception.ReviewNotFoundException;
+import com.hcmus.ecommerce_backend.user.exception.EmailAlreadyConfirmedException;
 
 import jakarta.validation.ConstraintViolationException;
 import org.apache.commons.lang3.StringUtils;
@@ -259,7 +260,8 @@ public class GlobalExceptionHandler {
         }
 
         /**
-         * Handles CartItemAlreadyExistsException thrown when a cart item already exists.
+         * Handles CartItemAlreadyExistsException thrown when a cart item already
+         * exists.
          * 
          * @param ex The CartItemAlreadyExistsException instance.
          * @return ResponseEntity with CustomError containing details of the exception.
@@ -293,13 +295,15 @@ public class GlobalExceptionHandler {
         }
 
         /**
-         * Handles OrderTrackAlreadyExistsException thrown when an order track already exists.
+         * Handles OrderTrackAlreadyExistsException thrown when an order track already
+         * exists.
          * 
          * @param ex The OrderTrackAlreadyExistsException instance.
          * @return ResponseEntity with CustomError containing details of the exception.
          */
         @ExceptionHandler(OrderTrackAlreadyExistsException.class)
-        protected ResponseEntity<Object> handleOrderTrackAlreadyExistsException(final OrderTrackAlreadyExistsException ex) {
+        protected ResponseEntity<Object> handleOrderTrackAlreadyExistsException(
+                        final OrderTrackAlreadyExistsException ex) {
                 CustomError customError = CustomError.builder()
                                 .httpStatus(HttpStatus.CONFLICT)
                                 .header(CustomError.Header.ALREADY_EXIST.getName())
@@ -375,5 +379,16 @@ public class GlobalExceptionHandler {
                                 .build();
 
                 return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
+        }
+
+        @ExceptionHandler(EmailAlreadyConfirmedException.class)
+        public ResponseEntity<Object> handleEmailAlreadyConfirmedException(
+                        EmailAlreadyConfirmedException ex) {
+                CustomError response = CustomError.builder()
+                                .httpStatus(HttpStatus.BAD_REQUEST)
+                                .header(CustomError.Header.ALREADY_EXIST.getName())
+                                .message(ex.getMessage())
+                                .build();
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 }
