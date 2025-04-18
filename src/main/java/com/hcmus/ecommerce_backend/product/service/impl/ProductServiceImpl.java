@@ -192,25 +192,13 @@ public class ProductServiceImpl implements ProductService {
         log.info("ProductServiceImpl | getTopTrendingProducts | page: {}, size: {}", page, size);
         Pageable pageable = PageRequest.of(page, size);
     
-        List<Object[]> results = productRepository.findTopTrendingProducts(pageable);
+        List<Product> products = productRepository.findTopTrendingProducts(pageable);
     
-        return results.stream()
-                .map(row -> ProductResponse.builder()
-                        .id((String) row[0])
-                        .name((String) row[1])
-                        .description((String) row[2])
-                        .cost((Double) row[3])
-                        .total((Integer) row[4])
-                        .price((Double) row[5])
-                        .discountPercent((Double) row[6])
-                        .enable((Boolean) row[7])
-                        .inStock((Boolean) row[8])
-                        .mainImageUrl((String) row[9])
-                        .averageRating(row[10] != null ? ((Number) row[10]).doubleValue() : 0.0)
-                        .reviewCount(row[11] != null ? ((Number) row[11]).doubleValue() : 0.0)
-                        .build())
+        return products.stream()
+                .map(productMapper::toResponse)
                 .collect(Collectors.toList());
     }
+    
 
     @Override
     @Transactional(readOnly = true)
@@ -218,23 +206,10 @@ public class ProductServiceImpl implements ProductService {
         log.info("ProductServiceImpl | getTopSellingProducts | page: {}, size: {}", page, size);
         Pageable pageable = PageRequest.of(page, size);
     
-        List<Object[]> results = productRepository.findTopSellingProducts(pageable);
+        List<Product> products = productRepository.findTopSellingProducts(pageable);
     
-        return results.stream()
-                .map(row -> ProductResponse.builder()
-                        .id((String) row[0])
-                        .name((String) row[1])
-                        .description((String) row[2])
-                        .cost((Double) row[3])
-                        .total((Integer) row[4])
-                        .price((Double) row[5])
-                        .discountPercent((Double) row[6])
-                        .enable((Boolean) row[7])
-                        .inStock((Boolean) row[8])
-                        .mainImageUrl((String) row[9])
-                        .averageRating(row[10] != null ? ((Number) row[10]).doubleValue() : 0.0)
-                        .reviewCount(row[11] != null ? ((Number) row[11]).doubleValue() : 0.)
-                        .build())
+        return products.stream()
+                .map(productMapper::toResponse)
                 .collect(Collectors.toList());
     }
 }

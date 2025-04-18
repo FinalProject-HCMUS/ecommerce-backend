@@ -52,6 +52,9 @@ public class ProductResponse {
     @Schema(description = "ID of the category this product belongs to", example = "550e8400-e29b-41d4-a716-446655440000")
     private String categoryId;
 
+    @Schema(description = "Name of the category this product belongs to", example = "Electronics")
+    private String categoryName;
+
     @Schema(description = "Date and time when the product was created")
     private String createdAt;
 

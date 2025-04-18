@@ -14,19 +14,15 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     
     boolean existsByName(String name);
 
-    @Query("SELECT p.id, p.name, p.description, p.cost, p.total, p.price, p.discountPercent, p.enable, " +
-        "p.inStock, p.mainImageUrl, p.averageRating, p.reviewCount " +
+    @Query("SELECT p " +
         "FROM Product p " +
         "ORDER BY p.reviewCount DESC, p.averageRating DESC")
-    List<Object[]> findTopTrendingProducts(Pageable pageable);
+    List<Product> findTopTrendingProducts(Pageable pageable);
 
-    @Query("SELECT p.id, p.name, p.description, p.cost, p.total, p.price, p.discountPercent, p.enable, " +
-       "p.inStock, p.mainImageUrl, p.averageRating, p.reviewCount, SUM(od.quantity) AS totalOrders " +
-       "FROM ProductColorSize pcs " +
-       "JOIN pcs.product p " +
-       "JOIN OrderDetail od ON od.productId = p.id " +
-       "GROUP BY p.id, p.name, p.description, p.cost, p.total, p.price, p.discountPercent, p.enable, " +
-       "p.inStock, p.mainImageUrl, p.averageRating, p.reviewCount " +
-       "ORDER BY totalOrders DESC")
-    List<Object[]> findTopSellingProducts(Pageable pageable);
+    @Query("SELECT p " +
+        "FROM Product p " +
+        "JOIN OrderDetail od ON od.productId = p.id " +
+        "GROUP BY p " +
+        "ORDER BY SUM(od.quantity) DESC")
+    List<Product> findTopSellingProducts(Pageable pageable);
 }
