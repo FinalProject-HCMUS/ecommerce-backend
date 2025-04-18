@@ -1,9 +1,6 @@
 package com.hcmus.ecommerce_backend.user.model.dto.request;
 
-import com.hcmus.ecommerce_backend.user.model.enums.Role;
-
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,11 +15,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "Request object for updating an existing user")
 public class UpdateUserRequest {
-
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
-    @Schema(description = "Email of the user", example = "user@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String email;
 
     @NotBlank(message = "Phone number is required")
     @Schema(description = "Phone number of the user", example = "1234567890", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -49,14 +41,7 @@ public class UpdateUserRequest {
     @Schema(description = "Height of the user in centimeters", example = "175", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer height;
 
-    @NotNull(message = "Enabled status is required")
-    @Schema(description = "Whether the user account is enabled", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Boolean enabled;
-
     @Schema(description = "Photo URL of the user", example = "https://example.com/photo.jpg")
     private String photo;
 
-    @NotNull(message = "Role is required")
-    @Schema(description = "Role of the user", example = "USER", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Role role;
 }

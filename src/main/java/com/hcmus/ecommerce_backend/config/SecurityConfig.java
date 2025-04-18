@@ -31,7 +31,7 @@ public class SecurityConfig {
         return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
     }
 
-        @Bean
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
             final CustomBearerTokenAuthenticationFilter customBearerTokenAuthenticationFilter,
             final CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
@@ -42,13 +42,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Authentication endpoints
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                        
+
                         // User registration
                         .requestMatchers(HttpMethod.POST, "/users/**").permitAll()
-                        
+
                         // Swagger/OpenAPI documentation
                         .requestMatchers("/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                        
+
+                        .requestMatchers("/error").permitAll()
+
                         // Public GET endpoints
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
@@ -58,7 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/product-images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/product-color-sizes/**").permitAll()
-                        
+
                         // Admin endpoints
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/categories/**").hasRole("ADMIN")
@@ -70,18 +72,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/blogs/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/blogs/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/blogs/**").hasRole("ADMIN")
-                        
+
                         // User-specific endpoints - require authentication
                         .requestMatchers("/orders/**").authenticated()
                         .requestMatchers("/cart-items/**").authenticated()
                         .requestMatchers("/reviews/create").authenticated()
                         .requestMatchers("/messages/**").authenticated()
-                        
-                        // Default: require authentication for everything else
-                        .anyRequest().authenticated())
+
+                        .anyRequest().permitAll())
                 .sessionManagement(auth -> auth.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(customBearerTokenAuthenticationFilter, BearerTokenAuthenticationFilter.class);
-    
+
         return http.build();
     }
 

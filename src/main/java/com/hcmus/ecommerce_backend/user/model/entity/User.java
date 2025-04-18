@@ -71,9 +71,10 @@ public class User extends BaseEntity {
     @Column(name = "photo")
     private String photo;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private Role role;
+    private Role role = Role.USER;
 
     @Builder.Default
     @Column(name = "token_version", nullable = false)

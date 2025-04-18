@@ -1,7 +1,6 @@
 package com.hcmus.ecommerce_backend.user.service.impl;
 
 import com.hcmus.ecommerce_backend.common.service.EmailService;
-import com.hcmus.ecommerce_backend.user.exception.EmailAlreadyConfirmedException;
 import com.hcmus.ecommerce_backend.user.exception.UserAlreadyExistsException;
 import com.hcmus.ecommerce_backend.user.exception.UserNotAuthorizedException;
 import com.hcmus.ecommerce_backend.user.exception.UserNotFoundException;
@@ -19,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,9 +27,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,19 +40,27 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
 
     @Override
-    public List<UserResponse> getAllUsers() {
-        log.info("UserServiceImpl | getAllUsers | Retrieving all users");
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        log.info("UserServiceImpl | getAllUsers | Retrieving users with pagination - Page: {}, Size: {}, Sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+
         try {
-            List<UserResponse> users = userRepository.findAll().stream()
-                    .map(userMapper::toResponse)
-                    .collect(Collectors.toList());
-            log.info("UserServiceImpl | getAllUsers | Found {} users", users.size());
-            return users;
+            Page<User> userPage = userRepository.findAll(pageable);
+            Page<UserResponse> userResponsePage = userPage.map(userMapper::toResponse);
+
+            log.info("UserServiceImpl | getAllUsers | Found {} users on page {} of {}",
+                    userResponsePage.getNumberOfElements(),
+                    userResponsePage.getNumber() + 1,
+                    userResponsePage.getTotalPages());
+
+            return userResponsePage;
         } catch (DataAccessException e) {
-            log.error("UserServiceImpl | getAllUsers | Error retrieving users: {}", e.getMessage(), e);
-            return Collections.emptyList();
+            log.error("UserServiceImpl | getAllUsers | Database error retrieving paginated users: {}", e.getMessage(),
+                    e);
+            return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("UserServiceImpl | getAllUsers | Unexpected error: {}", e.getMessage(), e);
+            log.error("UserServiceImpl | getAllUsers | Unexpected error retrieving paginated users: {}", e.getMessage(),
+                    e);
             throw e;
         }
     }
@@ -132,9 +139,7 @@ public class UserServiceImpl implements UserService {
             User user = findUserById(id);
 
             // Check if email or phone number already exists for another user
-            if (!user.getEmail().equals(request.getEmail())) {
-                checkUserEmailExists(request.getEmail());
-            }
+
             if (!user.getPhoneNum().equals(request.getPhoneNum())) {
                 checkUserPhoneNumExists(request.getPhoneNum());
             }
@@ -244,50 +249,52 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void resendConfirmationEmail(String email) {
-        log.info("UserServiceImpl | resendConfirmationEmail | Resending confirmation email to: {}", email);
+        log.info("UserServiceImpl | resendConfirmationEmail | Resending confirmation email request received");
 
         try {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> {
-                        log.error("UserServiceImpl | resendConfirmationEmail | User not found with email: {}", email);
-                        return new UserNotFoundException("User not found with email: " + email);
-                    });
+            // Find the user but don't reveal if they exist or not in error messages
+            Optional<User> userOptional = userRepository.findByEmail(email);
 
-            // Skip if user is already enabled
-            if (user.isEnabled()) {
-                log.info("UserServiceImpl | resendConfirmationEmail | Email already confirmed for user: {}", email);
-                throw new EmailAlreadyConfirmedException();
+            // Only proceed if user exists and is not enabled yet
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+
+                // If already enabled, silently return without error
+                if (user.isEnabled()) {
+                    log.info("UserServiceImpl | resendConfirmationEmail | User already confirmed");
+                    return;
+                }
+
+                // Generate new confirmation token and update expiry
+                String newToken = java.util.UUID.randomUUID().toString();
+                user.setConfirmationToken(newToken);
+                user.setConfirmationTokenExpiry(LocalDateTime.now().plusHours(24));
+
+                User savedUser = userRepository.save(user);
+
+                // Send email confirmation
+                emailService.sendEmailConfirmation(
+                        savedUser.getEmail(),
+                        savedUser.getFirstName() + ' ' + savedUser.getLastName(),
+                        newToken);
+                log.info("UserServiceImpl | resendConfirmationEmail | Confirmation email sent");
+            } else {
+                // User doesn't exist, but log it privately and don't expose this info
+                log.info("UserServiceImpl | resendConfirmationEmail | No user found with email: {}", email);
+                // Still return a success to avoid revealing user existence
             }
 
-            // Generate new confirmation token and update expiry
-            String newToken = java.util.UUID.randomUUID().toString();
-            user.setConfirmationToken(newToken);
-            user.setConfirmationTokenExpiry(LocalDateTime.now().plusHours(24));
-
-            User savedUser = userRepository.save(user);
-            log.info("UserServiceImpl | resendConfirmationEmail | Token refreshed for user: {}", savedUser.getId());
-
-            // Send email confirmation
-            emailService.sendEmailConfirmation(
-                    savedUser.getEmail(),
-                    savedUser.getFirstName() + ' ' + savedUser.getLastName(),
-                    newToken);
-            log.info("UserServiceImpl | resendConfirmationEmail | New email confirmation sent to {}",
-                    savedUser.getEmail());
-
-        } catch (UserNotFoundException e) {
-            throw e;
-        } catch (EmailAlreadyConfirmedException e) {
-            log.warn("UserServiceImpl | resendConfirmationEmail | {}", e.getMessage());
-            throw e;
+            // Always return success regardless of whether the email exists
+            // This prevents user enumeration attacks
         } catch (DataAccessException e) {
-            log.error("UserServiceImpl | resendConfirmationEmail | Database error for email '{}': {}",
-                    email, e.getMessage(), e);
-            throw e;
+            // Still log the actual error for debugging, but don't expose details
+            log.error("UserServiceImpl | resendConfirmationEmail | Database error: {}", e.getMessage(), e);
+            // Re-throw without email in message
+            throw new RuntimeException("Error processing request");
         } catch (Exception e) {
-            log.error("UserServiceImpl | resendConfirmationEmail | Unexpected error for email '{}': {}",
-                    email, e.getMessage(), e);
-            throw e;
+            log.error("UserServiceImpl | resendConfirmationEmail | Unexpected error: {}", e.getMessage(), e);
+            // Re-throw without email in message
+            throw new RuntimeException("Error processing request");
         }
     }
 

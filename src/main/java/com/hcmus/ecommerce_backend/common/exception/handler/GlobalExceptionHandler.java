@@ -15,7 +15,6 @@ import com.hcmus.ecommerce_backend.product.exception.ProductAlreadyExistsExcepti
 import com.hcmus.ecommerce_backend.product.exception.ProductNotFoundException;
 import com.hcmus.ecommerce_backend.review.exception.ReviewAlreadyExistsException;
 import com.hcmus.ecommerce_backend.review.exception.ReviewNotFoundException;
-import com.hcmus.ecommerce_backend.user.exception.EmailAlreadyConfirmedException;
 
 import jakarta.validation.ConstraintViolationException;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +31,25 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+        /**
+         * Handles NoHandlerFoundException thrown when a requested endpoint is not
+         * found.
+         *
+         * @param ex The NoHandlerFoundException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(org.springframework.web.servlet.NoHandlerFoundException.class)
+        protected ResponseEntity<Object> handleNoHandlerFoundException(
+                        final org.springframework.web.servlet.NoHandlerFoundException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND)
+                                .header(CustomError.Header.NOT_FOUND.getName())
+                                .message("The requested resource was not found: " + ex.getRequestURL())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+        }
 
         /**
          * Handles MethodArgumentNotValidException thrown when validation on an argument
@@ -379,16 +397,5 @@ public class GlobalExceptionHandler {
                                 .build();
 
                 return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
-        }
-
-        @ExceptionHandler(EmailAlreadyConfirmedException.class)
-        public ResponseEntity<Object> handleEmailAlreadyConfirmedException(
-                        EmailAlreadyConfirmedException ex) {
-                CustomError response = CustomError.builder()
-                                .httpStatus(HttpStatus.BAD_REQUEST)
-                                .header(CustomError.Header.ALREADY_EXIST.getName())
-                                .message(ex.getMessage())
-                                .build();
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 }
