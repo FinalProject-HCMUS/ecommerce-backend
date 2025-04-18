@@ -1,5 +1,6 @@
 package com.hcmus.ecommerce_backend.product.model.entity;
 
+import com.hcmus.ecommerce_backend.category.model.entity.Category;
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
 
 import jakarta.persistence.*;
@@ -55,12 +56,7 @@ public class Product extends BaseEntity {
     @Column(name = "review_count")
     private double reviewCount;
 
-    @Column(name = "created_time", nullable = false)
-    private String createdTime;
-
-    @Column(name = "update_time", nullable = false)
-    private String updateTime;
-
-    @Column(name = "category_id", nullable = false)
-    private String categoryId;  
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 }

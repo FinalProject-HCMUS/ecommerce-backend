@@ -13,6 +13,8 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
+    @Mapping(source = "category", target = "categoryId", qualifiedByName = "categoryToCategoryId")
+    @Mapping(source = "category", target = "categoryName", qualifiedByName = "categoryToCategoryName")
     ProductResponse toResponse(Product product);
     
     @Mapping(target = "id", ignore = true)
@@ -21,9 +23,8 @@ public interface ProductMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "averageRating", ignore = true)
-    @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "reviewCount", ignore = true)
-    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "category", source = "categoryId", qualifiedByName = "categoryIdToCategory")
     Product toEntity(CreateProductRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -32,9 +33,8 @@ public interface ProductMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "averageRating", ignore = true)
-    @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "reviewCount", ignore = true)
-    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "category", source = "categoryId", qualifiedByName = "categoryIdToCategory")
     void updateEntity(UpdateProductRequest request, @MappingTarget Product product);
 
     @Named("categoryIdToCategory")
@@ -53,5 +53,13 @@ public interface ProductMapper {
             return null;
         }
         return category.getId(); 
+    }
+
+    @Named("categoryToCategoryName")
+    default String categoryToCategoryName(Category category) {
+        if (category == null) {
+            return null;
+        }
+        return category.getName(); 
     }
 }
