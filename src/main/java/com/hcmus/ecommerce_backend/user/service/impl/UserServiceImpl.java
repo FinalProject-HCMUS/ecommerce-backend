@@ -6,28 +6,34 @@ import com.hcmus.ecommerce_backend.user.exception.UserNotAuthorizedException;
 import com.hcmus.ecommerce_backend.user.exception.UserNotFoundException;
 import com.hcmus.ecommerce_backend.user.model.dto.request.ChangePasswordRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.CreateUserRequest;
+import com.hcmus.ecommerce_backend.user.model.dto.request.ResetPasswordRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.UpdateUserRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.response.UserResponse;
 import com.hcmus.ecommerce_backend.user.model.entity.User;
+import com.hcmus.ecommerce_backend.user.model.entity.VerificationToken;
 import com.hcmus.ecommerce_backend.user.model.mapper.UserMapper;
 import com.hcmus.ecommerce_backend.user.repository.UserRepository;
+import com.hcmus.ecommerce_backend.user.repository.VerificationTokenRepository;
 import com.hcmus.ecommerce_backend.user.service.UserService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import com.hcmus.ecommerce_backend.user.exception.VerificationTokenAlreadyExpired;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final VerificationTokenRepository verificationTokenRepository;
 
     @Override
     public Page<UserResponse> getAllUsers(Pageable pageable) {
@@ -97,9 +104,13 @@ public class UserServiceImpl implements UserService {
             log.info("UserServiceImpl | createUser | Created user with id: {}", savedUser.getId());
 
             // Send email confirmation
-            String token = savedUser.getConfirmationToken();
+            VerificationToken token = VerificationToken.builder()
+                    .user(savedUser)
+                    .build();
+
+            verificationTokenRepository.save(token);
             emailService.sendEmailConfirmation(savedUser.getEmail(),
-                    savedUser.getFirstName() + ' ' + savedUser.getLastName(), token);
+                    savedUser.getFirstName() + ' ' + savedUser.getLastName(), token.getToken());
             log.info("UserServiceImpl | createUser | Email confirmation sent to {}", savedUser.getEmail());
 
             return userMapper.toResponse(savedUser);
@@ -119,7 +130,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse updateUser(String id, UpdateUserRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
             Jwt jwt = (Jwt) authentication.getPrincipal();
             String authenticatedUserId = jwt.getClaimAsString("userId");
@@ -140,7 +152,8 @@ public class UserServiceImpl implements UserService {
 
             // Check if email or phone number already exists for another user
 
-            if (!user.getPhoneNum().equals(request.getPhoneNum())) {
+            if (!user.getPhoneNum()
+                    .equals(request.getPhoneNum())) {
                 checkUserPhoneNumExists(request.getPhoneNum());
             }
 
@@ -191,7 +204,8 @@ public class UserServiceImpl implements UserService {
         log.info("UserServiceImpl | changePassword | Changing password for user with id: {}", userId);
 
         try {
-            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            if (!request.getNewPassword()
+                    .equals(request.getConfirmPassword())) {
                 throw new IllegalArgumentException("New password and confirm password do not match");
             }
 
@@ -230,18 +244,17 @@ public class UserServiceImpl implements UserService {
     public boolean confirmEmail(String token) {
         log.info("Confirming email with token: {}", token);
 
-        User user = userRepository.findByConfirmationToken(token)
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid confirmation token"));
 
-        if (LocalDateTime.now().isAfter(user.getConfirmationTokenExpiry())) {
-            throw new RuntimeException("Confirmation token expired");
+        if (LocalDateTime.now()
+                .isAfter(verificationToken.getExpiryDate())) {
+            throw new VerificationTokenAlreadyExpired();
         }
-
+        User user = verificationToken.getUser();
         user.setEnabled(true);
-        user.setConfirmationToken(null);
-        user.setConfirmationTokenExpiry(null);
         User savedUser = userRepository.save(user);
-
+        verificationTokenRepository.delete(verificationToken);
         log.info("Email confirmed successfully for user: {}", savedUser.getId());
         return true;
     }
@@ -266,16 +279,18 @@ public class UserServiceImpl implements UserService {
                 }
 
                 // Generate new confirmation token and update expiry
-                String newToken = java.util.UUID.randomUUID().toString();
-                user.setConfirmationToken(newToken);
-                user.setConfirmationTokenExpiry(LocalDateTime.now().plusHours(24));
-
-                User savedUser = userRepository.save(user);
-
+                String newToken = java.util.UUID.randomUUID()
+                        .toString();
+                VerificationToken verificationToken = verificationTokenRepository.findByUserId(user.getId())
+                        .orElseThrow(() -> new RuntimeException("Verification token not found"));
+                verificationToken.setToken(newToken);
+                verificationToken.setExpiryDate(LocalDateTime.now()
+                        .plusHours(24));
+                verificationTokenRepository.save(verificationToken);
                 // Send email confirmation
                 emailService.sendEmailConfirmation(
-                        savedUser.getEmail(),
-                        savedUser.getFirstName() + ' ' + savedUser.getLastName(),
+                        user.getEmail(),
+                        user.getFirstName() + ' ' + user.getLastName(),
                         newToken);
                 log.info("UserServiceImpl | resendConfirmationEmail | Confirmation email sent");
             } else {
@@ -295,6 +310,89 @@ public class UserServiceImpl implements UserService {
             log.error("UserServiceImpl | resendConfirmationEmail | Unexpected error: {}", e.getMessage(), e);
             // Re-throw without email in message
             throw new RuntimeException("Error processing request");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void sendResetPasswordEmail(String email) {
+        log.info("UserServiceImpl | sendResetPasswordEmail | Sending reset password email request received");
+
+        try {
+            // Find the user but don't reveal if they exist or not in error messages
+            Optional<User> userOptional = userRepository.findByEmail(email);
+
+            // Only proceed if user exists and is not enabled yet
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+
+                // Check if there's an existing token for this user and delete it
+                Optional<VerificationToken> existingToken = verificationTokenRepository.findByUserId(user.getId());
+                existingToken.ifPresent(verificationTokenRepository::delete);
+                // Generate new confirmation token and update expiry
+                VerificationToken verificationToken = VerificationToken.builder()
+                        .user(user)
+                        .expiryDate(LocalDateTime.now().plusMinutes(30))
+                        .build();
+                verificationTokenRepository.save(verificationToken);
+                // Send email confirmation
+                emailService.sendResetPasswordEmail(
+                        user.getEmail(),
+                        user.getFirstName() + ' ' + user.getLastName(),
+                        verificationToken.getToken());
+                log.info("Reset password email sent to {}", user.getEmail());
+            } else {
+                // User doesn't exist, but log it privately and don't expose this info
+                log.info("Reset password requested for non-existent email: {}", email);
+                // Still return a success to avoid revealing user existence
+            }
+
+            // Always return success regardless of whether the email exists
+            // This prevents user enumeration attacks
+        } catch (DataAccessException e) {
+            // Still log the actual error for debugging, but don't expose details
+            log.error("UserServiceImpl | sendResetPasswordEmail | Database error: {}", e.getMessage(), e);
+            // Re-throw without email in message
+            throw new RuntimeException("Error processing request");
+        } catch (Exception e) {
+            log.error("UserServiceImpl | sendResetPasswordEmail | Unexpected error: {}", e.getMessage(), e);
+            // Re-throw without email in message
+            throw new RuntimeException("Error processing request");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        log.info("UserServiceImpl | resetPassword | Resetting password with token");
+
+        if(!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("New password and confirm password do not match");
+        }
+        try {
+            VerificationToken verificationToken = verificationTokenRepository.findByToken(request.getToken())
+                    .orElseThrow(() -> new RuntimeException("Invalid reset token"));
+
+            if (LocalDateTime.now().isAfter(verificationToken.getExpiryDate())) {
+                verificationTokenRepository.delete(verificationToken);
+                throw new VerificationTokenAlreadyExpired("Reset password token has expired");
+            }
+
+            User user = verificationToken.getUser();
+
+            // Update password and increment token version to invalidate other tokens
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            user.setTokenVersion(user.getTokenVersion() + 1);
+
+            userRepository.save(user);
+
+            // Delete the used token
+            verificationTokenRepository.delete(verificationToken);
+
+            log.info("Password reset successfully for user: {}", user.getId());
+        } catch (Exception e) {
+            log.error("Error resetting password: {}", e.getMessage(), e);
+            throw e;
         }
     }
 

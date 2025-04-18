@@ -80,14 +80,6 @@ public class User extends BaseEntity {
     @Column(name = "token_version", nullable = false)
     private int tokenVersion = 0;
 
-    @Builder.Default
-    @Column(name = "CONFIRMATION_TOKEN")
-    private String confirmationToken = UUID.randomUUID().toString();
-
-    @Builder.Default
-    @Column(name = "CONFIRMATION_TOKEN_EXPIRY")
-    private LocalDateTime confirmationTokenExpiry = LocalDateTime.now().plusHours(24);
-
     public Map<String, Object> getClaims() {
 
         final Map<String, Object> claims = new HashMap<>();

@@ -34,7 +34,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Value("${app.email.shop-name:}")
     private String shopName;
-    
+
     @Value("${app.email.support-email:}")
     private String supportEmail;
 
@@ -53,7 +53,7 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("confirmationUrl", frontendUrl + "/confirm-email?token=" + token);
             context.setVariable("shopName", shopName);
             context.setVariable("supportEmail", supportEmail);
-            
+
             // Set social media links
             Map<String, String> socialLinks = new HashMap<>();
             socialLinks.put("facebook", "https://facebook.com/" + shopName.toLowerCase());
@@ -68,6 +68,39 @@ public class EmailServiceImpl implements EmailService {
             log.info("Email confirmation sent to {}", email);
         } catch (MessagingException e) {
             log.error("Failed to send email confirmation: {}", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void sendResetPasswordEmail(String email, String name, String token) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setFrom(fromEmail);
+            helper.setTo(email);
+            helper.setSubject("Reset Your Password");
+
+            Context context = new Context();
+            context.setVariable("name", name);
+            context.setVariable("resetUrl", frontendUrl + "/reset-password?token=" + token);
+            context.setVariable("shopName", shopName);
+            context.setVariable("supportEmail", supportEmail);
+
+            // Set social media links
+            Map<String, String> socialLinks = new HashMap<>();
+            socialLinks.put("facebook", "https://facebook.com/" + shopName.toLowerCase());
+            socialLinks.put("instagram", "https://instagram.com/" + shopName.toLowerCase());
+            socialLinks.put("twitter", "https://twitter.com/" + shopName.toLowerCase());
+            context.setVariable("socialLinks", socialLinks);
+
+            String emailContent = templateEngine.process("email/reset-password", context);
+            helper.setText(emailContent, true);
+
+            mailSender.send(message);
+            log.info("Password reset email sent to {}", email);
+        } catch (MessagingException e) {
+            log.error("Failed to send password reset email: {}", e.getMessage(), e);
         }
     }
 }

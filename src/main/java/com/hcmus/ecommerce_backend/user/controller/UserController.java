@@ -3,6 +3,7 @@ package com.hcmus.ecommerce_backend.user.controller;
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
 import com.hcmus.ecommerce_backend.user.model.dto.request.ChangePasswordRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.CreateUserRequest;
+import com.hcmus.ecommerce_backend.user.model.dto.request.ResetPasswordRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.UpdateUserRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.response.UserResponse;
 import com.hcmus.ecommerce_backend.user.service.UserService;
@@ -152,6 +153,33 @@ public class UserController {
                         @Parameter(description = "Email address", required = true) @RequestParam String email) {
                 log.info("UserController | resendConfirmationEmail | email: {}", email);
                 userService.resendConfirmationEmail(email);
+                return ResponseEntity.ok(CustomResponse.SUCCESS);
+        }
+
+        @Operation(summary = "Request password reset", description = "Sends a password reset email to the user")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Password reset email sent successfully"),
+                        @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CustomResponse.class)))
+        })
+        @PostMapping("/request-password-reset")
+        public ResponseEntity<CustomResponse<Void>> requestPasswordReset(
+                        @Parameter(description = "Email address", required = true) @RequestParam String email) {
+                log.info("UserController | requestPasswordReset | email: {}", email);
+                userService.sendResetPasswordEmail(email);
+                return ResponseEntity.ok(CustomResponse.SUCCESS);
+        }
+
+        @Operation(summary = "Reset password", description = "Resets the user's password using a token")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Password successfully reset"),
+                        @ApiResponse(responseCode = "400", description = "Invalid token or password mismatch", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CustomResponse.class))),
+                        @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CustomResponse.class)))
+        })
+        @PostMapping("/reset-password")
+        public ResponseEntity<CustomResponse<Void>> resetPassword(
+                        @Parameter(description = "Password reset details", required = true) @Valid @RequestBody ResetPasswordRequest request) {
+                log.info("UserController | resetPassword | request: {}", request);
+                userService.resetPassword(request);
                 return ResponseEntity.ok(CustomResponse.SUCCESS);
         }
 

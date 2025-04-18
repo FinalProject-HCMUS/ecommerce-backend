@@ -2,6 +2,7 @@ package com.hcmus.ecommerce_backend.user.service;
 
 import com.hcmus.ecommerce_backend.user.model.dto.request.ChangePasswordRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.CreateUserRequest;
+import com.hcmus.ecommerce_backend.user.model.dto.request.ResetPasswordRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.UpdateUserRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.response.UserResponse;
 
@@ -26,4 +27,8 @@ public interface UserService {
     public boolean confirmEmail(String token);
 
     void resendConfirmationEmail(String email);
+
+    void sendResetPasswordEmail(String email);
+
+    void resetPassword(ResetPasswordRequest request);
 }
