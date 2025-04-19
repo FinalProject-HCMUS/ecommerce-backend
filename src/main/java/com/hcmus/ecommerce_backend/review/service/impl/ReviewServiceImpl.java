@@ -11,6 +11,8 @@ import com.hcmus.ecommerce_backend.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,28 +25,75 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewServiceImpl implements ReviewService {
-    
+
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
-    
+
     @Override
-    public List<ReviewResponse> getAllReviews() {
-        log.info("ReviewServiceImpl | getAllReviews | Retrieving all reviews");
+    public Page<ReviewResponse> getAllReviewsPaginated(Pageable pageable) {
+        log.info(
+                "ReviewServiceImpl | getAllReviewsPaginated | Retrieving reviews with pagination - Page: {}, Size: {}, Sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         try {
-            List<ReviewResponse> reviews = reviewRepository.findAll().stream()
-                    .map(reviewMapper::toResponse)
-                    .collect(Collectors.toList());
-            log.info("ReviewServiceImpl | getAllReviews | Found {} reviews", reviews.size());
-            return reviews;
+            Page<Review> reviewPage = reviewRepository.findAll(pageable);
+            Page<ReviewResponse> reviewResponsePage = reviewPage.map(reviewMapper::toResponse);
+
+            log.info("ReviewServiceImpl | getAllReviewsPaginated | Found {} reviews on page {} of {}",
+                    reviewResponsePage.getNumberOfElements(),
+                    reviewResponsePage.getNumber() + 1,
+                    reviewResponsePage.getTotalPages());
+
+            return reviewResponsePage;
         } catch (DataAccessException e) {
-            log.error("ReviewServiceImpl | getAllReviews | Error retrieving reviews: {}", e.getMessage(), e);
-            return Collections.emptyList();
+            log.error("ReviewServiceImpl | getAllReviewsPaginated | Database error retrieving paginated reviews: {}",
+                    e.getMessage(), e);
+            throw e;
         } catch (Exception e) {
-            log.error("ReviewServiceImpl | getAllReviews | Unexpected error: {}", e.getMessage(), e);
+            log.error("ReviewServiceImpl | getAllReviewsPaginated | Unexpected error retrieving paginated reviews: {}",
+                    e.getMessage(), e);
             throw e;
         }
     }
-    
+
+    @Override
+    public Page<ReviewResponse> searchReviews(String keyword, Integer minRating, Integer maxRating, Pageable pageable) {
+        log.info(
+                "ReviewServiceImpl | searchReviews | keyword: {}, minRating: {}, maxRating: {}, page: {}, size: {}, sort: {}",
+                keyword, minRating, maxRating, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+
+        try {
+            // If all search parameters are null, use standard findAll method
+            Page<Review> reviewPage;
+            if ((keyword == null || keyword.trim().isEmpty()) && minRating == null && maxRating == null) {
+                reviewPage = reviewRepository.findAll(pageable);
+            } else {
+                // Process keyword
+                String processedKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+
+                reviewPage = reviewRepository.searchReviews(
+                        processedKeyword,
+                        minRating,
+                        maxRating,
+                        pageable);
+            }
+
+            Page<ReviewResponse> reviewResponsePage = reviewPage.map(reviewMapper::toResponse);
+
+            log.info("ReviewServiceImpl | searchReviews | Found {} reviews on page {} of {}",
+                    reviewResponsePage.getNumberOfElements(),
+                    reviewResponsePage.getNumber() + 1,
+                    reviewResponsePage.getTotalPages());
+
+            return reviewResponsePage;
+        } catch (DataAccessException e) {
+            log.error("ReviewServiceImpl | searchReviews | Database error searching reviews: {}", e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("ReviewServiceImpl | searchReviews | Unexpected error searching reviews: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
     @Override
     public ReviewResponse getReviewById(String id) {
         log.info("ReviewServiceImpl | getReviewById | id: {}", id);
@@ -62,25 +111,81 @@ public class ReviewServiceImpl implements ReviewService {
             throw e;
         }
     }
-    
+
     @Override
-    public List<ReviewResponse> getReviewsByOrderId(String orderId) {
-        log.info("ReviewServiceImpl | getReviewsByOrderId | orderId: {}", orderId);
+    public Page<ReviewResponse> getReviewsByOrderIdPaginated(String orderId, Pageable pageable) {
+        log.info("ReviewServiceImpl | getReviewsByOrderIdPaginated | orderId: {}, page: {}, size: {}, sort: {}",
+                orderId, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         try {
-            List<ReviewResponse> reviews = reviewRepository.findByOrderId(orderId).stream()
-                    .map(reviewMapper::toResponse)
-                    .collect(Collectors.toList());
-            log.info("ReviewServiceImpl | getReviewsByOrderId | Found {} reviews for order {}", reviews.size(), orderId);
-            return reviews;
+            Page<Review> reviewPage = reviewRepository.findByOrderId(orderId, pageable);
+            Page<ReviewResponse> reviewResponsePage = reviewPage.map(reviewMapper::toResponse);
+
+            log.info(
+                    "ReviewServiceImpl | getReviewsByOrderIdPaginated | Found {} reviews on page {} of {} for order {}",
+                    reviewResponsePage.getNumberOfElements(),
+                    reviewResponsePage.getNumber() + 1,
+                    reviewResponsePage.getTotalPages(),
+                    orderId);
+
+            return reviewResponsePage;
         } catch (DataAccessException e) {
-            log.error("ReviewServiceImpl | getReviewsByOrderId | Database error for orderId {}: {}", orderId, e.getMessage(), e);
-            return Collections.emptyList();
+            log.error("ReviewServiceImpl | getReviewsByOrderIdPaginated | Database error for orderId {}: {}",
+                    orderId, e.getMessage(), e);
+            throw e;
         } catch (Exception e) {
-            log.error("ReviewServiceImpl | getReviewsByOrderId | Unexpected error for orderId {}: {}", orderId, e.getMessage(), e);
+            log.error("ReviewServiceImpl | getReviewsByOrderIdPaginated | Unexpected error for orderId {}: {}",
+                    orderId, e.getMessage(), e);
             throw e;
         }
     }
-    
+
+    @Override
+    public Page<ReviewResponse> searchReviewsByOrderId(String orderId, String keyword, Integer minRating,
+            Integer maxRating, Pageable pageable) {
+        log.info(
+                "ReviewServiceImpl | searchReviewsByOrderId | orderId: {}, keyword: {}, minRating: {}, maxRating: {}, page: {}, size: {}, sort: {}",
+                orderId, keyword, minRating, maxRating, pageable.getPageNumber(), pageable.getPageSize(),
+                pageable.getSort());
+
+        try {
+            // If all search parameters are null, use standard findByOrderId method
+            Page<Review> reviewPage;
+            if ((keyword == null || keyword.trim().isEmpty()) && minRating == null && maxRating == null) {
+                reviewPage = reviewRepository.findByOrderId(orderId, pageable);
+            } else {
+                // Process keyword
+                String processedKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+
+                reviewPage = reviewRepository.searchReviewsByOrderId(
+                        orderId,
+                        processedKeyword,
+                        minRating,
+                        maxRating,
+                        pageable);
+            }
+
+            Page<ReviewResponse> reviewResponsePage = reviewPage.map(reviewMapper::toResponse);
+
+            log.info("ReviewServiceImpl | searchReviewsByOrderId | Found {} reviews on page {} of {} for order {}",
+                    reviewResponsePage.getNumberOfElements(),
+                    reviewResponsePage.getNumber() + 1,
+                    reviewResponsePage.getTotalPages(),
+                    orderId);
+
+            return reviewResponsePage;
+        } catch (DataAccessException e) {
+            log.error(
+                    "ReviewServiceImpl | searchReviewsByOrderId | Database error searching reviews for orderId {}: {}",
+                    orderId, e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error(
+                    "ReviewServiceImpl | searchReviewsByOrderId | Unexpected error searching reviews for orderId {}: {}",
+                    orderId, e.getMessage(), e);
+            throw e;
+        }
+    }
+
     @Override
     @Transactional
     public ReviewResponse createReview(CreateReviewRequest request) {
@@ -88,28 +193,29 @@ public class ReviewServiceImpl implements ReviewService {
         try {
             // Check if a review for this order already exists
             if (reviewRepository.existsByOrderId(request.getOrderId())) {
-                log.warn("ReviewServiceImpl | createReview | A review already exists for order: {}", request.getOrderId());
+                log.warn("ReviewServiceImpl | createReview | A review already exists for order: {}",
+                        request.getOrderId());
                 throw new ReviewAlreadyExistsException(request.getOrderId());
             }
-            
+
             Review review = reviewMapper.toEntity(request);
             Review savedReview = reviewRepository.save(review);
-            log.info("ReviewServiceImpl | createReview | Created review with id: {} for order: {}", 
+            log.info("ReviewServiceImpl | createReview | Created review with id: {} for order: {}",
                     savedReview.getId(), savedReview.getOrderId());
             return reviewMapper.toResponse(savedReview);
         } catch (ReviewAlreadyExistsException e) {
             throw e; // Re-throw domain exceptions to be handled by global exception handler
         } catch (DataAccessException e) {
-            log.error("ReviewServiceImpl | createReview | Database error creating review for order {}: {}", 
+            log.error("ReviewServiceImpl | createReview | Database error creating review for order {}: {}",
                     request.getOrderId(), e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("ReviewServiceImpl | createReview | Unexpected error creating review for order {}: {}", 
+            log.error("ReviewServiceImpl | createReview | Unexpected error creating review for order {}: {}",
                     request.getOrderId(), e.getMessage(), e);
             throw e;
         }
     }
-    
+
     @Override
     @Transactional
     public void deleteReview(String id) {
@@ -120,45 +226,46 @@ public class ReviewServiceImpl implements ReviewService {
                 log.error("ReviewServiceImpl | deleteReview | Review not found with id: {}", id);
                 throw new ReviewNotFoundException(id);
             }
-            
+
             // Then delete in the current transaction
             reviewRepository.deleteById(id);
             log.info("ReviewServiceImpl | deleteReview | Deleted review with id: {}", id);
         } catch (ReviewNotFoundException e) {
             throw e; // Re-throw domain exceptions to be handled by global exception handler
         } catch (DataAccessException e) {
-            log.error("ReviewServiceImpl | deleteReview | Database error deleting review with id '{}': {}", 
+            log.error("ReviewServiceImpl | deleteReview | Database error deleting review with id '{}': {}",
                     id, e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("ReviewServiceImpl | deleteReview | Unexpected error deleting review with id '{}': {}", 
+            log.error("ReviewServiceImpl | deleteReview | Unexpected error deleting review with id '{}': {}",
                     id, e.getMessage(), e);
             throw e;
         }
     }
-    
+
     @Override
     public List<ReviewResponse> getReviewsByRatingRange(Integer minRating, Integer maxRating) {
         log.info("ReviewServiceImpl | getReviewsByRatingRange | minRating: {}, maxRating: {}", minRating, maxRating);
         try {
-            List<ReviewResponse> reviews = reviewRepository.findByRatingBetweenOrderByCreatedAtDesc(minRating, maxRating)
+            List<ReviewResponse> reviews = reviewRepository
+                    .findByRatingBetweenOrderByCreatedAtDesc(minRating, maxRating)
                     .stream()
                     .map(reviewMapper::toResponse)
                     .collect(Collectors.toList());
-            log.info("ReviewServiceImpl | getReviewsByRatingRange | Found {} reviews with rating between {} and {}", 
+            log.info("ReviewServiceImpl | getReviewsByRatingRange | Found {} reviews with rating between {} and {}",
                     reviews.size(), minRating, maxRating);
             return reviews;
         } catch (DataAccessException e) {
-            log.error("ReviewServiceImpl | getReviewsByRatingRange | Database error for rating range {} to {}: {}", 
+            log.error("ReviewServiceImpl | getReviewsByRatingRange | Database error for rating range {} to {}: {}",
                     minRating, maxRating, e.getMessage(), e);
             return Collections.emptyList();
         } catch (Exception e) {
-            log.error("ReviewServiceImpl | getReviewsByRatingRange | Unexpected error for rating range {} to {}: {}", 
+            log.error("ReviewServiceImpl | getReviewsByRatingRange | Unexpected error for rating range {} to {}: {}",
                     minRating, maxRating, e.getMessage(), e);
             throw e;
         }
     }
-    
+
     /**
      * Helper method to find a review by ID.
      * Uses a separate transaction to avoid issues with the main transaction.
@@ -171,7 +278,7 @@ public class ReviewServiceImpl implements ReviewService {
                     return new ReviewNotFoundException(id);
                 });
     }
-    
+
     /**
      * Helper method to check if a review exists by ID.
      * Uses a separate transaction to avoid issues with the main transaction.

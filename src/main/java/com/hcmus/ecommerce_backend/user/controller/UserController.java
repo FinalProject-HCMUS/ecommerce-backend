@@ -55,6 +55,23 @@ public class UserController {
                 return ResponseEntity.ok(CustomResponse.successOf(users));
         }
 
+        @Operation(summary = "Search users", description = "Searches users by keyword with pagination and sorting")
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated users")
+        @GetMapping("/search")
+        public ResponseEntity<CustomResponse<Page<UserResponse>>> searchUsers(
+                        @Parameter(description = "Search keyword") @RequestParam(required = false) String keyword,
+                        @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
+                        @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
+                        @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
+                                        "Default sort order is ascending. " +
+                                        "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
+                log.info("UserController | searchUsers | keyword: {}, page: {}, size: {}, sort: {}",
+                                keyword, page, size, sort != null ? String.join(", ", sort) : "unsorted");
+                Pageable pageable = CreatePageable.build(page, size, sort);
+                Page<UserResponse> users = userService.searchUsers(keyword, pageable);
+                return ResponseEntity.ok(CustomResponse.successOf(users));
+        }
+
         @Operation(summary = "Get user by ID", description = "Retrieves a specific user by its ID")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "User found"),

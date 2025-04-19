@@ -18,7 +18,7 @@ public class UpdateUserRequest {
 
     @NotBlank(message = "Phone number is required")
     @Schema(description = "Phone number of the user", example = "1234567890", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String phoneNum;
+    private String phoneNumber;
 
     @NotBlank(message = "First name is required")
     @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")

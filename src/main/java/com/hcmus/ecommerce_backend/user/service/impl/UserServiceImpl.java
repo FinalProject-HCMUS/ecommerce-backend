@@ -74,6 +74,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<UserResponse> searchUsers(String keyword, Pageable pageable) {
+        log.info(
+                "UserServiceImpl | searchUsers | Retrieving users with pagination - Keyword: {}, Page: {}, Size: {}, Sort: {}",
+                keyword, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+
+        try {
+            Page<User> userPage = userRepository.searchUsers(keyword, pageable);
+            Page<UserResponse> userResponsePage = userPage.map(userMapper::toResponse);
+
+            log.info("UserServiceImpl | searchUsers | Found {} users on page {} of {}",
+                    userResponsePage.getNumberOfElements(),
+                    userResponsePage.getNumber() + 1,
+                    userResponsePage.getTotalPages());
+
+            return userResponsePage;
+        } catch (DataAccessException e) {
+            log.error("UserServiceImpl | searchUsers | Database error retrieving paginated users: {}", e.getMessage(),
+                    e);
+            return Page.empty(pageable);
+        } catch (Exception e) {
+            log.error("UserServiceImpl | searchUsers | Unexpected error retrieving paginated users: {}", e.getMessage(),
+                    e);
+            throw e;
+        }
+    }
+
+    @Override
     public UserResponse getUserById(String id) {
         log.info("UserServiceImpl | getUserById | id: {}", id);
         try {
@@ -97,7 +124,7 @@ public class UserServiceImpl implements UserService {
         log.info("UserServiceImpl | createUser | Creating user with email: {}", request.getEmail());
         try {
             checkUserEmailExists(request.getEmail());
-            checkUserPhoneNumExists(request.getPhoneNum());
+            checkUserPhoneNumberExists(request.getPhoneNumber());
 
             User user = userMapper.toEntity(request);
             user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -176,9 +203,9 @@ public class UserServiceImpl implements UserService {
 
             // Check if email or phone number already exists for another user
 
-            if (!user.getPhoneNum()
-                    .equals(request.getPhoneNum())) {
-                checkUserPhoneNumExists(request.getPhoneNum());
+            if (!user.getPhoneNumber()
+                    .equals(request.getPhoneNumber())) {
+                checkUserPhoneNumberExists(request.getPhoneNumber());
             }
 
             userMapper.updateEntity(request, user);
@@ -463,11 +490,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected void checkUserPhoneNumExists(String phoneNum) {
-        if (userRepository.existsByPhoneNum(phoneNum)) {
-            log.error("UserServiceImpl | checkUserPhoneNumExists | User already exists with phone number: {}",
-                    phoneNum);
-            throw new UserAlreadyExistsException(phoneNum, false);
+    protected void checkUserPhoneNumberExists(String phoneNumber) {
+        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+            log.error("UserServiceImpl | checkUserPhoneNumberExists | User already exists with phone number: {}",
+                    phoneNumber);
+            throw new UserAlreadyExistsException(phoneNumber, false);
         }
     }
 }

@@ -44,7 +44,7 @@ public class User extends BaseEntity {
     private String email;
 
     @Column(name = "phone_num", nullable = false, unique = true)
-    private String phoneNum;
+    private String phoneNumber;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -89,7 +89,7 @@ public class User extends BaseEntity {
         claims.put(TokenClaims.USER_FIRST_NAME.getValue(), this.firstName);
         claims.put(TokenClaims.USER_LAST_NAME.getValue(), this.lastName);
         claims.put(TokenClaims.USER_EMAIL.getValue(), this.email);
-        claims.put(TokenClaims.USER_PHONE_NUMBER.getValue(), this.phoneNum);
+        claims.put(TokenClaims.USER_PHONE_NUMBER.getValue(), this.phoneNumber);
         claims.put(TokenClaims.TOKEN_VERSION.getValue(), this.tokenVersion);
 
         return claims;

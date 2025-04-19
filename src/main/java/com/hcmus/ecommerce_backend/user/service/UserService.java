@@ -14,6 +14,8 @@ public interface UserService {
 
     Page<UserResponse> getAllUsers(Pageable pageable);
 
+    Page<UserResponse> searchUsers(String keyword, Pageable pageable);
+
     UserResponse getUserById(String id);
 
     UserResponse getCurrentUser();

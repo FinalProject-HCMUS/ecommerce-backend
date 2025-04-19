@@ -21,7 +21,7 @@ public class UserResponse {
     private String email;
 
     @Schema(description = "Phone number of the user", example = "1234567890")
-    private String phoneNum;
+    private String phoneNumber;
 
     @Schema(description = "First name of the user", example = "John")
     private String firstName;

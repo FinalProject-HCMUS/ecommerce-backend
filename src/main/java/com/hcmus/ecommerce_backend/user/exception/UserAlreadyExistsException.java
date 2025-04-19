@@ -13,8 +13,8 @@ public class UserAlreadyExistsException extends RuntimeException {
             : "User already exists with phone number: " + value);
     }
     
-    public UserAlreadyExistsException(String email, String phoneNum) {
-        super("User already exists with email: " + email + " and phone number: " + phoneNum);
+    public UserAlreadyExistsException(String email, String phoneNumber) {
+        super("User already exists with email: " + email + " and phone number: " + phoneNumber);
     }
     
 }
