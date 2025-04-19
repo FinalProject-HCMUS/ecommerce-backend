@@ -5,6 +5,7 @@ import com.hcmus.ecommerce_backend.order.model.dto.request.CreateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.UpdateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderResponse;
 import com.hcmus.ecommerce_backend.order.model.entity.Order;
+import com.hcmus.ecommerce_backend.order.model.enums.Status;
 import com.hcmus.ecommerce_backend.order.model.mapper.OrderMapper;
 import com.hcmus.ecommerce_backend.order.repository.OrderRepository;
 import com.hcmus.ecommerce_backend.order.service.OrderService;
@@ -50,6 +51,39 @@ public class OrderServiceImpl implements OrderService {
         } catch (Exception e) {
             log.error("OrderServiceImpl | getAllOrders | Unexpected error retrieving paginated orders: {}",
                     e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<OrderResponse> searchOrders(String keyword, Status status, Pageable pageable) {
+        log.info("OrderServiceImpl | searchOrders | keyword: {}, status: {}, page: {}, size: {}, sort: {}",
+                keyword, status, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+        try {
+            // If both search parameters are null, use the standard findAll method
+            Page<Order> orderPage;
+            if ((keyword == null || keyword.trim().isEmpty()) && status == null) {
+                orderPage = orderRepository.findAll(pageable);
+            } else {
+                orderPage = orderRepository.searchOrders(
+                        keyword == null || keyword.trim().isEmpty() ? null : keyword.trim(),
+                        status,
+                        pageable);
+            }
+
+            Page<OrderResponse> orderResponsePage = orderPage.map(orderMapper::toResponse);
+
+            log.info("OrderServiceImpl | searchOrders | Found {} orders on page {} of {}",
+                    orderResponsePage.getNumberOfElements(),
+                    orderResponsePage.getNumber() + 1,
+                    orderResponsePage.getTotalPages());
+
+            return orderResponsePage;
+        } catch (DataAccessException e) {
+            log.error("OrderServiceImpl | searchOrders | Database error searching orders: {}", e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("OrderServiceImpl | searchOrders | Unexpected error searching orders: {}", e.getMessage(), e);
             throw e;
         }
     }

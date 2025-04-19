@@ -4,6 +4,7 @@ import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
 import com.hcmus.ecommerce_backend.order.model.dto.request.CreateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.UpdateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderResponse;
+import com.hcmus.ecommerce_backend.order.model.enums.Status;
 import com.hcmus.ecommerce_backend.order.service.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,6 +53,34 @@ public class OrderController {
 
         Pageable pageable = CreatePageable.build(page, size, sort);
         Page<OrderResponse> orders = orderService.getAllOrders(pageable);
+
+        return ResponseEntity.ok(CustomResponse.successOf(orders));
+    }
+
+    @Operation(summary = "Search orders", description = "Searches orders by keyword and/or status with pagination and sorting")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved search results")
+    @GetMapping("/search")
+    public ResponseEntity<CustomResponse<Page<OrderResponse>>> searchOrders(
+            @Parameter(description = "Keyword to search by name") @RequestParam(required = false) String keyword,
+
+            @Parameter(description = "Filter by order status: NEW, CANCELLED, PROCESSING, PACKAGED, PICKED, SHIPPING, DELIVERED, REFUNDED", schema = @Schema(type = "string", allowableValues = {
+                    "NEW", "CANCELLED", "PROCESSING",
+                    "PACKAGED", "PICKED", "SHIPPING", "DELIVERED",
+                    "REFUNDED" }, description = "Order status values")) @RequestParam(required = false) Status status,
+
+            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
+
+            @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
+                    "Default sort order is ascending. " +
+                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
+
+        log.info("OrderController | searchOrders | keyword: {}, status: {}, page: {}, size: {}, sort: {}",
+                keyword, status, page, size, sort != null ? String.join(", ", sort) : "unsorted");
+
+        Pageable pageable = CreatePageable.build(page, size, sort);
+        Page<OrderResponse> orders = orderService.searchOrders(keyword, status, pageable);
 
         return ResponseEntity.ok(CustomResponse.successOf(orders));
     }
