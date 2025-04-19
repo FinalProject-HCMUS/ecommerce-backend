@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,17 +33,24 @@ public class ProductColorSizeServiceImpl implements ProductColorSizeService{
     private final ProductColorSizeMapper productColorSizeMapper;
 
     @Override
-    public List<ProductColorSizeResponse> getAllProductColorSizes() {
-        log.info("ProductColorSizeServiceImpl | getAllProductColorSizes | Retrieving all product_color_sizes");
+    @Transactional(readOnly = true)
+    public Page<ProductColorSizeResponse> getAllProductColorSizes(Pageable pageable) {
+        log.info("ProductColorSizeServiceImpl | getAllProductColorSizes | Retrieving product color sizes with pagination - Page: {}, Size: {}, Sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         try {
-            List<ProductColorSizeResponse> productColorSizes = productColorSizeRepository.findAll().stream()
-                    .map(productColorSizeMapper::toResponse)
-                    .collect(Collectors.toList());
-            log.info("ProductColorSizeServiceImpl | getAllProductColorSizes | Found {} product_color_sizes", productColorSizes.size());
-            return productColorSizes;
+            Page<ProductColorSize> productColorSizePage = productColorSizeRepository.findAll(pageable);
+            Page<ProductColorSizeResponse> productColorSizeResponsePage = productColorSizePage.map(productColorSizeMapper::toResponse);
+            log.info("ProductColorSizeServiceImpl | getAllProductColorSizes | Found {} product color sizes on page {} of {}",
+                    productColorSizeResponsePage.getNumberOfElements(),
+                    productColorSizeResponsePage.getNumber() + 1,
+                    productColorSizeResponsePage.getTotalPages());
+            return productColorSizeResponsePage;
         } catch (DataAccessException e) {
-            log.error("ProductColorSizeServiceImpl | getAllProductColorSizes | Database error: {}", e.getMessage(), e);
-            return Collections.emptyList();
+            log.error("ProductColorSizeServiceImpl | getAllProductColorSizes | Database error retrieving paginated product color sizes: {}", e.getMessage(), e);
+            return Page.empty(pageable);
+        } catch (Exception e) {
+            log.error("ProductColorSizeServiceImpl | getAllProductColorSizes | Unexpected error retrieving paginated product color sizes: {}", e.getMessage(), e);
+            throw e;
         }
     }
 

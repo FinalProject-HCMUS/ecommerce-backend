@@ -5,6 +5,8 @@ import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.SizeResponse;
 import com.hcmus.ecommerce_backend.product.service.SizeService;
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
+import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,12 +17,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/sizes")
@@ -31,12 +34,19 @@ public class SizeController {
 
     private final SizeService sizeService;
 
-    @Operation(summary = "Get all sizes", description = "Retrieves a list of all available sizes")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved all sizes")
+    @Operation(summary = "Get all sizes", description = "Retrieves a paginated list of sizes with sorting capabilities")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated sizes")
     @GetMapping
-    public ResponseEntity<CustomResponse<List<SizeResponse>>> getAllSizes() {
-        log.info("SizeController | getAllSizes | Retrieving all sizes");
-        List<SizeResponse> sizes = sizeService.getAllSizes();
+    public ResponseEntity<CustomResponse<Page<SizeResponse>>> getAllSizes(
+            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
+                    "Default sort order is ascending. " +
+                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
+        log.info("SizeController | getAllSizes | page: {}, size: {}, sort: {}",
+                page, size, sort != null ? String.join(", ", sort) : "unsorted");
+        Pageable pageable = CreatePageable.build(page, size, sort);
+        Page<SizeResponse> sizes = sizeService.getAllSizes(pageable);
         return ResponseEntity.ok(CustomResponse.successOf(sizes));
     }
 

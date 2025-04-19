@@ -6,9 +6,12 @@ import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemResponse;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface CartItemService {
     
-    List<CartItemResponse> getAllCartItems();
+    Page<CartItemResponse> getAllCartItems(Pageable pageable);
     
     CartItemResponse getCartItemById(String id);
     

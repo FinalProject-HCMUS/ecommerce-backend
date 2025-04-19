@@ -12,6 +12,8 @@ import com.hcmus.ecommerce_backend.product.service.SizeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,19 +31,23 @@ public class SizeServiceImpl implements SizeService {
     private final SizeMapper sizeMapper;
 
     @Override
-    public List<SizeResponse> getAllSizes() {
-        log.info("SizeServiceImpl | getAllSizes | Retrieving all sizes");
+    @Transactional(readOnly = true)
+    public Page<SizeResponse> getAllSizes(Pageable pageable) {
+        log.info("SizeServiceImpl | getAllSizes | Retrieving sizes with pagination - Page: {}, Size: {}, Sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         try {
-            List<SizeResponse> sizes = sizeRepository.findAll().stream()
-                    .map(sizeMapper::toResponse)
-                    .collect(Collectors.toList());
-            log.info("SizeServiceImpl | getAllSizes | Found {} sizes", sizes.size());
-            return sizes;
+            Page<Size> sizePage = sizeRepository.findAll(pageable);
+            Page<SizeResponse> sizeResponsePage = sizePage.map(sizeMapper::toResponse);
+            log.info("SizeServiceImpl | getAllSizes | Found {} sizes on page {} of {}",
+                    sizeResponsePage.getNumberOfElements(),
+                    sizeResponsePage.getNumber() + 1,
+                    sizeResponsePage.getTotalPages());
+            return sizeResponsePage;
         } catch (DataAccessException e) {
-            log.error("SizeServiceImpl | getAllSizes | Error retrieving sizes: {}", e.getMessage(), e);
-            return Collections.emptyList();
+            log.error("SizeServiceImpl | getAllSizes | Database error retrieving paginated sizes: {}", e.getMessage(), e);
+            return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("SizeServiceImpl | getAllSizes | Unexpected error: {}", e.getMessage(), e);
+            log.error("SizeServiceImpl | getAllSizes | Unexpected error retrieving paginated sizes: {}", e.getMessage(), e);
             throw e;
         }
     }
