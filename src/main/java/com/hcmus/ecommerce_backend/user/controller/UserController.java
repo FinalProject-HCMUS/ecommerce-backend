@@ -70,6 +70,19 @@ public class UserController {
                 return ResponseEntity.ok(CustomResponse.successOf(user));
         }
 
+        @Operation(summary = "Get current user profile", description = "Retrieves user profile based on the authentication token")
+        @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user profile"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CustomResponse.class))),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CustomResponse.class)))
+        })
+        @GetMapping("/me")
+        public ResponseEntity<CustomResponse<UserResponse>> getCurrentUser() {
+            log.info("UserController | getCurrentUser | Getting current user profile");
+            UserResponse user = userService.getCurrentUser();
+            return ResponseEntity.ok(CustomResponse.successOf(user));
+        }
+
         @Operation(summary = "Create a new user", description = "Creates a new user with the provided information")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "201", description = "User successfully created"),

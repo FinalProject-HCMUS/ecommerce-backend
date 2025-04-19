@@ -129,6 +129,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse getCurrentUser() {
+        log.info("UserServiceImpl | getCurrentUser | Getting current user details from token");
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
+                String userId = jwt.getClaimAsString("userId");
+                log.info("UserServiceImpl | getCurrentUser | Extracted user id: {}", userId);
+
+                User user = findUserById(userId);
+                return userMapper.toResponse(user);
+            } else {
+                log.error("UserServiceImpl | getCurrentUser | No valid authentication found in context");
+                throw new UserNotAuthorizedException("No valid authentication found");
+            }
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("UserServiceImpl | getCurrentUser | Unexpected error: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
     @Transactional
     public UserResponse updateUser(String id, UpdateUserRequest request) {
         Authentication authentication = SecurityContextHolder.getContext()
@@ -418,7 +441,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private User findUserById(String id) {
+    protected User findUserById(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("UserServiceImpl | findUserById | User not found with id: {}", id);
@@ -427,12 +450,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private boolean doesUserExistById(String id) {
+    protected boolean doesUserExistById(String id) {
         return userRepository.existsById(id);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private void checkUserEmailExists(String email) {
+    protected void checkUserEmailExists(String email) {
         if (userRepository.existsByEmail(email)) {
             log.error("UserServiceImpl | checkUserEmailExists | User already exists with email: {}", email);
             throw new UserAlreadyExistsException(email, true);
@@ -440,7 +463,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private void checkUserPhoneNumExists(String phoneNum) {
+    protected void checkUserPhoneNumExists(String phoneNum) {
         if (userRepository.existsByPhoneNum(phoneNum)) {
             log.error("UserServiceImpl | checkUserPhoneNumExists | User already exists with phone number: {}",
                     phoneNum);
