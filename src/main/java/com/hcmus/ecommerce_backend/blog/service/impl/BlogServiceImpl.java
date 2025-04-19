@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 
@@ -34,19 +37,23 @@ public class BlogServiceImpl implements BlogService {
     private final UserRepository userRepository;
 
     @Override
-    public List<BlogResponse> getAllBlogs() {
-        log.info("BlogServiceImpl | getAllBlogs | Retrieving all blogs");
+    @Transactional(readOnly = true)
+    public Page<BlogResponse> getAllBlogs(Pageable pageable) {
+        log.info("BlogServiceImpl | getAllBlogs | Retrieving blogs with pagination - Page: {}, Size: {}, Sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         try {
-            List<BlogResponse> blogs = blogRepository.findAll().stream()
-                    .map(blogMapper::toResponse)
-                    .collect(Collectors.toList());
-            log.info("BlogServiceImpl | getAllBlogs | Found {} blogs", blogs.size());
-            return blogs;
+            Page<Blog> blogPage = blogRepository.findAll(pageable);
+            Page<BlogResponse> blogResponsePage = blogPage.map(blogMapper::toResponse);
+            log.info("BlogServiceImpl | getAllBlogs | Found {} blogs on page {} of {}",
+                    blogResponsePage.getNumberOfElements(),
+                    blogResponsePage.getNumber() + 1,
+                    blogResponsePage.getTotalPages());
+            return blogResponsePage;
         } catch (DataAccessException e) {
-            log.error("BlogServiceImpl | getAllBlogs | Error retrieving blogs: {}", e.getMessage(), e);
-            return Collections.emptyList();
+            log.error("BlogServiceImpl | getAllBlogs | Database error retrieving paginated blogs: {}", e.getMessage(), e);
+            return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("BlogServiceImpl | getAllBlogs | Unexpected error: {}", e.getMessage(), e);
+            log.error("BlogServiceImpl | getAllBlogs | Unexpected error retrieving paginated blogs: {}", e.getMessage(), e);
             throw e;
         }
     }

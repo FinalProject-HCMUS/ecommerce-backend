@@ -4,11 +4,12 @@ import com.hcmus.ecommerce_backend.category.model.dto.request.CreateCategoryRequ
 import com.hcmus.ecommerce_backend.category.model.dto.request.UpdateCategoryRequest;
 import com.hcmus.ecommerce_backend.category.model.dto.response.CategoryResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CategoryService {
     
-    List<CategoryResponse> getAllCategories();
+    Page<CategoryResponse> getAllCategories(Pageable pageable);
     
     CategoryResponse getCategoryById(String id);
     

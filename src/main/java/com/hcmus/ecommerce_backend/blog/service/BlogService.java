@@ -1,6 +1,7 @@
 package com.hcmus.ecommerce_backend.blog.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.hcmus.ecommerce_backend.blog.model.dto.request.CreateBlogRequest;
 import com.hcmus.ecommerce_backend.blog.model.dto.request.UpdateBlogRequest;
@@ -8,7 +9,7 @@ import com.hcmus.ecommerce_backend.blog.model.dto.response.BlogResponse;
 
 public interface BlogService {
     
-    List<BlogResponse> getAllBlogs();
+    Page<BlogResponse> getAllBlogs(Pageable pageable);
     
     BlogResponse getBlogById(String id);
     
