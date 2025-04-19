@@ -11,6 +11,8 @@ import com.hcmus.ecommerce_backend.product.service.CartItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,19 +31,22 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CartItemResponse> getAllCartItems() {
-        log.info("CartItemServiceImpl | getAllCartItems | Retrieving all cart items");
+    public Page<CartItemResponse> getAllCartItems(Pageable pageable) {
+        log.info("CartItemServiceImpl | getAllCartItems | Retrieving cart items with pagination - Page: {}, Size: {}, Sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         try {
-            List<CartItemResponse> cartItems = cartItemRepository.findAll().stream()
-                    .map(cartItemMapper::toResponse)
-                    .collect(Collectors.toList());
-            log.info("CartItemServiceImpl | getAllCartItems | Found {} cart items", cartItems.size());
-            return cartItems;
+            Page<CartItem> cartItemPage = cartItemRepository.findAll(pageable);
+            Page<CartItemResponse> cartItemResponsePage = cartItemPage.map(cartItemMapper::toResponse);
+            log.info("CartItemServiceImpl | getAllCartItems | Found {} cart items on page {} of {}",
+                    cartItemResponsePage.getNumberOfElements(),
+                    cartItemResponsePage.getNumber() + 1,
+                    cartItemResponsePage.getTotalPages());
+            return cartItemResponsePage;
         } catch (DataAccessException e) {
-            log.error("CartItemServiceImpl | getAllCartItems | Error retrieving cart items: {}", e.getMessage(), e);
-            return Collections.emptyList();
+            log.error("CartItemServiceImpl | getAllCartItems | Database error retrieving paginated cart items: {}", e.getMessage(), e);
+            return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("CartItemServiceImpl | getAllCartItems | Unexpected error: {}", e.getMessage(), e);
+            log.error("CartItemServiceImpl | getAllCartItems | Unexpected error retrieving paginated cart items: {}", e.getMessage(), e);
             throw e;
         }
     }

@@ -5,6 +5,8 @@ import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateColorRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ColorResponse;
 import com.hcmus.ecommerce_backend.product.service.ColorService;
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
+import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,12 +17,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/colors")
@@ -31,12 +35,19 @@ public class ColorController {
 
     private final ColorService colorService;
 
-    @Operation(summary = "Get all colors", description = "Retrieves a list of all available colors")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved all colors")
+    @Operation(summary = "Get all colors", description = "Retrieves a paginated list of colors with sorting capabilities")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated colors")
     @GetMapping
-    public ResponseEntity<CustomResponse<List<ColorResponse>>> getAllColors() {
-        log.info("ColorController | getAllColors | Retrieving all colors");
-        List<ColorResponse> colors = colorService.getAllColors();
+    public ResponseEntity<CustomResponse<Page<ColorResponse>>> getAllColors(
+            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
+                    "Default sort order is ascending. " +
+                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
+        log.info("ColorController | getAllColors | page: {}, size: {}, sort: {}",
+                page, size, sort != null ? String.join(", ", sort) : "unsorted");
+        Pageable pageable = CreatePageable.build(page, size, sort);
+        Page<ColorResponse> colors = colorService.getAllColors(pageable);
         return ResponseEntity.ok(CustomResponse.successOf(colors));
     }
 

@@ -1,6 +1,7 @@
 package com.hcmus.ecommerce_backend.product.controller;
 
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
+import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateCartItemRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateCartItemRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemResponse;
@@ -15,6 +16,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +35,19 @@ public class CartItemController {
     
     private final CartItemService cartItemService;
     
-    @Operation(summary = "Get all cart items", description = "Retrieves a list of all available cart items")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved all cart items")
+    @Operation(summary = "Get all cart items", description = "Retrieves a paginated list of cart items")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated cart items")
     @GetMapping
-    public ResponseEntity<CustomResponse<List<CartItemResponse>>> getAllCartItems() {
-        log.info("CartItemController | getAllCartItems | Retrieving all cart items");
-        List<CartItemResponse> cartItems = cartItemService.getAllCartItems();
+    public ResponseEntity<CustomResponse<Page<CartItemResponse>>> getAllCartItems(
+            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
+                    "Default sort order is ascending. " +
+                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
+        log.info("CartItemController | getAllCartItems | page: {}, size: {}, sort: {}",
+                page, size, sort != null ? String.join(", ", sort) : "unsorted");
+        Pageable pageable = CreatePageable.build(page, size, sort);
+        Page<CartItemResponse> cartItems = cartItemService.getAllCartItems(pageable);
         return ResponseEntity.ok(CustomResponse.successOf(cartItems));
     }
     

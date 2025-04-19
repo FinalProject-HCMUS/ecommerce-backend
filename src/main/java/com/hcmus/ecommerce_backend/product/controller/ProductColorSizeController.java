@@ -1,6 +1,7 @@
 package com.hcmus.ecommerce_backend.product.controller;
 
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
+import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductColorSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductColorSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductColorSizeResponse;
@@ -15,6 +16,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +35,19 @@ public class ProductColorSizeController {
 
     private final ProductColorSizeService productColorSizeService;
 
-    @Operation(summary = "Get all product color sizes", description = "Retrieves all product color and size combinations")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved all product color sizes")
+    @Operation(summary = "Get all product color sizes", description = "Retrieves a paginated list of product color and size combinations")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated product color sizes")
     @GetMapping
-    public ResponseEntity<CustomResponse<List<ProductColorSizeResponse>>> getAllProductColorSizes() {
-        log.info("ProductColorSizeController | getAllProductColorSizes | Retrieving all product color sizes");
-        List<ProductColorSizeResponse> productColorSizes = productColorSizeService.getAllProductColorSizes();
+    public ResponseEntity<CustomResponse<Page<ProductColorSizeResponse>>> getAllProductColorSizes(
+            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
+                    "Default sort order is ascending. " +
+                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
+        log.info("ProductColorSizeController | getAllProductColorSizes | page: {}, size: {}, sort: {}",
+                page, size, sort != null ? String.join(", ", sort) : "unsorted");
+        Pageable pageable = CreatePageable.build(page, size, sort);
+        Page<ProductColorSizeResponse> productColorSizes = productColorSizeService.getAllProductColorSizes(pageable);
         return ResponseEntity.ok(CustomResponse.successOf(productColorSizes));
     }
 

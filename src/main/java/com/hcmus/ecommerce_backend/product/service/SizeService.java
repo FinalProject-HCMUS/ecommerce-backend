@@ -1,6 +1,7 @@
 package com.hcmus.ecommerce_backend.product.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateSizeRequest;
@@ -8,7 +9,7 @@ import com.hcmus.ecommerce_backend.product.model.dto.response.SizeResponse;
 
 public interface SizeService {
     
-    List<SizeResponse> getAllSizes();
+    Page<SizeResponse> getAllSizes(Pageable pageable);
 
     SizeResponse getSizeById(String id);
 

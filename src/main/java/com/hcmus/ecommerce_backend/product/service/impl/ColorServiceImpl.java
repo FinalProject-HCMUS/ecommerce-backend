@@ -12,6 +12,8 @@ import com.hcmus.ecommerce_backend.product.service.ColorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,19 +30,23 @@ public class ColorServiceImpl implements ColorService {
     private final ColorMapper colorMapper;
     
     @Override
-    public List<ColorResponse> getAllColors() {
-        log.info("ColorServiceImpl | getAllColors | Retrieving all colors");
+    @Transactional(readOnly = true)
+    public Page<ColorResponse> getAllColors(Pageable pageable) {
+        log.info("ColorServiceImpl | getAllColors | Retrieving colors with pagination - Page: {}, Size: {}, Sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         try {
-            List<ColorResponse> colors = colorRepository.findAll().stream()
-                    .map(colorMapper::toResponse)
-                    .collect(Collectors.toList());
-            log.info("ColorServiceImpl | getAllColors | Found {} colors", colors.size());
-            return colors;
+            Page<Color> colorPage = colorRepository.findAll(pageable);
+            Page<ColorResponse> colorResponsePage = colorPage.map(colorMapper::toResponse);
+            log.info("ColorServiceImpl | getAllColors | Found {} colors on page {} of {}",
+                    colorResponsePage.getNumberOfElements(),
+                    colorResponsePage.getNumber() + 1,
+                    colorResponsePage.getTotalPages());
+            return colorResponsePage;
         } catch (DataAccessException e) {
-            log.error("ColorServiceImpl | getAllColors | Error retrieving colors: {}", e.getMessage(), e);
-            return Collections.emptyList();
+            log.error("ColorServiceImpl | getAllColors | Database error retrieving paginated colors: {}", e.getMessage(), e);
+            return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("ColorServiceImpl | getAllColors | Unexpected error: {}", e.getMessage(), e);
+            log.error("ColorServiceImpl | getAllColors | Unexpected error retrieving paginated colors: {}", e.getMessage(), e);
             throw e;
         }
     }
