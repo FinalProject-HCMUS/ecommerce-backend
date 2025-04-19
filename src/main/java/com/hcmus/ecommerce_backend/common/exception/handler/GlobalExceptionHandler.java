@@ -15,6 +15,12 @@ import com.hcmus.ecommerce_backend.product.exception.ProductAlreadyExistsExcepti
 import com.hcmus.ecommerce_backend.product.exception.ProductNotFoundException;
 import com.hcmus.ecommerce_backend.review.exception.ReviewAlreadyExistsException;
 import com.hcmus.ecommerce_backend.review.exception.ReviewNotFoundException;
+import com.hcmus.ecommerce_backend.user.exception.EmailAlreadyConfirmedException;
+import com.hcmus.ecommerce_backend.user.exception.UserAlreadyExistsException;
+import com.hcmus.ecommerce_backend.user.exception.UserNotAuthorizedException;
+import com.hcmus.ecommerce_backend.user.exception.UserNotFoundException;
+import com.hcmus.ecommerce_backend.user.exception.VerificationTokenAlreadyExpired;
+import com.hcmus.ecommerce_backend.user.exception.VerificationTokenNotFoundException;
 
 import jakarta.validation.ConstraintViolationException;
 import org.apache.commons.lang3.StringUtils;
@@ -397,5 +403,112 @@ public class GlobalExceptionHandler {
                                 .build();
 
                 return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
+        }
+
+        /**
+         * Handles UserAlreadyExistsException thrown when a user already exists.
+         *
+         * @param ex The UserAlreadyExistsException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(UserAlreadyExistsException.class)
+        protected ResponseEntity<Object> handleUserAlreadyExistsException(final UserAlreadyExistsException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.CONFLICT)
+                                .header(CustomError.Header.ALREADY_EXIST.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
+        }
+
+        /**
+         * Handles UserNotFoundException thrown when a user is not found.
+         *
+         * @param ex The UserNotFoundException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(UserNotFoundException.class)
+        protected ResponseEntity<Object> handleUserNotFoundException(final UserNotFoundException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND)
+                                .header(CustomError.Header.NOT_FOUND.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+        }
+
+        /**
+         * Handles UserNotAuthorizedException thrown when a user is not authorized.
+         *
+         * @param ex The UserNotAuthorizedException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(UserNotAuthorizedException.class)
+        protected ResponseEntity<Object> handleUserNotAuthorizedException(final UserNotAuthorizedException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.FORBIDDEN)
+                                .header(CustomError.Header.AUTH_ERROR.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.FORBIDDEN);
+        }
+
+        /**
+         * Handles VerificationTokenAlreadyExpired thrown when a verification token has
+         * expired.
+         *
+         * @param ex The VerificationTokenAlreadyExpired instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(VerificationTokenAlreadyExpired.class)
+        protected ResponseEntity<Object> handleVerificationTokenAlreadyExpired(
+                        final VerificationTokenAlreadyExpired ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.BAD_REQUEST)
+                                .header(CustomError.Header.PROCESS_ERROR.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.BAD_REQUEST);
+        }
+
+        /**
+         * Handles EmailAlreadyConfirmedException thrown when an email is already
+         * confirmed.
+         *
+         * @param ex The EmailAlreadyConfirmedException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(EmailAlreadyConfirmedException.class)
+        protected ResponseEntity<Object> handleEmailAlreadyConfirmedException(final EmailAlreadyConfirmedException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.BAD_REQUEST)
+                                .header(CustomError.Header.PROCESS_ERROR.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.BAD_REQUEST);
+        }
+
+        /**
+         * Handles VerificationTokenNotFoundException thrown when a verification token
+         * is not found.
+         *
+         * @param ex The VerificationTokenNotFoundException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(VerificationTokenNotFoundException.class)
+        protected ResponseEntity<Object> handleVerificationTokenNotFoundException(
+                        final VerificationTokenNotFoundException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.BAD_REQUEST)
+                                .header(CustomError.Header.NOT_FOUND.getName())
+                                .message(ex.getMessage())
+                                .build();
+
+                return new ResponseEntity<>(customError, HttpStatus.BAD_REQUEST);
         }
 }

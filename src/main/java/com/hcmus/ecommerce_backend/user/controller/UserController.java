@@ -183,6 +183,19 @@ public class UserController {
                 return ResponseEntity.ok(CustomResponse.SUCCESS);
         }
 
+        @Operation(summary = "Validate password reset token", description = "Checks if a password reset token is valid and not expired")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Token is valid and not expired"),
+                        @ApiResponse(responseCode = "400", description = "Invalid or expired token", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CustomResponse.class)))
+        })
+        @GetMapping("/validate-reset-token")
+        public ResponseEntity<CustomResponse<Void>> validateResetToken(
+                        @Parameter(description = "Reset token to validate", required = true) @RequestParam String token) {
+                log.info("UserController | validateResetToken | Validating reset token");
+                userService.validateResetToken(token);
+                return ResponseEntity.ok(CustomResponse.SUCCESS);
+        }
+
         private Pageable createPageable(int page, int size, String[] sortParams) {
                 if (sortParams == null || sortParams.length == 0) {
                         return PageRequest.of(page, size);

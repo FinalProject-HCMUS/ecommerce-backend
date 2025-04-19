@@ -30,5 +30,7 @@ public interface UserService {
 
     void sendResetPasswordEmail(String email);
 
+    void validateResetToken(String token);
+
     void resetPassword(ResetPasswordRequest request);
 }

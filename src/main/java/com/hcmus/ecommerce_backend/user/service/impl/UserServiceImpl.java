@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.hcmus.ecommerce_backend.user.exception.VerificationTokenAlreadyExpired;
+import com.hcmus.ecommerce_backend.user.exception.VerificationTokenNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -245,7 +246,7 @@ public class UserServiceImpl implements UserService {
         log.info("Confirming email with token: {}", token);
 
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid confirmation token"));
+                .orElseThrow(() -> new VerificationTokenNotFoundException());
 
         if (LocalDateTime.now()
                 .isAfter(verificationToken.getExpiryDate())) {
@@ -362,20 +363,40 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void validateResetToken(String token) {
+        log.info("UserServiceImpl | validateResetToken | Validating reset token");
+
+        try {
+            VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
+                    .orElseThrow(() -> new VerificationTokenNotFoundException());
+
+            if (LocalDateTime.now().isAfter(verificationToken.getExpiryDate())) {
+                throw new VerificationTokenAlreadyExpired();
+            }
+
+            // If we reach here, the token is valid
+            log.info("Reset token is valid for user: {}", verificationToken.getUser().getId());
+        } catch (Exception e) {
+            log.error("Error validating reset token: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
     @Transactional
     public void resetPassword(ResetPasswordRequest request) {
         log.info("UserServiceImpl | resetPassword | Resetting password with token");
 
-        if(!request.getNewPassword().equals(request.getConfirmPassword())) {
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new IllegalArgumentException("New password and confirm password do not match");
         }
         try {
             VerificationToken verificationToken = verificationTokenRepository.findByToken(request.getToken())
-                    .orElseThrow(() -> new RuntimeException("Invalid reset token"));
+                    .orElseThrow(() -> new VerificationTokenNotFoundException());
 
             if (LocalDateTime.now().isAfter(verificationToken.getExpiryDate())) {
                 verificationTokenRepository.delete(verificationToken);
-                throw new VerificationTokenAlreadyExpired("Reset password token has expired");
+                throw new VerificationTokenAlreadyExpired();
             }
 
             User user = verificationToken.getUser();
