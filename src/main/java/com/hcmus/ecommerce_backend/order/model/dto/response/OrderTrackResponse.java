@@ -24,7 +24,16 @@ public class OrderTrackResponse {
     
     @Schema(description = "Status of the order at this tracking point", example = "SHIPPED")
     private Status status;
-    
-    @Schema(description = "Time when the status was updated", example = "2023-05-12T14:30:00")
-    private LocalDateTime updatedTime;
+
+    @Schema(description = "Date and time when the order track was created")
+    private LocalDateTime createdAt;
+
+    @Schema(description = "User who created the order track", example = "admin")
+    private String createdBy;
+
+    @Schema(description = "Date and time when the order track was last updated")
+    private LocalDateTime updatedAt;
+
+    @Schema(description = "User who last updated the order track", example = "admin")
+    private String updatedBy;
 }

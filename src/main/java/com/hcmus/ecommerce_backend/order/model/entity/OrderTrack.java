@@ -31,9 +31,6 @@ public class OrderTrack extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Status status = Status.NEW;
 
-    @Column(name = "updated_time")
-    private LocalDateTime updatedTime;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;

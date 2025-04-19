@@ -24,7 +24,6 @@ public interface OrderMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
-    @Mapping(target = "orderDate", ignore = true)
     @Mapping(target = "status", ignore = true)
     Order toEntity(CreateOrderRequest request);
     
@@ -34,6 +33,5 @@ public interface OrderMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
-    @Mapping(target = "orderDate", ignore = true)
     void updateEntity(UpdateOrderRequest request, @MappingTarget Order order);
 }

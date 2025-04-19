@@ -7,6 +7,7 @@ import com.hcmus.ecommerce_backend.user.model.dto.request.ResetPasswordRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.request.UpdateUserRequest;
 import com.hcmus.ecommerce_backend.user.model.dto.response.UserResponse;
 import com.hcmus.ecommerce_backend.user.service.UserService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,16 +20,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
 
 @RestController
 @RequestMapping("/users")
@@ -52,7 +50,7 @@ public class UserController {
                                         "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
                 log.info("UserController | getPaginatedUsers | page: {}, size: {}, sort: {}",
                                 page, size, sort != null ? String.join(", ", sort) : "unsorted");
-                Pageable pageable = createPageable(page, size, sort);
+                Pageable pageable = CreatePageable.build(page, size, sort);
                 Page<UserResponse> users = userService.getAllUsers(pageable);
                 return ResponseEntity.ok(CustomResponse.successOf(users));
         }
@@ -207,25 +205,5 @@ public class UserController {
                 log.info("UserController | validateResetToken | Validating reset token");
                 userService.validateResetToken(token);
                 return ResponseEntity.ok(CustomResponse.SUCCESS);
-        }
-
-        private Pageable createPageable(int page, int size, String[] sortParams) {
-                if (sortParams == null || sortParams.length == 0) {
-                        return PageRequest.of(page, size);
-                }
-
-                List<Sort.Order> orders = new ArrayList<>();
-                for (String param : sortParams) {
-                        if (param.contains(",")) {
-                                String[] parts = param.split(",");
-                                Sort.Direction direction = parts[1].equalsIgnoreCase("desc") ? Sort.Direction.DESC
-                                                : Sort.Direction.ASC;
-                                orders.add(new Sort.Order(direction, parts[0]));
-                        } else {
-                                orders.add(new Sort.Order(Sort.Direction.ASC, param));
-                        }
-                }
-
-                return PageRequest.of(page, size, Sort.by(orders));
         }
 }

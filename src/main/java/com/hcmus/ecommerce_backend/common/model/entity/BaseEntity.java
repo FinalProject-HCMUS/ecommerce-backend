@@ -1,14 +1,6 @@
 package com.hcmus.ecommerce_backend.common.model.entity;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-
 import com.hcmus.ecommerce_backend.auth.model.enums.TokenClaims;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
@@ -18,6 +10,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -54,15 +52,16 @@ public class BaseEntity {
         this.updatedBy = getCurrentUserIdentifier();
         this.updatedAt = LocalDateTime.now();
     }
-    
+
     /**
      * Gets the current user identifier from the security context.
      * Handles different authentication principal types.
-     * 
+     *
      * @return the user identifier or "anonymousUser" if none is available
      */
     private String getCurrentUserIdentifier() {
-        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+        return Optional.ofNullable(SecurityContextHolder.getContext()
+                        .getAuthentication())
                 .map(Authentication::getPrincipal)
                 .map(principal -> {
                     if (principal instanceof Jwt jwt) {

@@ -13,7 +13,7 @@ public interface OrderTrackRepository extends JpaRepository<OrderTrack, String> 
     
     List<OrderTrack> findByOrderId(String orderId);
     
-    List<OrderTrack> findByStatusOrderByUpdatedTimeDesc(Status status);
+    List<OrderTrack> findByStatusOrderByUpdatedAtDesc(Status status);
     
-    List<OrderTrack> findByOrderIdOrderByUpdatedTimeDesc(String orderId);
+    List<OrderTrack> findByOrderIdOrderByUpdatedAtDesc(String orderId);
 }

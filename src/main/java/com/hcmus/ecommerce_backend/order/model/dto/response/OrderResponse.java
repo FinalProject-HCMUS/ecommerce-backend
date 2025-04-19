@@ -33,9 +33,6 @@ public class OrderResponse {
     @Schema(description = "Current status of the order", example = "PROCESSING")
     private Status status;
     
-    @Schema(description = "Order creation date", example = "2023-05-10T10:30:00")
-    private LocalDateTime orderDate;
-    
     @Schema(description = "Expected delivery date", example = "2023-05-15T15:30:00")
     private LocalDateTime deliveryDate;
     

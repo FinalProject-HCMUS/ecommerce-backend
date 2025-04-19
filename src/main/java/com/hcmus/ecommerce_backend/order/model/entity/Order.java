@@ -40,10 +40,6 @@ public class Order extends BaseEntity{
     @Column(name = "delivery_date")
     private LocalDateTime deliveryDate;
 
-    @Builder.Default
-    @Column(name = "order_date")
-    private LocalDateTime orderDate = LocalDateTime.now();
-
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
@@ -62,6 +58,9 @@ public class Order extends BaseEntity{
 
     @Column(name = "customer_id")
     private String customerId; // References Users entity
+
+    @Column(name = "is_paid")
+    private Boolean isPaid;
 
     // Relationships
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

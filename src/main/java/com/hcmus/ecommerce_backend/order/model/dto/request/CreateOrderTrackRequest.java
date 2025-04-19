@@ -25,10 +25,6 @@ public class CreateOrderTrackRequest {
     @Schema(description = "Status of the order at this tracking point", example = "NEW", required = true)
     private Status status;
     
-    @Builder.Default
-    @Schema(description = "Time when the status was updated", example = "2023-05-12T14:30:00")
-    private LocalDateTime updatedTime = LocalDateTime.now();
-    
     @NotBlank(message = "Order ID is required")
     @Schema(description = "ID of the order this tracking belongs to", example = "550e8400-e29b-41d4-a716-446655440000", required = true)
     private String orderId;

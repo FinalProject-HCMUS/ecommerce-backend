@@ -73,7 +73,7 @@ public class OrderTrackServiceImpl implements OrderTrackService {
     public List<OrderTrackResponse> getOrderTracksByOrderId(String orderId) {
         log.info("OrderTrackServiceImpl | getOrderTracksByOrderId | orderId: {}", orderId);
         try {
-            List<OrderTrackResponse> orderTracks = orderTrackRepository.findByOrderIdOrderByUpdatedTimeDesc(orderId).stream()
+            List<OrderTrackResponse> orderTracks = orderTrackRepository.findByOrderIdOrderByUpdatedAtDesc(orderId).stream()
                     .map(orderTrackMapper::toResponse)
                     .collect(Collectors.toList());
             log.info("OrderTrackServiceImpl | getOrderTracksByOrderId | Found {} order tracks for order {}", 
@@ -94,7 +94,7 @@ public class OrderTrackServiceImpl implements OrderTrackService {
     public List<OrderTrackResponse> getOrderTracksByStatus(Status status) {
         log.info("OrderTrackServiceImpl | getOrderTracksByStatus | status: {}", status);
         try {
-            List<OrderTrackResponse> orderTracks = orderTrackRepository.findByStatusOrderByUpdatedTimeDesc(status).stream()
+            List<OrderTrackResponse> orderTracks = orderTrackRepository.findByStatusOrderByUpdatedAtDesc(status).stream()
                     .map(orderTrackMapper::toResponse)
                     .collect(Collectors.toList());
             log.info("OrderTrackServiceImpl | getOrderTracksByStatus | Found {} order tracks with status {}", 
@@ -234,7 +234,7 @@ public class OrderTrackServiceImpl implements OrderTrackService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private boolean doesOrderTrackExistById(String id) {
+    protected boolean doesOrderTrackExistById(String id) {
         return orderTrackRepository.existsById(id);
     }
 }
