@@ -12,13 +12,11 @@ import com.hcmus.ecommerce_backend.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,19 +27,23 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
     
     @Override
-    public List<CategoryResponse> getAllCategories() {
-        log.info("CategoryServiceImpl | getAllCategories | Retrieving all categories");
+    @Transactional(readOnly = true)
+    public Page<CategoryResponse> getAllCategories(Pageable pageable) {
+        log.info("CategoryServiceImpl | getAllCategories | Retrieving categories with pagination - Page: {}, Size: {}, Sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         try {
-            List<CategoryResponse> categories = categoryRepository.findAll().stream()
-                    .map(categoryMapper::toResponse)
-                    .collect(Collectors.toList());
-            log.info("CategoryServiceImpl | getAllCategories | Found {} categories", categories.size());
-            return categories;
+            Page<Category> categoryPage = categoryRepository.findAll(pageable);
+            Page<CategoryResponse> categoryResponsePage = categoryPage.map(categoryMapper::toResponse);
+            log.info("CategoryServiceImpl | getAllCategories | Found {} categories on page {} of {}",
+                    categoryResponsePage.getNumberOfElements(),
+                    categoryResponsePage.getNumber() + 1,
+                    categoryResponsePage.getTotalPages());
+            return categoryResponsePage;
         } catch (DataAccessException e) {
-            log.error("CategoryServiceImpl | getAllCategories | Error retrieving categories: {}", e.getMessage(), e);
-            return Collections.emptyList();
+            log.error("CategoryServiceImpl | getAllCategories | Database error retrieving paginated categories: {}", e.getMessage(), e);
+            return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("CategoryServiceImpl | getAllCategories | Unexpected error: {}", e.getMessage(), e);
+            log.error("CategoryServiceImpl | getAllCategories | Unexpected error retrieving paginated categories: {}", e.getMessage(), e);
             throw e;
         }
     }
