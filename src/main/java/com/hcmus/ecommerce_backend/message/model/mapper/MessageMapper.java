@@ -12,10 +12,10 @@ public interface MessageMapper {
     MessageResponse toResponse(Message message);
     
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "conversation.id", source = "conversationId")
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
     Message toEntity(CreateMessageRequest request);
-
 }

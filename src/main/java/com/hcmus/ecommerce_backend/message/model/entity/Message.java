@@ -5,10 +5,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
-import com.hcmus.ecommerce_backend.message.model.enums.RoleChat;
 
 @Entity
-@Table(name = "message")
+@Table(name = "messages")
 @Getter
 @Setter
 @SuperBuilder
@@ -24,13 +23,10 @@ public class Message extends BaseEntity {
     @Column(name = "content")
     private String content;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role_chat")
-    private RoleChat roleChat;
+    @Column(name = "user_id")
+    private String userId; // References Users entity
 
-    @Column(name = "customer_id")
-    private String customerId; // References Users entity
-
-    @Column(name = "admin_id")
-    private String adminId; // References Users entity
+    @ManyToOne
+    @JoinColumn(name = "conversation_id", referencedColumnName = "id")
+    private Conversation conversation; // References Conversation entity
 }

@@ -3,6 +3,9 @@ package com.hcmus.ecommerce_backend.common.exception.handler;
 import com.hcmus.ecommerce_backend.category.exception.CategoryAlreadyExistsException;
 import com.hcmus.ecommerce_backend.category.exception.CategoryNotFoundException;
 import com.hcmus.ecommerce_backend.common.model.dto.CustomError;
+import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
+import com.hcmus.ecommerce_backend.message.exception.ConversationAlreadyExistsException;
+import com.hcmus.ecommerce_backend.message.exception.ConversationNotFoundException;
 import com.hcmus.ecommerce_backend.message.exception.MessageAlreadyExistsException;
 import com.hcmus.ecommerce_backend.message.exception.MessageNotFoundException;
 import com.hcmus.ecommerce_backend.product.exception.CartItemAlreadyExistsException;
@@ -31,6 +34,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -510,5 +514,27 @@ public class GlobalExceptionHandler {
                                 .build();
 
                 return new ResponseEntity<>(customError, HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(ConversationNotFoundException.class)
+        public ResponseEntity<Object> handleConversationNotFoundException(final 
+                        ConversationNotFoundException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND)
+                                .header(CustomError.Header.NOT_FOUND.getName())
+                                .message(ex.getMessage())
+                                .build();
+                return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+        }
+
+        @ExceptionHandler(ConversationAlreadyExistsException.class)
+        public ResponseEntity<Object> handleConversationAlreadyExistsException(
+                        final ConversationAlreadyExistsException ex) {
+                CustomError customError = CustomError.builder()
+                                .httpStatus(HttpStatus.CONFLICT)
+                                .header(CustomError.Header.ALREADY_EXIST.getName())
+                                .message(ex.getMessage())
+                                .build();
+                return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
         }
 }
