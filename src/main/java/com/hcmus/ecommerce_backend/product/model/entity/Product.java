@@ -1,5 +1,7 @@
 package com.hcmus.ecommerce_backend.product.model.entity;
 
+import java.util.List;
+
 import com.hcmus.ecommerce_backend.category.model.entity.Category;
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
 
@@ -59,4 +61,7 @@ public class Product extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @OneToMany(mappedBy = "product")
+    private List<ProductColorSize> productColorSizes;
 }

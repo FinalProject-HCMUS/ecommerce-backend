@@ -1,6 +1,7 @@
 package com.hcmus.ecommerce_backend.product.controller;
 
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
+import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductResponse;
@@ -15,6 +16,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,15 +38,31 @@ public class ProductController {
     
     private final ProductService productService;
     
-    @Operation(summary = "Get all products", description = "Retrieves a list of all available products")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved all products")
+    @Operation(summary = "Get all products with filters", description = "Retrieves a paginated list of products with filters and sorting capabilities")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved filtered products")
     @GetMapping
-    public ResponseEntity<CustomResponse<List<ProductResponse>>> getAllProducts() {
-        log.info("ProductController | getAllProducts | Retrieving all products");
-        List<ProductResponse> products = productService.getAllProducts();
+    public ResponseEntity<CustomResponse<Page<ProductResponse>>> getAllProducts(
+            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int perpage,
+            @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
+                    "Default sort order is ascending. " +
+                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort,
+            @Parameter(description = "Keyword to search in product name or description") @RequestParam(required = false) String keysearch,
+            @Parameter(description = "Filter by category ID (UUID)") @RequestParam(required = false) String category,
+            @Parameter(description = "Minimum price (inclusive)") @RequestParam(required = false) Double fromprice,
+            @Parameter(description = "Maximum price (inclusive)") @RequestParam(required = false) Double toprice,
+            @Parameter(description = "Filter by color") @RequestParam(required = false) String color,
+            @Parameter(description = "Filter by size (e.g., S, M, L, XL)") @RequestParam(required = false) String size) {
+    
+        log.info("ProductController | getAllProducts | page: {}, perpage: {}, sort: {}, filters: keysearch={}, category={}, fromprice={}, toprice={}, color={}, size={}",
+                page, perpage, sort != null ? String.join(", ", sort) : "unsorted", keysearch, category, fromprice, toprice, color, size);
+    
+        Pageable pageable = CreatePageable.build(page, perpage, sort);
+        Page<ProductResponse> products = productService.getAllProducts(pageable, keysearch, category, fromprice, toprice, color, size);
+    
         return ResponseEntity.ok(CustomResponse.successOf(products));
     }
-    
+
     @Operation(summary = "Get product by ID", description = "Retrieves a specific product by its ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Product found"),

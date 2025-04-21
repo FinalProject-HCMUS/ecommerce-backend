@@ -6,9 +6,12 @@ import com.hcmus.ecommerce_backend.product.model.dto.response.ProductResponse;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface ProductService {
     
-    List<ProductResponse> getAllProducts();
+    Page<ProductResponse> getAllProducts(Pageable pageable, String keysearch, String category, Double fromprice, Double toprice, String color, String size);
     
     ProductResponse getProductById(String id);
     
