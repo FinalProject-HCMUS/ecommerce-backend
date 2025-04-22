@@ -8,5 +8,6 @@ import com.hcmus.ecommerce_backend.auth.model.dto.response.TokenResponse;
 public interface AuthenticationService {
     TokenResponse login(LoginRequest loginRequest);
     TokenResponse refreshToken(TokenRefreshRequest tokenRefreshRequest);
+    TokenResponse outboundAuthentication(String code);
     void logout(TokenInvalidateRequest tokenInvalidateRequest);
 }

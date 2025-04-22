@@ -1,8 +1,14 @@
 package com.hcmus.ecommerce_backend.auth.service.impl;
 
+import com.hcmus.ecommerce_backend.auth.client.OutboundIdentityClient;
+import com.hcmus.ecommerce_backend.auth.client.OutboundUserClient;
+import com.hcmus.ecommerce_backend.auth.model.dto.request.ExchangeTokenRequest;
+import com.hcmus.ecommerce_backend.auth.model.dto.response.OutboundUserResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,7 +42,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         private final TokenValidationService tokenValidationService;
         private final TokenManagementService tokenManagementService;
         private final TokenMapper tokenMapper;
-
+        private final OutboundIdentityClient outboundIdentityClient;
+        private final OutboundUserClient outboundUserClient;
+        @NonFinal
+        @Value("${outbound.identity.client-id}")
+        protected String CLIENT_ID;
+        @NonFinal
+        @Value("${outbound.identity.client-secret}")
+        protected String CLIENT_SECRET;
+        @NonFinal
+        @Value("${redirect-uri}")
+        protected String REDIRECT_URI;
+        @NonFinal
+        protected String GRANT_TYPE = "authorization_code";
         @Override
         @Cacheable(value = "userTokens", key = "#loginRequest.email")
         public TokenResponse login(LoginRequest loginRequest) {
@@ -69,6 +87,36 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 Token token = tokenGenerationService.generateToken(user.getClaims(),
                                 tokenRefreshRequest.getRefreshToken());
 
+                TokenResponse tokenResponse = tokenMapper.toTokenResponse(token);
+                return tokenResponse;
+        }
+
+        @Override
+        public TokenResponse outboundAuthentication(String code) {
+                var accessToken = outboundIdentityClient.exchangeToken(
+                        ExchangeTokenRequest.builder()
+                                .code(code)
+                                .clientId(CLIENT_ID)
+                                .clientSecret(CLIENT_SECRET)
+                                .redirectUri(REDIRECT_URI)
+                                .grantType(GRANT_TYPE)
+                                .build()
+                );
+                OutboundUserResponse userResponse = outboundUserClient.getUserInfo("json", accessToken.getAccessToken());
+                // Check if the user already exists in the database
+                User user = userRepository.findByEmail(userResponse.getEmail())
+                                .orElseGet(() -> {
+                                        // If the user does not exist, create a new user
+                                        User newUser = User.builder()
+                                                        .email(userResponse.getEmail())
+                                                        .firstName(userResponse.getName())
+                                                        .lastName(userResponse.getGivenName())
+                                                        .photo(userResponse.getPicture())
+                                                        .enabled(true)
+                                                        .build();
+                                        return userRepository.save(newUser);
+                                });
+                Token token = tokenGenerationService.generateToken(user.getClaims());
                 TokenResponse tokenResponse = tokenMapper.toTokenResponse(token);
                 return tokenResponse;
         }

@@ -120,6 +120,19 @@ public class AuthController {
     return ResponseEntity.ok(authentication);
   }
 
+  @Operation(summary = "Outbound authentication", description = "Handles outbound authentication using an authorization code")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Outbound authentication successful"),
+        @ApiResponse(responseCode = "400", description = "Invalid authorization code",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class)))
+    })
+  @PostMapping("/outbound/authentication")
+  ResponseEntity<CustomResponse<TokenResponse>> outboundAuthenticate(@RequestParam("code") String code) throws Exception {
+    TokenResponse tokenResponse =  authenticationService.outboundAuthentication(code);
+    return ResponseEntity.ok().body(CustomResponse.successOf(tokenResponse));
+  }
+
   /**
    * Helper method to extract JWT token from Authorization header
    */
