@@ -37,7 +37,7 @@ fi
 
 # Stop any running postgres container from this project
 info "Stopping any running PostgreSQL container..."
-docker-compose -f docker-compose.dev.yml down
+docker compose -f docker-compose.dev.yml down
 
 # Optional: Clean up volumes if the -c or --clean flag is provided
 if [[ "$1" == "-c" || "$1" == "--clean" ]]; then
@@ -48,7 +48,7 @@ fi
 
 # Start the postgres container in detached mode
 info "Starting PostgreSQL database..."
-docker-compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml up -d
 
 # Check the exit status of the last command
 if [ $? -ne 0 ]; then
@@ -64,4 +64,4 @@ fi
 
 # Display container status
 info "Container status:"
-docker-compose -f docker-compose.dev.yml ps
+docker compose -f docker-compose.dev.yml ps
