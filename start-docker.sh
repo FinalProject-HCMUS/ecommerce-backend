@@ -43,7 +43,7 @@ fi
 
 # Stop any running containers for this project
 info "Stopping any running containers..."
-docker-compose down
+docker compose down
 
 # Optional: Clean up volumes if the -c or --clean flag is provided
 if [[ "$1" == "-c" || "$1" == "--clean" ]]; then
@@ -56,11 +56,11 @@ fi
 
 # Build the services
 info "Building services..."
-docker-compose build
+docker compose build
 
 # Start the services in detached mode
 info "Starting services..."
-docker-compose up -d
+docker compose up -d
 
 # Check the exit status of the last command
 if [ $? -ne 0 ]; then
@@ -74,4 +74,4 @@ fi
 
 # Display container status
 info "Container status:"
-docker-compose ps
+docker compose ps
