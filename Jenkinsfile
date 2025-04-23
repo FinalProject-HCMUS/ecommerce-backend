@@ -6,6 +6,9 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Check User') {
+            sh 'whoami'
+        }
         stage('Run start script') {
             steps {
                 sh 'chmod +x start-docker.sh'
