@@ -18,6 +18,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'environment-file', variable: 'ENV_FILE')]) {
                     sh '''
+                        #!/bin/bash
                         set -a; source $ENV_FILE; set +a
                         chmod +x start-docker.sh
                         ./start-docker.sh
