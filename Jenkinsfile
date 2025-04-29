@@ -14,7 +14,7 @@ pipeline {
             }
         }
 
-        stage('Load .env file') {
+        stage('Run Start Script') {
             steps {
                 withCredentials([file(credentialsId: 'environment-file', variable: 'ENV_FILE')]) {
                     sh '''
@@ -24,17 +24,12 @@ pipeline {
                         set +a
                         # Example: Print a variable
                         echo "MAIL_USERNAME=$MAIL_USERNAME"
+
+                        # Run Start Script
+                        chmod +x start-docker.sh
+                        ./start-docker.sh
                     '''
                 }
-            }
-        }
-
-        stage('Run Start Script') {
-            steps {
-                sh '''
-                    chmod +x start-docker.sh
-                    ./start-docker.sh
-                '''
             }
         }
     }
