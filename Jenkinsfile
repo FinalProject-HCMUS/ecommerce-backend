@@ -14,6 +14,21 @@ pipeline {
             }
         }
 
+        stage('Load .env file') {
+            steps {
+                withCredentials([file(credentialsId: 'environment-file', variable: 'ENV_FILE')]) {
+                    sh '''
+                        # Export variables from .env file
+                        set -a  # Automatically export all variables
+                        source $ENV_FILE
+                        set +a
+                        # Example: Print a variable
+                        echo "MAIL_USERNAME=$MAIL_USERNAME"
+                    '''
+                }
+            }
+        }
+
         stage('Run Start Script') {
             steps {
                 sh '''
