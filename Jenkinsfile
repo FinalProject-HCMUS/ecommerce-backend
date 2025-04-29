@@ -20,7 +20,7 @@ pipeline {
                     sh '''
                         # Export variables from .env file
                         set -a  # Automatically export all variables
-                        source $ENV_FILE
+                        . $ENV_FILE
                         set +a
                         # Example: Print a variable
                         echo "MAIL_USERNAME=$MAIL_USERNAME"
