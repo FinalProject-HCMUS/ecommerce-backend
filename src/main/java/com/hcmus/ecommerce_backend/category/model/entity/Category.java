@@ -33,4 +33,7 @@ public class Category extends BaseEntity {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "stock", nullable = false)
+    private int stock;
 }

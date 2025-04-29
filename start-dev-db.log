@@ -1,12 +1,10 @@
 [0;32m[INFO][0m Using PostgreSQL settings from .env file
 [0;32m[INFO][0m Stopping any running PostgreSQL container...
-time="2025-04-20T20:22:38+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
+time="2025-04-28T00:52:18+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
 [0;32m[INFO][0m Starting PostgreSQL database...
-time="2025-04-20T20:22:39+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
+time="2025-04-28T00:52:18+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
  Network ecommerce-backend_ecommerce-network  Creating
  Network ecommerce-backend_ecommerce-network  Created
- Volume "ecommerce-backend_postgres-data"  Creating
- Volume "ecommerce-backend_postgres-data"  Created
  Container ecommerce-backend-postgres-1  Creating
  Container ecommerce-backend-postgres-1  Created
  Container ecommerce-backend-postgres-1  Starting
@@ -17,6 +15,6 @@ time="2025-04-20T20:22:39+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 [0;32m[INFO][0m Username: postgres
 [0;32m[INFO][0m Password: postgres
 [0;32m[INFO][0m Container status:
-time="2025-04-20T20:22:40+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
+time="2025-04-28T00:52:19+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
 NAME                           IMAGE             COMMAND                  SERVICE    CREATED        STATUS                  PORTS
 ecommerce-backend-postgres-1   postgres:latest   "docker-entrypoint.s…"   postgres   1 second ago   Up Less than a second   0.0.0.0:5432->5432/tcp

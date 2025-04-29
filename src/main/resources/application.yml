@@ -4,21 +4,23 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
   jpa:
-    defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    baseline-version: 0  # Start version numbering at 0
+    out-of-order: true  # Allow out-of-order migrations
+    validate-on-migrate: false
   sql:
     init:
-      mode: always
-      platform: postgres
-      encoding: UTF-8
-      separator: ";"
-      continue-on-error: true
+      mode: never
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}
@@ -27,11 +29,12 @@ spring:
     properties:
       mail.smtp.auth: ${MAIL_PROPERTIES_MAIL_SMTP_AUTH}
       mail.smtp.starttls.enable: ${MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE}
-  #Login with social media
-  outbound:
-    identity:
-      client-id: ${CLIENT_ID}
-      client-secret: ${CLIENT_SECRET}
+
+#Login with social media
+outbound:
+  identity:
+    client-id: ${CLIENT_ID}
+    client-secret: ${CLIENT_SECRET}
   redirect-uri: ${REDIRECT_URI}
 
 logging:

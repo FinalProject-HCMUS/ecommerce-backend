@@ -1,32 +1,32 @@
 [INFO] Stopping any running containers...
-time="2025-04-19T09:08:12+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+time="2025-04-29T15:51:03+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
 [INFO] Building services...
-time="2025-04-19T09:08:13+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+time="2025-04-29T15:51:03+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
 #0 building with "desktop-linux" instance using docker driver
 
 #1 [app internal] load build definition from Dockerfile
 #1 transferring dockerfile: 699B done
 #1 DONE 0.0s
 
-#2 [app internal] load metadata for docker.io/library/eclipse-temurin:17-jre-alpine
-#2 DONE 0.9s
+#2 [app internal] load metadata for docker.io/library/maven:3.9.8-eclipse-temurin-17
+#2 DONE 2.4s
 
-#3 [app internal] load metadata for docker.io/library/maven:3.9.8-eclipse-temurin-17
-#3 DONE 0.9s
+#3 [app internal] load metadata for docker.io/library/eclipse-temurin:17-jre-alpine
+#3 DONE 2.7s
 
 #4 [app internal] load .dockerignore
 #4 transferring context: 2B done
 #4 DONE 0.0s
 
-#5 [app stage-1 1/3] FROM docker.io/library/eclipse-temurin:17-jre-alpine@sha256:865cca6d0b31f284a5fc4e8cbd8f9375f470fd07cf6e909cea62f2790d4187fe
+#5 [app build 1/9] FROM docker.io/library/maven:3.9.8-eclipse-temurin-17@sha256:d62e34e458c64b13e7a38ec055264082b4235a1ea2c3b3d881ad04d6ca20311e
 #5 DONE 0.0s
 
-#6 [app build 1/9] FROM docker.io/library/maven:3.9.8-eclipse-temurin-17@sha256:d62e34e458c64b13e7a38ec055264082b4235a1ea2c3b3d881ad04d6ca20311e
+#6 [app stage-1 1/3] FROM docker.io/library/eclipse-temurin:17-jre-alpine@sha256:b10e4fda9d71b3819a91fbb0dbb28512edbb37a45f6af2a301c780223bb42fb8
 #6 DONE 0.0s
 
 #7 [app internal] load build context
-#7 transferring context: 52.23kB 0.0s done
-#7 DONE 0.0s
+#7 transferring context: 98.91MB 2.9s done
+#7 DONE 2.9s
 
 #8 [app build 2/9] WORKDIR /app
 #8 CACHED
@@ -38,7 +38,7 @@ time="2025-04-19T09:08:13+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 #10 CACHED
 
 #11 [app build 5/9] COPY src ./src
-#11 DONE 0.1s
+#11 DONE 0.5s
 
 #12 [app build 6/9] COPY .mvn ./.mvn
 #12 DONE 0.1s
@@ -50,67 +50,79 @@ time="2025-04-19T09:08:13+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 #14 DONE 0.1s
 
 #15 [app build 9/9] RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests
-#15 1.242 [INFO] Scanning for projects...
-#15 1.454 [INFO] 
-#15 1.454 [INFO] --------------------< com.hcmus:ecommerce-backend >---------------------
-#15 1.454 [INFO] Building ecommerce-backend 0.0.1-SNAPSHOT
-#15 1.454 [INFO]   from pom.xml
-#15 1.455 [INFO] --------------------------------[ jar ]---------------------------------
-#15 1.949 [INFO] 
-#15 1.949 [INFO] --- clean:3.4.1:clean (default-clean) @ ecommerce-backend ---
-#15 1.999 [INFO] 
-#15 1.999 [INFO] --- resources:3.3.1:resources (default-resources) @ ecommerce-backend ---
-#15 2.120 [INFO] Copying 1 resource from src/main/resources to target/classes
-#15 2.136 [INFO] Copying 5 resources from src/main/resources to target/classes
-#15 2.140 [INFO] 
-#15 2.140 [INFO] --- compiler:3.13.0:compile (default-compile) @ ecommerce-backend ---
-#15 2.268 [INFO] Recompiling the module because of changed source code.
-#15 2.277 [INFO] Compiling 205 source files with javac [debug parameters release 17] to target/classes
-#15 8.399 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/review/model/mapper/ReviewMapper.java:[15,12] Unmapped target properties: "createdAt, createdBy, updatedAt, updatedBy".
-#15 8.399 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/order/model/mapper/OrderDetailMapper.java:[24,17] Unmapped target properties: "id, order".
-#15 8.399 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/user/model/mapper/UserMapper.java:[21,10] Unmapped target properties: "enabled, photo, role, tokenVersion".
-#15 8.399 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/user/model/mapper/UserMapper.java:[29,10] Unmapped target properties: "email, enabled, role, tokenVersion, claims".
-#15 8.399 [INFO] 
-#15 8.399 [INFO] --- resources:3.3.1:testResources (default-testResources) @ ecommerce-backend ---
-#15 8.404 [INFO] skip non existing resourceDirectory /app/src/test/resources
-#15 8.404 [INFO] 
-#15 8.404 [INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ecommerce-backend ---
-#15 8.414 [INFO] Recompiling the module because of changed dependency.
-#15 8.414 [INFO] Compiling 1 source file with javac [debug parameters release 17] to target/test-classes
-#15 8.777 [INFO] 
-#15 8.777 [INFO] --- surefire:3.5.2:test (default-test) @ ecommerce-backend ---
-#15 8.872 [INFO] Tests are skipped.
-#15 8.872 [INFO] 
-#15 8.872 [INFO] --- jar:3.4.2:jar (default-jar) @ ecommerce-backend ---
-#15 9.162 [INFO] Building jar: /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar
-#15 9.311 [INFO] 
-#15 9.311 [INFO] --- spring-boot:3.4.3:repackage (repackage) @ ecommerce-backend ---
-#15 9.918 [INFO] Replacing main artifact /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
-#15 9.918 [INFO] The original artifact has been renamed to /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar.original
-#15 9.919 [INFO] ------------------------------------------------------------------------
-#15 9.920 [INFO] BUILD SUCCESS
-#15 9.920 [INFO] ------------------------------------------------------------------------
-#15 9.921 [INFO] Total time:  8.698 s
-#15 9.922 [INFO] Finished at: 2025-04-19T02:08:24Z
-#15 9.922 [INFO] ------------------------------------------------------------------------
-#15 DONE 10.1s
+#15 1.431 [INFO] Scanning for projects...
+#15 1.744 [INFO] 
+#15 1.744 [INFO] --------------------< com.hcmus:ecommerce-backend >---------------------
+#15 1.744 [INFO] Building ecommerce-backend 0.0.1-SNAPSHOT
+#15 1.745 [INFO]   from pom.xml
+#15 1.745 [INFO] --------------------------------[ jar ]---------------------------------
+#15 2.478 [INFO] 
+#15 2.478 [INFO] --- clean:3.4.1:clean (default-clean) @ ecommerce-backend ---
+#15 2.582 [INFO] 
+#15 2.582 [INFO] --- resources:3.3.1:resources (default-resources) @ ecommerce-backend ---
+#15 2.742 [INFO] Copying 1 resource from src/main/resources to target/classes
+#15 2.756 [INFO] Copying 5 resources from src/main/resources to target/classes
+#15 2.911 [INFO] 
+#15 2.911 [INFO] --- compiler:3.13.0:compile (default-compile) @ ecommerce-backend ---
+#15 3.035 [INFO] Recompiling the module because of changed source code.
+#15 3.042 [INFO] Compiling 221 source files with javac [debug parameters release 17] to target/classes
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/message/model/mapper/ConversationMapper.java:[21,26] Unmapped target properties: "isAdminRead, isCustomerRead".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/message/model/mapper/MessageMapper.java:[12,21] Unmapped target property: "conversationId".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/user/model/mapper/UserMapper.java:[21,10] Unmapped target properties: "enabled, photo, role, tokenVersion".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/user/model/mapper/UserMapper.java:[29,10] Unmapped target properties: "email, enabled, role, tokenVersion, claims".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/product/model/mapper/ProductMapper.java:[28,13] Unmapped target property: "productColorSizes".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/product/model/mapper/ProductMapper.java:[38,10] Unmapped target property: "productColorSizes".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/message/model/mapper/ConversationMapper.java:[21,26] Unmapped target properties: "isAdminRead, isCustomerRead".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/message/model/mapper/ConversationMapper.java:[40,10] Unmapped target properties: "adminRead, customerRead".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/message/model/mapper/ConversationMapper.java:[53,21] Unmapped target property: "conversationId".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/category/model/mapper/CategoryMapper.java:[21,14] Unmapped target property: "stock".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/category/model/mapper/CategoryMapper.java:[28,10] Unmapped target property: "stock".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/order/model/mapper/OrderMapper.java:[28,11] Unmapped target property: "isPaid".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/order/model/mapper/OrderDetailMapper.java:[24,17] Unmapped target properties: "id, order".
+#15 10.10 [WARNING] /app/src/main/java/com/hcmus/ecommerce_backend/message/model/mapper/MessageMapper.java:[12,21] Unmapped target property: "conversationId".
+#15 10.10 [INFO] 
+#15 10.10 [INFO] --- resources:3.3.1:testResources (default-testResources) @ ecommerce-backend ---
+#15 10.11 [INFO] skip non existing resourceDirectory /app/src/test/resources
+#15 10.11 [INFO] 
+#15 10.11 [INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ecommerce-backend ---
+#15 10.11 [INFO] Recompiling the module because of changed dependency.
+#15 10.11 [INFO] Compiling 1 source file with javac [debug parameters release 17] to target/test-classes
+#15 10.44 [INFO] 
+#15 10.44 [INFO] --- surefire:3.5.2:test (default-test) @ ecommerce-backend ---
+#15 10.52 [INFO] Tests are skipped.
+#15 10.52 [INFO] 
+#15 10.52 [INFO] --- jar:3.4.2:jar (default-jar) @ ecommerce-backend ---
+#15 10.78 [INFO] Building jar: /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar
+#15 12.64 [INFO] 
+#15 12.64 [INFO] --- spring-boot:3.4.3:repackage (repackage) @ ecommerce-backend ---
+#15 15.32 [INFO] Replacing main artifact /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+#15 15.32 [INFO] The original artifact has been renamed to /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar.original
+#15 15.32 [INFO] ------------------------------------------------------------------------
+#15 15.32 [INFO] BUILD SUCCESS
+#15 15.32 [INFO] ------------------------------------------------------------------------
+#15 15.32 [INFO] Total time:  13.910 s
+#15 15.32 [INFO] Finished at: 2025-04-29T08:51:25Z
+#15 15.32 [INFO] ------------------------------------------------------------------------
+#15 DONE 15.6s
 
 #16 [app stage-1 2/3] WORKDIR /app
 #16 CACHED
 
 #17 [app stage-1 3/3] COPY --from=build /app/target/ecommerce-backend-0.0.1-SNAPSHOT.jar app.jar
-#17 DONE 0.2s
+#17 DONE 0.3s
 
 #18 [app] exporting to image
 #18 exporting layers
-#18 exporting layers 0.3s done
-#18 writing image sha256:0dac0c53093624bbdd720d6e1d9cd451a21741bdb670217ef95982b8945ed330 done
+#18 exporting layers 0.4s done
+#18 writing image sha256:95eefc16c71de605232ca0f10bf9594c01c7346d50f5d79c29f2c198ebd21447 done
 #18 naming to docker.io/library/ecommerce-backend-app done
-#18 DONE 0.3s
+#18 DONE 0.4s
 [INFO] Starting services...
-time="2025-04-19T09:08:26+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+time="2025-04-29T15:51:27+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
  Network ecommerce-backend_ecommerce-network  Creating
  Network ecommerce-backend_ecommerce-network  Created
+ Volume "ecommerce-backend_postgres-data"  Creating
+ Volume "ecommerce-backend_postgres-data"  Created
  Container ecommerce-backend-postgres-1  Creating
  Container ecommerce-backend-postgres-1  Created
  Container ecommerce-backend-app-1  Creating
@@ -123,7 +135,7 @@ time="2025-04-19T09:08:26+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 [INFO] E-commerce application is running at http://localhost:8080
 [INFO] PostgreSQL is available at localhost:5432
 [INFO] Container status:
-time="2025-04-19T09:08:27+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
+time="2025-04-29T15:51:28+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.yml: `version` is obsolete"
 NAME                           IMAGE                   COMMAND                  SERVICE    CREATED        STATUS                  PORTS
 ecommerce-backend-app-1        ecommerce-backend-app   "java -jar app.jar"      app        1 second ago   Up Less than a second   0.0.0.0:8080->8080/tcp
-ecommerce-backend-postgres-1   postgres:latest         "docker-entrypoint.s…"   postgres   1 second ago   Up Less than a second   0.0.0.0:5432->5432/tcp
+ecommerce-backend-postgres-1   postgres:latest         "docker-entrypoint.s…"   postgres   1 second ago   Up 1 second             0.0.0.0:5432->5432/tcp
