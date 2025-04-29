@@ -29,13 +29,12 @@ spring:
     properties:
       mail.smtp.auth: ${MAIL_PROPERTIES_MAIL_SMTP_AUTH}
       mail.smtp.starttls.enable: ${MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE}
-
-#Login with social media
+  #Login with social media
 outbound:
   identity:
-    client-id: ${CLIENT_ID}
-    client-secret: ${CLIENT_SECRET}
-  redirect-uri: ${REDIRECT_URI}
+    client-id: ${CLIENT_ID:default-client-id}
+    client-secret: ${CLIENT_SECRET:default-client-secret}
+redirect-uri: ${REDIRECT_URI}
 
 logging:
   level:
