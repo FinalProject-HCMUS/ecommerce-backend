@@ -59,9 +59,16 @@ fi
 info "Building services..."
 docker compose build
 
+# Wait for PostgreSQL to start
+info "Waiting for PostgreSQL to start..."
+sleep 5
+
 # Start the services in detached mode
 info "Starting services..."
 docker compose up -d
+
+info "Creating ecommerce database if it doesn't exist..."
+docker exec ecommerce-backend-postgres-1 sh -c 'psql -U "$POSTGRES_USER" -d postgres -c "CREATE DATABASE ecommerce;" || echo "Database already exists"'
 
 # Check the exit status of the last command
 if [ $? -ne 0 ]; then

@@ -65,3 +65,11 @@ fi
 # Display container status
 info "Container status:"
 docker compose -f docker-compose.dev.yml ps
+
+# Wait for PostgreSQL to start
+info "Waiting for PostgreSQL to start..."
+sleep 5
+
+# Explicitly create the database if it doesn't exist
+info "Creating ecommerce database if it doesn't exist..."
+docker exec ecommerce-backend-postgres-1 sh -c 'psql -U "$POSTGRES_USER" -d postgres -c "CREATE DATABASE ecommerce;" || echo "Database already exists"'
