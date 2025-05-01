@@ -64,7 +64,6 @@ public class ProductImageServiceImpl implements ProductImageService {
     public ProductImageResponse createProductImage(CreateProductImageRequest request) {
         log.info("ProductImageServiceImpl | createProductImage | Creating product image for productId: {}", request.getProductId());
         try {
-            validateProductImageLimit(request.getProductId());
             checkProductImageExists(request.getUrl(), request.getProductId());
     
             ProductImage productImage = productImageMapper.toEntity(request);
@@ -173,15 +172,6 @@ public class ProductImageServiceImpl implements ProductImageService {
         if (productImageRepository.existsByUrlAndProductId(url, productId)) {
             log.error("ProductImageServiceImpl | checkProductImageExists | Product image already exists with URL: {} and productId: {}", url, productId);
             throw new ProductImageAlreadyExistsException(url, productId);
-        }
-    }
-    
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private void validateProductImageLimit(String productId) {
-        long imageCount = productImageRepository.countByProductId(productId);
-        if (imageCount >= 3) {
-            log.error("ProductImageServiceImpl | validateProductImageLimit | Product with id {} already has 3 images.", productId);
-            throw new MaxProductImagesExceededException(productId);
         }
     }
 }
