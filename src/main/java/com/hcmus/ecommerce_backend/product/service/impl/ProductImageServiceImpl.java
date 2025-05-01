@@ -4,6 +4,7 @@ import com.hcmus.ecommerce_backend.product.exception.MaxProductImagesExceededExc
 import com.hcmus.ecommerce_backend.product.exception.ProductImageAlreadyExistsException;
 import com.hcmus.ecommerce_backend.product.exception.ProductImageNotFoundException;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductImageRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateListProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductImageResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.ProductImage;
@@ -160,6 +161,36 @@ public class ProductImageServiceImpl implements ProductImageService {
             throw new ProductImageNotFoundException(productId);
         }
         return productImages;
+    }
+
+    @Override
+    @Transactional
+    public void updateListProductImage(List<UpdateListProductImageRequest> productImages) {
+        log.info("ProductImageServiceImpl | updateListProductImage | Processing {} product images", productImages.size());
+        try {
+            for (UpdateListProductImageRequest imageRequest : productImages) {
+                if (imageRequest.getId() == null || imageRequest.getId().isEmpty()) {
+                    // Create new product image if ID is empty
+                    log.info("ProductImageServiceImpl | updateListProductImage | Creating new product image: {}", imageRequest);
+                    ProductImage productImage = productImageMapper.toEntity(imageRequest);
+                    productImageRepository.save(productImage);
+                } else if (imageRequest.getUrl() == null || imageRequest.getUrl().isEmpty()) {
+                    // Delete product image if URL is empty
+                    log.info("ProductImageServiceImpl | updateListProductImage | Deleting product image with ID: {}", imageRequest.getId());
+                    if (!doesProductImageExistById(imageRequest.getId())) {
+                        log.warn("ProductImageServiceImpl | updateListProductImage | Product image not found with ID: {}", imageRequest.getId());
+                        throw new ProductImageNotFoundException(imageRequest.getId());
+                    }
+                    productImageRepository.deleteById(imageRequest.getId());
+                }
+            }
+        } catch (ProductImageNotFoundException e) {
+            log.error("ProductImageServiceImpl | updateListProductImage | Product image not found: {}", e.getMessage(), e);
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("ProductImageServiceImpl | updateListProductImage | Database error: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
