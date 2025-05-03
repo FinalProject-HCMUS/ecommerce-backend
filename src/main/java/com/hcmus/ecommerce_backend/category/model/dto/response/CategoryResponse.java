@@ -23,6 +23,9 @@ public class CategoryResponse {
     
     @Schema(description = "Description of the category", example = "Electronic devices and gadgets")
     private String description;
+
+    @Schema(description = "Stock quantity of the category", example = "100")
+    private int stock;
     
     @Schema(description = "Date and time when the category was created")
     private LocalDateTime createdAt;

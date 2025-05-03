@@ -16,7 +16,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "Response object containing product_color_size information")
 public class ProductColorSizeResponse {
-    
+    @Schema(description = "Unique identifier of the product_color_size", example = "550e8400-e29b-41d4-a716-446655440000")
+    private String id;
+
     @Schema(description = "Quantity of the product_color_size", example = "10")
     @Min(value = 0, message = "Quantity must be at least 0")
     private int quantity;

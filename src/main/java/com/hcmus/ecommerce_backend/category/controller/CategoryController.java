@@ -18,6 +18,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -47,6 +49,15 @@ public class CategoryController {
                 page, size, sort != null ? String.join(", ", sort) : "unsorted");
         Pageable pageable = CreatePageable.build(page, size, sort);
         Page<CategoryResponse> categories = categoryService.getAllCategories(pageable);
+        return ResponseEntity.ok(CustomResponse.successOf(categories));
+    }
+
+    @Operation(summary = "Get all categories without pagination", description = "Retrieves a list of all categories without pagination")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved all categories")
+    @GetMapping("/all")
+    public ResponseEntity<CustomResponse<List<CategoryResponse>>> getAllCategoriesWithoutPagination() {
+        log.info("CategoryController | getAllCategoriesWithoutPagination | Retrieving all categories");
+        List<CategoryResponse> categories = categoryService.getAllCategoriesWithoutPagination();
         return ResponseEntity.ok(CustomResponse.successOf(categories));
     }
     

@@ -11,6 +11,10 @@ import com.hcmus.ecommerce_backend.category.repository.CategoryRepository;
 import com.hcmus.ecommerce_backend.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +50,15 @@ public class CategoryServiceImpl implements CategoryService {
             log.error("CategoryServiceImpl | getAllCategories | Unexpected error retrieving paginated categories: {}", e.getMessage(), e);
             throw e;
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryResponse> getAllCategoriesWithoutPagination() {
+        log.info("CategoryServiceImpl | getAllCategoriesWithoutPagination | Retrieving all categories");
+        return categoryRepository.findAll().stream()
+                .map(categoryMapper::toResponse)
+                .collect(Collectors.toList());
     }
     
     @Override

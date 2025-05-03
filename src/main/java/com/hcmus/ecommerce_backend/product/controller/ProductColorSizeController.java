@@ -17,6 +17,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -123,5 +125,21 @@ public class ProductColorSizeController {
         log.info("ProductColorSizeController | deleteProductColorSize | id: {}", id);
         productColorSizeService.deleteProductColorSize(id);
         return ResponseEntity.ok(CustomResponse.SUCCESS);
+    }
+
+    @Operation(summary = "Get product color sizes by product ID", description = "Retrieves a list of product color and size combinations for a specific product ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved product color sizes"),
+        @ApiResponse(responseCode = "404", description = "Product color sizes not found",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class)))
+    })
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<CustomResponse<List<ProductColorSizeResponse>>> getProductColorSizesByProductId(
+            @Parameter(description = "ID of the product to retrieve color and size combinations for", required = true)
+            @PathVariable String productId) {
+        log.info("ProductColorSizeController | getProductColorSizesByProductId | productId: {}", productId);
+        List<ProductColorSizeResponse> productColorSizes = productColorSizeService.getProductColorSizesByProductId(productId);
+        return ResponseEntity.ok(CustomResponse.successOf(productColorSizes));
     }
 }
