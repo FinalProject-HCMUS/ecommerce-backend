@@ -13,7 +13,7 @@ public interface ImageUploadService {
      * @return URL of the uploaded image
      * @throws IOException if upload fails
      */
-    String uploadImage(MultipartFile file, String folder) throws IOException;
+    String uploadImage(MultipartFile file);
     
     /**
      * Uploads an image with additional options using the system's configured storage
@@ -23,7 +23,7 @@ public interface ImageUploadService {
      * @return URL of the uploaded image
      * @throws IOException if upload fails
      */
-    String uploadImage(MultipartFile file, String folder, Map<String, Object> options) throws IOException;
+    String uploadImage(MultipartFile file, Map<String, Object> options);
     
     /**
      * Deletes an image by its URL
@@ -31,5 +31,5 @@ public interface ImageUploadService {
      * @return true if deleted successfully, false otherwise
      * @throws IOException if deletion fails
      */
-    boolean deleteImage(String imageUrl) throws IOException;
+    boolean deleteImage(String imageUrl);
 }

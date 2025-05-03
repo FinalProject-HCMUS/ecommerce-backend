@@ -1,6 +1,7 @@
 package com.hcmus.ecommerce_backend.product.service;
 
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductImageRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateListProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductImageResponse;
 
@@ -19,4 +20,6 @@ public interface ProductImageService {
     void deleteProductImage(String id);
 
     List<ProductImageResponse> getProductImagesByProductId(String productId);
+
+    void updateListProductImage(List<UpdateListProductImageRequest> productImages);
 }

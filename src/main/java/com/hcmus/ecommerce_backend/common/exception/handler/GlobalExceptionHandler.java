@@ -3,7 +3,6 @@ package com.hcmus.ecommerce_backend.common.exception.handler;
 import com.hcmus.ecommerce_backend.category.exception.CategoryAlreadyExistsException;
 import com.hcmus.ecommerce_backend.category.exception.CategoryNotFoundException;
 import com.hcmus.ecommerce_backend.common.model.dto.CustomError;
-import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
 import com.hcmus.ecommerce_backend.message.exception.ConversationAlreadyExistsException;
 import com.hcmus.ecommerce_backend.message.exception.ConversationNotFoundException;
 import com.hcmus.ecommerce_backend.message.exception.MessageAlreadyExistsException;
@@ -24,6 +23,7 @@ import com.hcmus.ecommerce_backend.user.exception.UserNotAuthorizedException;
 import com.hcmus.ecommerce_backend.user.exception.UserNotFoundException;
 import com.hcmus.ecommerce_backend.user.exception.VerificationTokenAlreadyExpired;
 import com.hcmus.ecommerce_backend.user.exception.VerificationTokenNotFoundException;
+import com.hcmus.ecommerce_backend.common.exception.ImageUploadException;
 
 import jakarta.validation.ConstraintViolationException;
 import org.apache.commons.lang3.StringUtils;
@@ -34,11 +34,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -536,5 +539,30 @@ public class GlobalExceptionHandler {
                                 .message(ex.getMessage())
                                 .build();
                 return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
+        }
+
+        @ExceptionHandler(ImageUploadException.class)
+        public ResponseEntity<Object> handleImageUploadException(
+                ImageUploadException exception) {
+                log.error("GlobalExceptionHandler | handleImageUploadException | {}", exception.getMessage(), exception);
+                                
+                CustomError customError = CustomError.builder()
+                        .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .header(CustomError.Header.PROCESS_ERROR.getName())
+                        .message(exception.getMessage())
+                        .build();
+                return new ResponseEntity<>(customError, HttpStatus.INTERNAL_SERVER_ERROR);
+                
+        }
+
+        @ExceptionHandler(IOException.class)
+        public ResponseEntity<Object> handleIOException(
+                        IOException exception) {
+                CustomError customError = CustomError.builder()
+                        .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .header(CustomError.Header.PROCESS_ERROR.getName())
+                        .message(exception.getMessage())
+                        .build();
+                return new ResponseEntity<>(customError, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 }

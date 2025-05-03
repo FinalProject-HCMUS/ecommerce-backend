@@ -35,3 +35,4 @@ build/
 .env
 dev-postgres.log
 start-docker.log
+application.yml

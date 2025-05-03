@@ -1,6 +1,7 @@
 package com.hcmus.ecommerce_backend.product.model.mapper;
 
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductImageRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateListProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductImageResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.Product;
@@ -32,6 +33,14 @@ public interface ProductImageMapper {
     @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "product", source = "productId", qualifiedByName = "productIdToProduct")
     void updateEntity(UpdateProductImageRequest request, @MappingTarget ProductImage productImage);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "product", source = "productId", qualifiedByName = "productIdToProduct")
+    ProductImage toEntity(UpdateListProductImageRequest request);
 
     @Named("productIdToProduct")
     default Product productIdToProduct(String id) {

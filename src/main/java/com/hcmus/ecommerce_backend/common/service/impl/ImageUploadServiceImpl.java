@@ -22,14 +22,12 @@ public class ImageUploadServiceImpl implements ImageUploadService {
     private final StorageSettingService storageSettingService;
 
     @Override
-    public String uploadImage(MultipartFile file, String folder) throws IOException {
-        return uploadImage(file, folder, null);
+    public String uploadImage(MultipartFile file) {
+        return uploadImage(file, null);
     }
 
     @Override
-    public String uploadImage(MultipartFile file, String folder, Map<String, Object> options) throws IOException {
-        log.info("ImageUploadServiceImpl | uploadImage | Uploading image to folder: {}", folder);
-        
+    public String uploadImage(MultipartFile file, Map<String, Object> options) {
         // Get the system's configured storage type
         StorageType storageType = storageSettingService.getSystemStorageType();
         log.info("ImageUploadServiceImpl | uploadImage | Using storage provider: {}", storageType);
@@ -38,14 +36,14 @@ public class ImageUploadServiceImpl implements ImageUploadService {
         ImageStorageService storageService = storageServiceFactory.getStorageService(storageType);
         
         // Upload the image
-        String imageUrl = storageService.uploadImage(file, folder, options);
+        String imageUrl = storageService.uploadImage(file, options);
         log.info("ImageUploadServiceImpl | uploadImage | Image uploaded successfully: {}", imageUrl);
         
         return imageUrl;
     }
 
     @Override
-    public boolean deleteImage(String imageUrl) throws IOException {
+    public boolean deleteImage(String imageUrl) {
         log.info("ImageUploadServiceImpl | deleteImage | Deleting image: {}", imageUrl);
         
         // Determine which storage service to use based on the image URL
@@ -76,7 +74,7 @@ public class ImageUploadServiceImpl implements ImageUploadService {
             return storageServiceFactory.getStorageService(StorageType.AWS_S3);
         } else {
             // If can't determine from URL, use local storage
-            return storageServiceFactory.getStorageService(StorageType.LOCAL_STORAGE);
+            return storageServiceFactory.getStorageService(StorageType.CLOUDINARY);
         }
     }
 }

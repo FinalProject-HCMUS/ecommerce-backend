@@ -14,22 +14,20 @@ public interface ImageStorageService {
      * Uploads an image file to a specific folder
      * 
      * @param file The image file to upload
-     * @param folder The destination folder
      * @return URL of the uploaded image
      * @throws IOException if upload fails
      */
-    String uploadImage(MultipartFile file) throws IOException;
+    String uploadImage(MultipartFile file);
     
     /**
      * Uploads an image file with additional options
      * 
      * @param file The image file to upload
-     * @param folder The destination folder
      * @param options Additional provider-specific options
      * @return URL of the uploaded image
      * @throws IOException if upload fails
      */
-    String uploadImage(MultipartFile file, Map<String, Object> options) throws IOException;
+    String uploadImage(MultipartFile file, Map<String, Object> options);
     
     /**
      * Deletes an image by URL
@@ -38,5 +36,5 @@ public interface ImageStorageService {
      * @return true if deleted successfully, false otherwise
      * @throws IOException if deletion fails
      */
-    boolean deleteImage(String imageUrl) throws IOException;
+    boolean deleteImage(String imageUrl);
 }

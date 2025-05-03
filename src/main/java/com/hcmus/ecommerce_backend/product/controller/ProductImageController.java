@@ -2,6 +2,7 @@ package com.hcmus.ecommerce_backend.product.controller;
 
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductImageRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateListProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductImageResponse;
 import com.hcmus.ecommerce_backend.product.service.ProductImageService;
@@ -130,5 +131,27 @@ public class ProductImageController {
         log.info("ProductImageController | getProductImagesByProductId | productId: {}", productId);
         List<ProductImageResponse> images = productImageService.getProductImagesByProductId(productId);
         return ResponseEntity.ok(CustomResponse.successOf(images));
+    }
+
+    @Operation(summary = "Update list of product images", description = "Creates new product images for empty IDs and deletes product images with empty URLs")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully updated product images"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Product image not found",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class))),
+        @ApiResponse(responseCode = "409", description = "Product image already exists",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class)))
+    })
+    @PutMapping("/update-list")
+    public ResponseEntity<CustomResponse<Void>> updateListProductImage(
+            @Parameter(description = "List of product images to update", required = true)
+            @Valid @RequestBody List<UpdateListProductImageRequest> productImages) {
+        log.info("ProductImageController | updateListProductImage | Updating product images: {}", productImages);
+        productImageService.updateListProductImage(productImages); 
+        return ResponseEntity.ok(CustomResponse.SUCCESS);
     }
 }

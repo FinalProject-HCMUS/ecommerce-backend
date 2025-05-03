@@ -1,14 +1,8 @@
 [0;32m[INFO][0m Using PostgreSQL settings from .env file
 [0;32m[INFO][0m Stopping any running PostgreSQL container...
-time="2025-04-30T15:50:38+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
- Container ecommerce-backend-postgres-1  Stopping
- Container ecommerce-backend-postgres-1  Stopped
- Container ecommerce-backend-postgres-1  Removing
- Container ecommerce-backend-postgres-1  Removed
- Network ecommerce-backend_ecommerce-network  Removing
- Network ecommerce-backend_ecommerce-network  Removed
+time="2025-05-02T23:03:18+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
 [0;32m[INFO][0m Starting PostgreSQL database...
-time="2025-04-30T15:50:39+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
+time="2025-05-02T23:03:19+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
  Network ecommerce-backend_ecommerce-network  Creating
  Network ecommerce-backend_ecommerce-network  Created
  Container ecommerce-backend-postgres-1  Creating
@@ -21,9 +15,10 @@ time="2025-04-30T15:50:39+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\
 [0;32m[INFO][0m Username: postgres
 [0;32m[INFO][0m Password: postgres
 [0;32m[INFO][0m Container status:
-time="2025-04-30T15:50:40+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
-NAME                           IMAGE             COMMAND                  SERVICE    CREATED        STATUS                  PORTS
-ecommerce-backend-postgres-1   postgres:latest   "docker-entrypoint.s…"   postgres   1 second ago   Up Less than a second   0.0.0.0:5432->5432/tcp
+time="2025-05-02T23:03:20+07:00" level=warning msg="C:\\Users\\ADMIN\\Workspace\\Graduation_Project\\ecommerce-backend\\docker-compose.dev.yml: `version` is obsolete"
+NAME                           IMAGE             COMMAND                  SERVICE    CREATED        STATUS        PORTS
+ecommerce-backend-postgres-1   postgres:latest   "docker-entrypoint.s…"   postgres   1 second ago   Up 1 second   0.0.0.0:5432->5432/tcp
 [0;32m[INFO][0m Waiting for PostgreSQL to start...
 [0;32m[INFO][0m Creating ecommerce database if it doesn't exist...
-CREATE DATABASE
+ERROR:  database "ecommerce" already exists
+Database already exists

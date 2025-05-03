@@ -2,12 +2,14 @@ package com.hcmus.ecommerce_backend.common.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.hcmus.ecommerce_backend.common.exception.ImageUploadException;
 import com.hcmus.ecommerce_backend.common.model.entity.SystemSetting;
 import com.hcmus.ecommerce_backend.common.model.enums.CloudinaryKeys;
 import com.hcmus.ecommerce_backend.common.repository.SystemSettingRepository;
 import com.hcmus.ecommerce_backend.common.service.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +23,7 @@ import java.util.Map;
 @Slf4j
 public class CloudinaryImageStorageService implements ImageStorageService {
 
+    @Autowired
     private SystemSettingRepository systemSettingRepository;
 
     private String cloudName;
@@ -59,12 +62,12 @@ public class CloudinaryImageStorageService implements ImageStorageService {
     }
     
     @Override
-    public String uploadImage(MultipartFile file) throws IOException {
+    public String uploadImage(MultipartFile file) {
         return uploadImage(file, null);
     }
     
     @Override
-    public String uploadImage(MultipartFile file, Map<String, Object> options) throws IOException {
+    public String uploadImage(MultipartFile file, Map<String, Object> options) {
         log.info("CloudinaryImageStorageService | uploadImage | Uploading to folder: {}", folder);
         try {
             Map<String, Object> params = new HashMap<>();
@@ -82,17 +85,17 @@ public class CloudinaryImageStorageService implements ImageStorageService {
             return imageUrl;
         } catch (IOException e) {
             log.error("CloudinaryImageStorageService | uploadImage | Error uploading image: {}", e.getMessage(), e);
-            throw e;
+            throw new ImageUploadException();
         }
     }
     
     @Override
-    public boolean deleteImage(String imageUrl) throws IOException {
+    public boolean deleteImage(String imageUrl) {
         log.info("CloudinaryImageStorageService | deleteImage | Deleting image: {}", imageUrl);
         try {
             // Extract public_id from URL
             String publicId = extractPublicIdFromUrl(imageUrl);
-
+            log.info("CloudinaryImageStorageService | deleteImage | Extracted public_id: {}", publicId);
             Map result = getCloudinaryInstance().uploader().destroy(publicId, ObjectUtils.emptyMap());
             String status = (String) result.get("result");
 
@@ -102,33 +105,42 @@ public class CloudinaryImageStorageService implements ImageStorageService {
             return success;
         } catch (IOException e) {
             log.error("CloudinaryImageStorageService | deleteImage | Error deleting image: {}", e.getMessage(), e);
-            throw e;
+            return false;
         }
     }
     
     private String extractPublicIdFromUrl(String imageUrl) {
-        // Extract public_id from Cloudinary URL
-        // Format: https://res.cloudinary.com/{cloud_name}/image/upload/v{version}/{public_id}.{extension}
-        
         if (imageUrl == null) return null;
-        
-        // Remove file extension
-        String withoutExtension = imageUrl.substring(0, imageUrl.lastIndexOf('.'));
-        
-        // Get the part after /upload/
-        int uploadIndex = withoutExtension.indexOf("/upload/");
+
+        // First check if the URL contains /upload/
+        int uploadIndex = imageUrl.indexOf("/upload/");
         if (uploadIndex == -1) return null;
-        
-        String afterUpload = withoutExtension.substring(uploadIndex + 8);
-        
-        // Remove version if present (/v1234567890/)
-        if (afterUpload.startsWith("/v")) {
-            int versionEndIndex = afterUpload.indexOf("/", 2);
-            if (versionEndIndex != -1) {
-                afterUpload = afterUpload.substring(versionEndIndex + 1);
+
+        // Get everything after /upload/
+        String afterUpload = imageUrl.substring(uploadIndex + 8);
+
+        // Extract public_id by removing version number (if present) and file extension
+        String publicId;
+
+        // Handle version number: v1746266513/ecommerce/iv6dya5h5llzqvcewctu.jpg
+        if (afterUpload.startsWith("v")) {
+            int firstSlash = afterUpload.indexOf("/");
+            if (firstSlash > 0) {
+                // Get everything after the version part
+                publicId = afterUpload.substring(firstSlash + 1);
+            } else {
+                publicId = afterUpload;
             }
+        } else {
+            publicId = afterUpload;
         }
-        
-        return afterUpload;
+
+        // Remove file extension
+        int lastDotIndex = publicId.lastIndexOf(".");
+        if (lastDotIndex > 0) {
+            publicId = publicId.substring(0, lastDotIndex);
+        }
+
+        return publicId;
     }
 }

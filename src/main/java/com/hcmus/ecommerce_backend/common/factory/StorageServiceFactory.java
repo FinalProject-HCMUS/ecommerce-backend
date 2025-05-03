@@ -4,7 +4,6 @@ import com.hcmus.ecommerce_backend.common.model.enums.StorageType;
 import com.hcmus.ecommerce_backend.common.service.ImageStorageService;
 import com.hcmus.ecommerce_backend.common.service.impl.CloudinaryImageStorageService;
 import com.hcmus.ecommerce_backend.common.service.impl.FirebaseImageStorageService;
-import com.hcmus.ecommerce_backend.common.service.impl.LocalImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,8 +15,7 @@ public class StorageServiceFactory {
 
     private final CloudinaryImageStorageService cloudinaryImageStorageService;
     private final FirebaseImageStorageService firebaseImageStorageService;
-    private final LocalImageStorageService localImageStorageService;
-    
+
     /**
      * Returns the appropriate storage service based on the storage type
      * 
@@ -30,7 +28,6 @@ public class StorageServiceFactory {
         return switch (storageType) {
             case CLOUDINARY -> cloudinaryImageStorageService;
             case FIREBASE_STORAGE -> firebaseImageStorageService;
-            case LOCAL_STORAGE -> localImageStorageService;
             case AWS_S3 -> null; // Not implemented yet
             default -> {
                 log.warn("StorageServiceFactory | getStorageService | Unknown storage type: {}, defaulting to CLOUDINARY", storageType);
