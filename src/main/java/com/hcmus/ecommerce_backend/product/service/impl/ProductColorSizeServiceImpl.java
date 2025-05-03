@@ -128,6 +128,24 @@ public class ProductColorSizeServiceImpl implements ProductColorSizeService{
         }
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductColorSizeResponse> getProductColorSizesByProductId(String productId) {
+        log.info("ProductColorSizeServiceImpl | getProductColorSizesByProductId | productId: {}", productId);
+        try {
+            List<ProductColorSizeResponse> productColorSizes = productColorSizeRepository.findByProductId(productId).stream()
+                    .map(productColorSizeMapper::toResponse)
+                    .collect(Collectors.toList());
+            log.info("ProductColorSizeServiceImpl | getProductColorSizesByProductId | Found {} product color sizes for productId {}", productColorSizes.size(), productId);
+            return productColorSizes;
+        } catch (DataAccessException e) {
+            log.error("ProductColorSizeServiceImpl | getProductColorSizesByProductId | Database error for productId {}: {}", productId, e.getMessage(), e);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            log.error("ProductColorSizeServiceImpl | getProductColorSizesByProductId | Unexpected error for productId {}: {}", productId, e.getMessage(), e);
+            throw e;
+        }
+    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     private void checkProductColorSizeExists(String productId, String colorId, String sizeId) {
