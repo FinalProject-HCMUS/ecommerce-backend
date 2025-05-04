@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
-
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
 import com.hcmus.ecommerce_backend.order.model.enums.Status;
 

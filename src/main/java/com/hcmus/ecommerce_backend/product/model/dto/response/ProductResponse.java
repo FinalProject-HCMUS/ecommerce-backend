@@ -1,5 +1,7 @@
 package com.hcmus.ecommerce_backend.product.model.dto.response;
 
+import java.time.LocalDateTime;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,10 +58,10 @@ public class ProductResponse {
     private String categoryName;
 
     @Schema(description = "Date and time when the product was created")
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @Schema(description = "Date and time when the product was last updated")
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 
     @Schema(description = "User who created the product", example = "admin")
     private String createdBy;

@@ -1,6 +1,8 @@
 package com.hcmus.ecommerce_backend.order.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataAccessException;
@@ -10,10 +12,13 @@ import com.hcmus.ecommerce_backend.order.exception.OrderDetailNotFoundException;
 import com.hcmus.ecommerce_backend.order.model.dto.request.CreateOrderDetailRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.UpdateOrderDetailRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderDetailResponse;
+import com.hcmus.ecommerce_backend.order.model.dto.response.OrderDetailWithProductResponse;
 import com.hcmus.ecommerce_backend.order.model.entity.OrderDetail;
 import com.hcmus.ecommerce_backend.order.model.mapper.OrderDetailMapper;
 import com.hcmus.ecommerce_backend.order.repository.OrderDetailRepository;
 import com.hcmus.ecommerce_backend.order.service.OrderDetailService;
+import com.hcmus.ecommerce_backend.product.model.dto.response.ProductResponse;
+import com.hcmus.ecommerce_backend.product.model.entity.Product;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -120,6 +125,29 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             throw e;
         } catch (Exception e) {
             log.error("OrderDetailServiceImpl | deleteOrderDetail | Unexpected error: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<OrderDetailWithProductResponse> getOrderDetailsWithProductByOrderId(String orderId) {
+        log.info("OrderDetailServiceImpl | getOrderDetailsWithProductByOrderId | orderId: {}", orderId);
+        try {
+            List<Map<String, Object>> orderDetails = orderDetailRepository.findOrderDetailsWithProductByOrderId(orderId);
+            if (orderDetails.isEmpty()) {
+                log.error("OrderDetailServiceImpl | getOrderDetailsWithProductByOrderId | No order details found for orderId: {}", orderId);
+                throw new OrderDetailNotFoundException("No order details found for order ID: " + orderId);
+            }
+            return orderDetails.stream()
+                    .map(orderDetailMapper::mapToOrderDetailWithProductResponse)
+                    .collect(Collectors.toList());
+        } catch (OrderDetailNotFoundException e) {
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("OrderDetailServiceImpl | getOrderDetailsWithProductByOrderId | Database error: {}", e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("OrderDetailServiceImpl | getOrderDetailsWithProductByOrderId | Unexpected error: {}", e.getMessage(), e);
             throw e;
         }
     }
