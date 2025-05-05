@@ -4,6 +4,7 @@ import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
 import com.hcmus.ecommerce_backend.order.model.dto.request.CreateOrderDetailRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.UpdateOrderDetailRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderDetailResponse;
+import com.hcmus.ecommerce_backend.order.model.dto.response.OrderDetailWithProductResponse;
 import com.hcmus.ecommerce_backend.order.service.OrderDetailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -108,5 +109,21 @@ public class OrderDetailController {
         log.info("OrderDetailController | deleteOrderDetail | id: {}", id);
         orderDetailService.deleteOrderDetail(id);
         return ResponseEntity.ok(CustomResponse.SUCCESS);
+    }
+
+    @Operation(summary = "Get order details by order ID", description = "Retrieves a list of order details for a specific order ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved order details"),
+        @ApiResponse(responseCode = "404", description = "Order not found",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = @Schema(implementation = CustomResponse.class)))
+    })
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<CustomResponse<List<OrderDetailWithProductResponse>>> getOrderDetailsByOrderId(
+            @Parameter(description = "ID of the order to retrieve details for", required = true)
+            @PathVariable String orderId) {
+        log.info("OrderDetailController | getOrderDetailsByOrderId | orderId: {}", orderId);
+        List<OrderDetailWithProductResponse> orderDetails = orderDetailService.getOrderDetailsWithProductByOrderId(orderId);
+        return ResponseEntity.ok(CustomResponse.successOf(orderDetails));
     }
 }

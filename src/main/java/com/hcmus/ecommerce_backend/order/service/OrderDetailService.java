@@ -5,6 +5,7 @@ import java.util.List;
 import com.hcmus.ecommerce_backend.order.model.dto.request.CreateOrderDetailRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.UpdateOrderDetailRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderDetailResponse;
+import com.hcmus.ecommerce_backend.order.model.dto.response.OrderDetailWithProductResponse;
 
 public interface OrderDetailService {
         
@@ -17,4 +18,6 @@ public interface OrderDetailService {
     OrderDetailResponse updateOrder(String id, UpdateOrderDetailRequest request);
     
     void deleteOrderDetail(String id);
+
+    List<OrderDetailWithProductResponse> getOrderDetailsWithProductByOrderId(String orderId);    
 }
