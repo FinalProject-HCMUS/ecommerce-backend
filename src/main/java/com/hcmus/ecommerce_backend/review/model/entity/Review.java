@@ -29,6 +29,6 @@ public class Review extends BaseEntity {
     @Column(name = "rating")
     private Integer rating;
 
-    @Column(name = "order_id")
-    private String orderId; //Reference to Order entity
+    @Column(name = "order_detail_id")
+    private String orderDetailId;
 }

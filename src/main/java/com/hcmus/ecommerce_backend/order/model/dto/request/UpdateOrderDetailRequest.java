@@ -36,9 +36,12 @@ public class UpdateOrderDetailRequest {
     @Schema(description = "Total cost of the order detail", example = "100.0")
     private Double total;
 
-    @NotBlank(message = "Product ID is required")
-    @Schema(description = "ID of the product", example = "550e8400-e29b-41d4-a716-446655440000")
-    private String productId;
+    @NotBlank(message = "Item ID is required")
+    @Schema(description = "ID of the product color size", example = "550e8400-e29b-41d4-a716-446655440000")
+    private String itemId; // References Product_Color_Size entity
+
+    @Schema(description = "Indicates if the order detail has been reviewed", example = "false")
+    private boolean isReviewed;
 
     @NotBlank(message = "Order ID is required")
     @Schema(description = "ID of the order", example = "550e8400-e29b-41d4-a716-446655440000")

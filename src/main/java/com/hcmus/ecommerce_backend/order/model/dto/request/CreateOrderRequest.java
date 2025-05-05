@@ -60,4 +60,8 @@ public class CreateOrderRequest {
     @NotBlank(message = "Customer ID is required")
     @Schema(description = "ID of the customer", example = "550e8400-e29b-41d4-a716-446655440000")
     private String customerId;
+
+    @NotBlank(message = "Address is required")
+    @Schema(description = "Shipping address for the order", example = "123 Main St, Springfield, USA")
+    private String address;
 }

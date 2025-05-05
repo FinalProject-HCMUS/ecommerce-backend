@@ -34,5 +34,4 @@ public class SystemSetting extends BaseEntity {
     @Column(name = "type")
     private SettingDataType type;
     
-    // Constants for system setting keys
 }

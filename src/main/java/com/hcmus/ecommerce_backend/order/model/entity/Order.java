@@ -62,6 +62,9 @@ public class Order extends BaseEntity{
     @Column(name = "is_paid")
     private Boolean isPaid;
 
+    @Column(name = "address")
+    private String address;
+
     // Relationships
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderTrack> orderTracks;

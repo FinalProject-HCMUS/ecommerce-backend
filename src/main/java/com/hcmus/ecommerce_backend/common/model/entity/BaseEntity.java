@@ -80,6 +80,6 @@ public class BaseEntity {
                         return principal.toString();
                     }
                 })
-                .orElse("anonymousUser");
+                .orElse("system");
     }
 }

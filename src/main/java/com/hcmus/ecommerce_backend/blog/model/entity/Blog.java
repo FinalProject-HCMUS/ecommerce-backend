@@ -30,5 +30,5 @@ public class Blog extends BaseEntity {
     private String image;
 
     @Column(name = "user_id", nullable = false)
-    private String userId; // References Users entity
+    private String userId;
 }

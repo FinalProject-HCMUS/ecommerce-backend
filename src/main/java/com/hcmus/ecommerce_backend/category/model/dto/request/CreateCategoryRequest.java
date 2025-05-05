@@ -19,7 +19,11 @@ public class CreateCategoryRequest {
     @Size(min = 2, max = 50, message = "Category name must be between 2 and 50 characters")
     @Schema(description = "Name of the category", example = "Electronics", required = true)
     private String name;
-    
+
     @Schema(description = "Description of the category", example = "Electronic devices and gadgets")
     private String description;
+
+    @NotBlank(message = "Stock is required")
+    @Schema(description = "Stock of the category", example = "100", required = true)
+    private int stock;
 }

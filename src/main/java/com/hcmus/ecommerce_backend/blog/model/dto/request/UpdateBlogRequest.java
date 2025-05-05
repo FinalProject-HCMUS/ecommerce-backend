@@ -14,6 +14,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "Request object for updating a new blog")
 public class UpdateBlogRequest {
+
+    @NotNull(message = "Blog ID cannot be null")
+    @Schema(description = "ID of the blog to be updated", example = "123e4567-e89b-12d3-a456-426614174000")
+    private String id;
         
     @NotBlank(message = "Title cannot be blank")
     @Schema(description = "Title of the fashion blog", example = "Top 10 Summer Outfits for 2024")
@@ -29,4 +33,5 @@ public class UpdateBlogRequest {
     @NotNull(message = "User ID cannot be null")
     @Schema(description = "ID of the admin or shop owner creating the blog", example = "5f3a2b8c-1d9e-4e6a-9238-6b7f4b2c9d1f")
     private String userId;
+
 }

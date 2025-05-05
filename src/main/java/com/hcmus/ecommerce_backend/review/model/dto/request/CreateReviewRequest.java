@@ -30,8 +30,8 @@ public class CreateReviewRequest {
     @Max(value = 5, message = "Rating cannot exceed 5")
     @Schema(description = "Rating from 1 to 5", example = "5")
     private Integer rating;
-    
-    @NotBlank(message = "Order ID is required")
-    @Schema(description = "ID of the order this review is for", example = "550e8400-e29b-41d4-a716-446655440000")
-    private String orderId;
+
+    @NotBlank(message = "Order detail ID is required")
+    @Schema(description = "ID of the order detail associated with the review", example = "123e4567-e89b-12d3-a456-426614174000")
+    private String orderDetailId;
 }

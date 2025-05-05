@@ -25,9 +25,6 @@ public class BlogResponse {
     @Schema(description = "Image URL for the blog", example = "https://fashionstore.com/blog/summer-trends.jpg")
     private String image;
 
-    @Schema(description = "ID of the admin or shop owner creating the blog", example = "5f3a2b8c-1d9e-4e6a-9238-6b7f4b2c9d1f")
-    private String userId;
-
     @Schema(description = "Date and time when the blog was created")
     private String createdAt;
 

@@ -3,6 +3,7 @@ package com.hcmus.ecommerce_backend.order.model.dto.request;
 import com.hcmus.ecommerce_backend.order.model.enums.PaymentMethod;
 import com.hcmus.ecommerce_backend.order.model.enums.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,4 +58,8 @@ public class UpdateOrderRequest {
 
     @Schema(description = "Is the order paid", example = "true")
     private Boolean isPaid;
+
+    @NotBlank(message = "Address is required")
+    @Schema(description = "Shipping address for the order", example = "123 Main St, Springfield, USA")
+    private String address;
 }

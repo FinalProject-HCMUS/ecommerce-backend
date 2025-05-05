@@ -11,10 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -43,8 +40,12 @@ public class OrderDetail extends BaseEntity {
     @Column(name = "total", nullable = false)
     private Double total;
 
-    @Column(name = "product_id", nullable = false)
-    private String productId;
+    @Column(name = "item_id", nullable = false)
+    private String itemId; //References Product_Color_Size entity
+
+    @Builder.Default
+    @Column(name = "is_reviewed", nullable = false)
+    private boolean isReviewed = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)

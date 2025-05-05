@@ -14,16 +14,15 @@ public interface BlogMapper {
     BlogResponse toResponse(Blog blog);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
     Blog toEntity(CreateBlogRequest request);
     
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
-    void updateEntity(UpdateBlogRequest blogReponse, @MappingTarget Blog blog);
+    void updateEntity(UpdateBlogRequest updateBlogRequest, @MappingTarget Blog blog);
 }

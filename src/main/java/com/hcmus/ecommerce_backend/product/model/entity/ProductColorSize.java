@@ -26,7 +26,7 @@ import lombok.experimental.SuperBuilder;
 public class ProductColorSize extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(name = "quantity", nullable = false)

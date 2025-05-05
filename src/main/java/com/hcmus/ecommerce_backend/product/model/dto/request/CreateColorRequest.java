@@ -20,4 +20,9 @@ public class CreateColorRequest {
     @Schema(description = "Name of the color", example = "Red", required = true)
     private String name;
 
+    @NotBlank(message = "Color code is required")
+    @Size(min = 7, max = 7, message = "Color code must be exactly 7 characters (e.g., #FFFFFF)")
+    @Schema(description = "Hex code of the color", example = "#FF5733", required = true)
+    private String code;
+
 }

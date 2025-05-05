@@ -22,4 +22,8 @@ public class UpdateCategoryRequest {
     
     @Schema(description = "Description of the category", example = "Appliances for household use")
     private String description;
+
+    @NotBlank(message = "Stock is required")
+    @Schema(description = "Stock of the category", example = "50", required = true)
+    private int stock;
 }

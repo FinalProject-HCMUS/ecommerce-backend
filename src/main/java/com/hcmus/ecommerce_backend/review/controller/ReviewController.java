@@ -43,9 +43,7 @@ public class ReviewController {
     @GetMapping("")
     public ResponseEntity<CustomResponse<Page<ReviewResponse>>> getAllReviewsPaginated(
             @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
-
             @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
-
             @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
                     "Default sort order is ascending. " +
                     "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
@@ -64,15 +62,10 @@ public class ReviewController {
     @GetMapping("/search")
     public ResponseEntity<CustomResponse<Page<ReviewResponse>>> searchReviews(
             @Parameter(description = "Keyword to search in headline or comment") @RequestParam(required = false) String keyword,
-
             @Parameter(description = "Minimum rating (1-5)") @RequestParam(required = false) @Min(1) @Max(5) Integer minRating,
-
             @Parameter(description = "Maximum rating (1-5)") @RequestParam(required = false) @Min(1) @Max(5) Integer maxRating,
-
             @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
-
             @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
-
             @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
                     "Default sort order is ascending. " +
                     "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
@@ -100,57 +93,47 @@ public class ReviewController {
         return ResponseEntity.ok(CustomResponse.successOf(review));
     }
 
-    @Operation(summary = "Get reviews by order ID with pagination", description = "Retrieves a paginated list of reviews for a specific order")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated order reviews")
-    @GetMapping("/order/{orderId}/paginated")
-    public ResponseEntity<CustomResponse<Page<ReviewResponse>>> getReviewsByOrderIdPaginated(
-            @Parameter(description = "ID of the order", required = true) @PathVariable String orderId,
-
+    @Operation(summary = "Get reviews by order detail ID with pagination", description = "Retrieves a paginated list of reviews for a specific order detail")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated order detail reviews")
+    @GetMapping("/order-detail/{orderDetailId}/paginated")
+    public ResponseEntity<CustomResponse<Page<ReviewResponse>>> getReviewsByOrderDetailIdPaginated(
+            @Parameter(description = "ID of the order detail", required = true) @PathVariable String orderDetailId,
             @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
-
             @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
-
             @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
                     "Default sort order is ascending. " +
                     "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
 
-        log.info("ReviewController | getReviewsByOrderIdPaginated | orderId: {}, page: {}, size: {}, sort: {}",
-                orderId, page, size, sort != null ? String.join(", ", sort) : "unsorted");
+        log.info("ReviewController | getReviewsByOrderDetailIdPaginated | orderDetailId: {}, page: {}, size: {}, sort: {}",
+                orderDetailId, page, size, sort != null ? String.join(", ", sort) : "unsorted");
 
         Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<ReviewResponse> reviews = reviewService.getReviewsByOrderIdPaginated(orderId, pageable);
+        Page<ReviewResponse> reviews = reviewService.getReviewsByOrderDetailIdPaginated(orderDetailId, pageable);
 
         return ResponseEntity.ok(CustomResponse.successOf(reviews));
     }
 
-    @Operation(summary = "Search reviews by order ID", description = "Search reviews for a specific order with filters and pagination")
+    @Operation(summary = "Search reviews by order detail ID", description = "Search reviews for a specific order detail with filters and pagination")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved search results")
-    @GetMapping("/order/{orderId}/search")
-    public ResponseEntity<CustomResponse<Page<ReviewResponse>>> searchReviewsByOrderId(
-            @Parameter(description = "ID of the order", required = true) @PathVariable String orderId,
-
+    @GetMapping("/order-detail/{orderDetailId}/search")
+    public ResponseEntity<CustomResponse<Page<ReviewResponse>>> searchReviewsByOrderDetailId(
+            @Parameter(description = "ID of the order detail", required = true) @PathVariable String orderDetailId,
             @Parameter(description = "Keyword to search in headline or comment") @RequestParam(required = false) String keyword,
-
             @Parameter(description = "Minimum rating (1-5)") @RequestParam(required = false) @Min(1) @Max(5) Integer minRating,
-
             @Parameter(description = "Maximum rating (1-5)") @RequestParam(required = false) @Min(1) @Max(5) Integer maxRating,
-
             @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
-
             @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
-
             @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
                     "Default sort order is ascending. " +
                     "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
 
         log.info(
-                "ReviewController | searchReviewsByOrderId | orderId: {}, keyword: {}, minRating: {}, maxRating: {}, page: {}, size: {}, sort: {}",
-                orderId, keyword, minRating, maxRating, page, size,
-                sort != null ? String.join(", ", sort) : "unsorted");
+                "ReviewController | searchReviewsByOrderDetailId | orderDetailId: {}, keyword: {}, minRating: {}, maxRating: {}, page: {}, size: {}, sort: {}",
+                orderDetailId, keyword, minRating, maxRating, page, size, sort != null ? String.join(", ", sort) : "unsorted");
 
         Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<ReviewResponse> reviews = reviewService.searchReviewsByOrderId(orderId, keyword, minRating, maxRating,
-                pageable);
+        Page<ReviewResponse> reviews = reviewService.searchReviewsByOrderDetailId(orderDetailId, keyword, minRating,
+                maxRating, pageable);
 
         return ResponseEntity.ok(CustomResponse.successOf(reviews));
     }
@@ -161,33 +144,29 @@ public class ReviewController {
     public ResponseEntity<CustomResponse<List<ReviewResponse>>> getReviewsByRatingRange(
             @Parameter(description = "Minimum rating (1-5)", required = true) @RequestParam @Min(1) @Max(5) Integer minRating,
             @Parameter(description = "Maximum rating (1-5)", required = true) @RequestParam @Min(1) @Max(5) Integer maxRating) {
+
         log.info("ReviewController | getReviewsByRatingRange | minRating: {}, maxRating: {}", minRating, maxRating);
+
         List<ReviewResponse> reviews = reviewService.getReviewsByRatingRange(minRating, maxRating);
         return ResponseEntity.ok(CustomResponse.successOf(reviews));
     }
 
     @Operation(summary = "Create a new review", description = "Creates a new review with the provided information")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Review successfully created"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CustomResponse.class))),
-            @ApiResponse(responseCode = "409", description = "Review already exists for the order", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CustomResponse.class)))
+            @ApiResponse(responseCode = "201", description = "Review created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid review data or review already exists", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CustomResponse.class)))
     })
     @PostMapping
     public ResponseEntity<CustomResponse<ReviewResponse>> createReview(
-            @Parameter(description = "Review information for creation", required = true) @Valid @RequestBody CreateReviewRequest request) {
-        log.info("ReviewController | createReview | request: {}", request);
-        ReviewResponse createdReview = reviewService.createReview(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(CustomResponse.<ReviewResponse>builder()
-                        .httpStatus(HttpStatus.CREATED)
-                        .isSuccess(true)
-                        .data(createdReview)
-                        .build());
+            @Parameter(description = "Review data", required = true) @RequestBody @Valid CreateReviewRequest request) {
+        log.info("ReviewController | createReview | Creating review for order detail: {}", request.getOrderDetailId());
+        ReviewResponse review = reviewService.createReview(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CustomResponse.successOf(review));
     }
 
     @Operation(summary = "Delete a review", description = "Deletes a review by its ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Review successfully deleted"),
+            @ApiResponse(responseCode = "200", description = "Review deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Review not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CustomResponse.class)))
     })
     @DeleteMapping("/{id}")
