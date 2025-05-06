@@ -28,7 +28,7 @@ public class Color extends BaseEntity {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
     @Column(name = "code", nullable = false)
