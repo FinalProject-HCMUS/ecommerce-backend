@@ -152,6 +152,28 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
     }
 
+    @Override
+    @Transactional
+    public List<OrderDetailResponse> addOrderDetails(List<CreateOrderDetailRequest> requests) {
+        log.info("OrderDetailServiceImpl | addOrderDetails | Adding {} order details", requests.size());
+        try {
+            List<OrderDetail> orderDetails = requests.stream()
+                    .map(orderDetailMapper::toEntity)
+                    .collect(Collectors.toList());
+            List<OrderDetail> savedOrderDetails = orderDetailRepository.saveAll(orderDetails);
+            log.info("OrderDetailServiceImpl | addOrderDetails | Successfully added {} order details", savedOrderDetails.size());
+            return savedOrderDetails.stream()
+                    .map(orderDetailMapper::toResponse)
+                    .collect(Collectors.toList());
+        } catch (DataAccessException e) {
+            log.error("OrderDetailServiceImpl | addOrderDetails | Database error: {}", e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("OrderDetailServiceImpl | addOrderDetails | Unexpected error: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
     /**
      * Helper method to find an order detail by ID.
      */

@@ -27,8 +27,8 @@ public class OrderDetailResponse {
     @Schema(description = "Total cost of the order detail", example = "100.0")
     private Double total;
 
-    @Schema(description = "ID of the product", example = "550e8400-e29b-41d4-a716-446655440000")
-    private String productId;
+    @Schema(description = "ID of the item (ProductColorSize)", example = "550e8400-e29b-41d4-a716-446655440000")
+    private String itemId;
 
     @Schema(description = "ID of the order", example = "550e8400-e29b-41d4-a716-446655440000")
     private String orderId;

@@ -126,4 +126,21 @@ public class OrderDetailController {
         List<OrderDetailWithProductResponse> orderDetails = orderDetailService.getOrderDetailsWithProductByOrderId(orderId);
         return ResponseEntity.ok(CustomResponse.successOf(orderDetails));
     }
+
+    @Operation(summary = "Add a list of order details", description = "Creates multiple order details in a single request")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Order details successfully created"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = @Schema(implementation = CustomResponse.class)))
+    })
+    @PostMapping("/batch")
+    public ResponseEntity<CustomResponse<List<OrderDetailResponse>>> addOrderDetails(
+            @Parameter(description = "List of order details to create", required = true)
+            @Valid @RequestBody List<CreateOrderDetailRequest> requests) {
+        log.info("OrderDetailController | addOrderDetails | requests: {}", requests);
+        List<OrderDetailResponse> createdOrderDetails = orderDetailService.addOrderDetails(requests);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CustomResponse.successOf(createdOrderDetails));
+    }
 }
