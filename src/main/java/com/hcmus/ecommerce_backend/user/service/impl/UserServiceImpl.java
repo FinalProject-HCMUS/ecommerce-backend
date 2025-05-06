@@ -1,13 +1,8 @@
 package com.hcmus.ecommerce_backend.user.service.impl;
 
 import com.hcmus.ecommerce_backend.common.service.EmailService;
-import com.hcmus.ecommerce_backend.user.exception.UserAlreadyExistsException;
-import com.hcmus.ecommerce_backend.user.exception.UserNotAuthorizedException;
-import com.hcmus.ecommerce_backend.user.exception.UserNotFoundException;
-import com.hcmus.ecommerce_backend.user.model.dto.request.ChangePasswordRequest;
-import com.hcmus.ecommerce_backend.user.model.dto.request.CreateUserRequest;
-import com.hcmus.ecommerce_backend.user.model.dto.request.ResetPasswordRequest;
-import com.hcmus.ecommerce_backend.user.model.dto.request.UpdateUserRequest;
+import com.hcmus.ecommerce_backend.user.exception.*;
+import com.hcmus.ecommerce_backend.user.model.dto.request.*;
 import com.hcmus.ecommerce_backend.user.model.dto.response.UserResponse;
 import com.hcmus.ecommerce_backend.user.model.entity.User;
 import com.hcmus.ecommerce_backend.user.model.entity.VerificationToken;
@@ -15,10 +10,8 @@ import com.hcmus.ecommerce_backend.user.model.mapper.UserMapper;
 import com.hcmus.ecommerce_backend.user.repository.UserRepository;
 import com.hcmus.ecommerce_backend.user.repository.VerificationTokenRepository;
 import com.hcmus.ecommerce_backend.user.service.UserService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,9 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
-import com.hcmus.ecommerce_backend.user.exception.VerificationTokenAlreadyExpired;
-import com.hcmus.ecommerce_backend.user.exception.VerificationTokenNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -159,7 +149,8 @@ public class UserServiceImpl implements UserService {
     public UserResponse getCurrentUser() {
         log.info("UserServiceImpl | getCurrentUser | Getting current user details from token");
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Authentication authentication = SecurityContextHolder.getContext()
+                    .getAuthentication();
             if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
                 String userId = jwt.getClaimAsString("userId");
                 log.info("UserServiceImpl | getCurrentUser | Extracted user id: {}", userId);
@@ -183,44 +174,52 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(String id, UpdateUserRequest request) {
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
+        boolean isAdmin = false;
+        String authenticatedUserId = null;
+
         if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
             Jwt jwt = (Jwt) authentication.getPrincipal();
-            String authenticatedUserId = jwt.getClaimAsString("userId");
-            log.info("UserServiceImpl | updateUser | Authenticated user id: {}", authenticatedUserId);
+            authenticatedUserId = jwt.getClaimAsString("userId");
+            isAdmin = authentication.getAuthorities()
+                    .stream()
+                    .anyMatch(a -> a.getAuthority()
+                            .equals("ADMIN"));
 
-            // Check if the authenticated user ID matches the ID being updated
-            if (!authenticatedUserId.equals(id)) {
-                log.error(
-                        "UserServiceImpl | updateUser | Authenticated user id '{}' does not match the target user id '{}'",
-                        authenticatedUserId, id);
-                throw new UserNotAuthorizedException(id);
-            }
+            log.info("UserServiceImpl | updateUser | Authenticated user id: {}, isAdmin: {}", authenticatedUserId, isAdmin);
+        }
+
+        // If not admin, check if user is updating their own profile
+        if (!isAdmin && (authenticatedUserId == null || !authenticatedUserId.equals(id))) {
+            log.error("UserServiceImpl | updateUser | Unauthorized access: user {} attempting to update user {}",
+                    authenticatedUserId, id);
+            throw new UserNotAuthorizedException(id);
         }
 
         log.info("UserServiceImpl | updateUser | Updating user with id: {}", id);
         try {
             User user = findUserById(id);
 
-            // Check if email or phone number already exists for another user
-
+            // Check phone number uniqueness if it changed
             if (!user.getPhoneNumber()
                     .equals(request.getPhoneNumber())) {
                 checkUserPhoneNumberExists(request.getPhoneNumber());
             }
 
+            // Update fields based on the request
             userMapper.updateEntity(request, user);
+
+            // Only admin can modify the 'enabled' field
+            if (isAdmin && request.getEnabled() != null) {
+                user.setEnabled(request.getEnabled());
+            }
+
             User updatedUser = userRepository.save(user);
             log.info("UserServiceImpl | updateUser | Updated user with id: {}", updatedUser.getId());
             return userMapper.toResponse(updatedUser);
         } catch (UserNotFoundException | UserAlreadyExistsException e) {
             throw e;
-        } catch (DataAccessException e) {
-            log.error("UserServiceImpl | updateUser | Database error updating user with id '{}': {}",
-                    id, e.getMessage(), e);
-            throw e;
         } catch (Exception e) {
-            log.error("UserServiceImpl | updateUser | Unexpected error updating user with id '{}': {}",
-                    id, e.getMessage(), e);
+            log.error("UserServiceImpl | updateUser | Error updating user with id '{}': {}", id, e.getMessage(), e);
             throw e;
         }
     }
@@ -383,7 +382,8 @@ public class UserServiceImpl implements UserService {
                 // Generate new confirmation token and update expiry
                 VerificationToken verificationToken = VerificationToken.builder()
                         .user(user)
-                        .expiryDate(LocalDateTime.now().plusMinutes(30))
+                        .expiryDate(LocalDateTime.now()
+                                .plusMinutes(30))
                         .build();
                 verificationTokenRepository.save(verificationToken);
                 // Send email confirmation
@@ -420,12 +420,14 @@ public class UserServiceImpl implements UserService {
             VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
                     .orElseThrow(() -> new VerificationTokenNotFoundException());
 
-            if (LocalDateTime.now().isAfter(verificationToken.getExpiryDate())) {
+            if (LocalDateTime.now()
+                    .isAfter(verificationToken.getExpiryDate())) {
                 throw new VerificationTokenAlreadyExpired();
             }
 
             // If we reach here, the token is valid
-            log.info("Reset token is valid for user: {}", verificationToken.getUser().getId());
+            log.info("Reset token is valid for user: {}", verificationToken.getUser()
+                    .getId());
         } catch (Exception e) {
             log.error("Error validating reset token: {}", e.getMessage(), e);
             throw e;
@@ -437,14 +439,16 @@ public class UserServiceImpl implements UserService {
     public void resetPassword(ResetPasswordRequest request) {
         log.info("UserServiceImpl | resetPassword | Resetting password with token");
 
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+        if (!request.getNewPassword()
+                .equals(request.getConfirmPassword())) {
             throw new IllegalArgumentException("New password and confirm password do not match");
         }
         try {
             VerificationToken verificationToken = verificationTokenRepository.findByToken(request.getToken())
                     .orElseThrow(() -> new VerificationTokenNotFoundException());
 
-            if (LocalDateTime.now().isAfter(verificationToken.getExpiryDate())) {
+            if (LocalDateTime.now()
+                    .isAfter(verificationToken.getExpiryDate())) {
                 verificationTokenRepository.delete(verificationToken);
                 throw new VerificationTokenAlreadyExpired();
             }

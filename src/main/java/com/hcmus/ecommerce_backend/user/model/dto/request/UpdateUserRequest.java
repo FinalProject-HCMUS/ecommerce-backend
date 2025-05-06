@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @Builder
@@ -43,5 +44,8 @@ public class UpdateUserRequest {
 
     @Schema(description = "Photo URL of the user", example = "https://example.com/photo.jpg")
     private String photo;
+
+    @Schema(description = "Enabled status of the user", example = "true")
+    private Boolean enabled;
 
 }

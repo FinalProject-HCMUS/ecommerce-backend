@@ -26,5 +26,6 @@ public interface UserMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "enabled", ignore = true)
     void updateEntity(UpdateUserRequest request, @MappingTarget User user);
 }
