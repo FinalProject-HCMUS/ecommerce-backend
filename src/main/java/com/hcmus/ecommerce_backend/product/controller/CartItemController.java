@@ -5,6 +5,7 @@ import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateCartItemRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateCartItemRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemResponse;
+import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemWithProductResponse;
 import com.hcmus.ecommerce_backend.product.service.CartItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -70,11 +71,11 @@ public class CartItemController {
     @Operation(summary = "Get cart items by user ID", description = "Retrieves cart items for a specific user")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved user's cart items")
     @GetMapping("/user/{userId}")
-    public ResponseEntity<CustomResponse<List<CartItemResponse>>> getCartItemsByUserId(
+    public ResponseEntity<CustomResponse<List<CartItemWithProductResponse>>> getCartItemsByUserId(
             @Parameter(description = "ID of the user", required = true)
             @PathVariable String userId) {
         log.info("CartItemController | getCartItemsByUserId | userId: {}", userId);
-        List<CartItemResponse> cartItems = cartItemService.getCartItemsByUserId(userId);
+        List<CartItemWithProductResponse> cartItems = cartItemService.getCartItemsByUserId(userId);
         return ResponseEntity.ok(CustomResponse.successOf(cartItems));
     }
     

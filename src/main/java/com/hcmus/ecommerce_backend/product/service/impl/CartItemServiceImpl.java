@@ -4,6 +4,7 @@ import com.hcmus.ecommerce_backend.product.exception.CartItemNotFoundException;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateCartItemRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateCartItemRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemResponse;
+import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemWithProductResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.CartItem;
 import com.hcmus.ecommerce_backend.product.model.mapper.CartItemMapper;
 import com.hcmus.ecommerce_backend.product.repository.CartItemRepository;
@@ -72,11 +73,11 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CartItemResponse> getCartItemsByUserId(String userId) {
+    public List<CartItemWithProductResponse> getCartItemsByUserId(String userId) {
         log.info("CartItemServiceImpl | getCartItemsByUserId | userId: {}", userId);
         try {
-            List<CartItemResponse> cartItems = cartItemRepository.findByUserId(userId).stream()
-                    .map(cartItemMapper::toResponse)
+            List<CartItemWithProductResponse> cartItems = cartItemRepository.findCartItemWithProductByUserId(userId).stream()
+                    .map(cartItemMapper::toCartItemWithProductReponse)
                     .collect(Collectors.toList());
             log.info("CartItemServiceImpl | getCartItemsByUserId | Found {} cart items for user {}", cartItems.size(), userId);
             return cartItems;
