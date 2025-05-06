@@ -3,6 +3,7 @@ package com.hcmus.ecommerce_backend.product.service;
 import com.hcmus.ecommerce_backend.product.model.dto.request.CreateCartItemRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateCartItemRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemResponse;
+import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemWithProductResponse;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface CartItemService {
     
     CartItemResponse getCartItemById(String id);
     
-    List<CartItemResponse> getCartItemsByUserId(String userId);
+    List<CartItemWithProductResponse> getCartItemsByUserId(String userId);
     
     CartItemResponse createCartItem(CreateCartItemRequest request);
     

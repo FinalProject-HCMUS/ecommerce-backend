@@ -123,6 +123,7 @@ public interface OrderDetailMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "order", source = "orderId", qualifiedByName = "orderIdToOrder")
     OrderDetail toEntity(CreateOrderDetailRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -135,6 +136,9 @@ public interface OrderDetailMapper {
 
     @Named("orderIdToOrder")
     default Order orderIdToOrder(String orderId) {
+        if (orderId == null) {
+            return null;
+        }
         Order order = new Order();
         order.setId(orderId);
         return order;

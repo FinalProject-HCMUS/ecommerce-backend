@@ -61,5 +61,5 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, String
     JOIN sizes s ON pcs.size_id = s.id
     WHERE od.order_id = :orderId
     """, nativeQuery = true)
-    List<Map<String, Object>> findOrderDetailsWithProductByOrderId(@org.springframework.data.repository.query.Param("orderId") String orderId);
+    List<Map<String, Object>> findOrderDetailsWithProductByOrderId(@Param("orderId") String orderId);
 }

@@ -20,4 +20,6 @@ public interface OrderDetailService {
     void deleteOrderDetail(String id);
 
     List<OrderDetailWithProductResponse> getOrderDetailsWithProductByOrderId(String orderId);    
+
+    List<OrderDetailResponse> addOrderDetails(List<CreateOrderDetailRequest> requests);
 }
