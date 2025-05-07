@@ -63,15 +63,15 @@ public class SecurityConfig {
 
                         // Admin endpoints
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/blogs/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/blogs/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/blogs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/categories/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/categories/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/categories/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/products/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/products/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/blogs/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/blogs/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/blogs/**").hasAuthority("ADMIN")
 
                         // User-specific endpoints - require authentication
                         .requestMatchers("/orders/**").authenticated()

@@ -1,5 +1,7 @@
 package com.hcmus.ecommerce_backend.common.exception.handler;
 
+import com.hcmus.ecommerce_backend.blog.exception.BlogAlreadyExistsException;
+import com.hcmus.ecommerce_backend.blog.exception.BlogNotFoundException;
 import com.hcmus.ecommerce_backend.category.exception.CategoryAlreadyExistsException;
 import com.hcmus.ecommerce_backend.category.exception.CategoryNotFoundException;
 import com.hcmus.ecommerce_backend.common.model.dto.CustomError;
@@ -564,5 +566,39 @@ public class GlobalExceptionHandler {
                         .message(exception.getMessage())
                         .build();
                 return new ResponseEntity<>(customError, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        /**
+         * Handles BlogNotFoundException thrown when a blog is not found.
+         *
+         * @param ex The BlogNotFoundException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(BlogNotFoundException.class)
+        protected ResponseEntity<Object> handleBlogNotFoundException(final BlogNotFoundException ex) {
+            CustomError customError = CustomError.builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .header(CustomError.Header.NOT_FOUND.getName())
+                    .message(ex.getMessage())
+                    .build();
+
+            return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+        }
+
+        /**
+         * Handles BlogAlreadyExistsException thrown when a blog already exists.
+         *
+         * @param ex The BlogAlreadyExistsException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(BlogAlreadyExistsException.class)
+        protected ResponseEntity<Object> handleBlogAlreadyExistsException(final BlogAlreadyExistsException ex) {
+            CustomError customError = CustomError.builder()
+                    .httpStatus(HttpStatus.CONFLICT)
+                    .header(CustomError.Header.ALREADY_EXIST.getName())
+                    .message(ex.getMessage())
+                    .build();
+
+            return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
         }
 }
