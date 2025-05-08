@@ -16,6 +16,8 @@ public interface ProductColorSizeService {
 
     ProductColorSizeResponse createProductColorSize(CreateProductColorSizeRequest request);
 
+    List<ProductColorSizeResponse> createMultipleProductColorSizes(List<CreateProductColorSizeRequest> requests);
+
     ProductColorSizeResponse updateProductColorSize(String id, UpdateProductColorSizeRequest request);
 
     void deleteProductColorSize(String id);

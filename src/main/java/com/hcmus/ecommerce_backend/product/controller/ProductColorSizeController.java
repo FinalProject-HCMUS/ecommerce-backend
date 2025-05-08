@@ -2,6 +2,7 @@ package com.hcmus.ecommerce_backend.product.controller;
 
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
 import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.CreateMultipleProductColorSizesRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.product.CreateProductColorSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateProductColorSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductColorSizeResponse;
@@ -85,6 +86,29 @@ public class ProductColorSizeController {
         ProductColorSizeResponse createdProductColorSize = productColorSizeService.createProductColorSize(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CustomResponse.successOf(createdProductColorSize));
+    }
+
+    @Operation(summary = "Create multiple product color sizes",
+               description = "Creates multiple product color and size combinations at once")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Product color sizes successfully created"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class))),
+        @ApiResponse(responseCode = "409", description = "One or more product color sizes already exist",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class)))
+    })
+    @PostMapping("/batch")
+    public ResponseEntity<CustomResponse<List<ProductColorSizeResponse>>> createMultipleProductColorSizes(
+            @Parameter(description = "List of product color sizes for creation", required = true)
+            @Valid @RequestBody CreateMultipleProductColorSizesRequest request) {
+        log.info("ProductColorSizeController | createMultipleProductColorSizes | request with {} items",
+                 request.getProductColorSizes().size());
+        List<ProductColorSizeResponse> createdProductColorSizes =
+                productColorSizeService.createMultipleProductColorSizes(request.getProductColorSizes());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CustomResponse.successOf(createdProductColorSizes));
     }
 
     @Operation(summary = "Update a product color size", description = "Updates an existing product color and size combination")

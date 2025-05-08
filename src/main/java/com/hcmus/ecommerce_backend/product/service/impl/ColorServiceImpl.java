@@ -218,8 +218,8 @@ public class ColorServiceImpl implements ColorService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     protected void checkColorNameExists(String name) {
         if (colorRepository.existsByName(name)) {
-            log.error("ColorServiceImpl | checkColorNameExists | Color already exists with name: {}", name);
-            throw new ColorAlreadyExistsException(name);
+                log.error("ColorServiceImpl | checkColorNameExists | Color already exists with name: {}", name);
+                throw new ColorAlreadyExistsException(name);
         }
     }
 }

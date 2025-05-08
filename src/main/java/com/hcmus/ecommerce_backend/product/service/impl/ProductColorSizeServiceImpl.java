@@ -90,6 +90,45 @@ public class ProductColorSizeServiceImpl implements ProductColorSizeService{
 
     @Override
     @Transactional
+    public List<ProductColorSizeResponse> createMultipleProductColorSizes(List<CreateProductColorSizeRequest> requests) {
+        log.info("ProductColorSizeServiceImpl | createMultipleProductColorSizes | Creating {} product color sizes", requests.size());
+        try {
+            // Check for existing combinations first
+            for (CreateProductColorSizeRequest request : requests) {
+                checkProductColorSizeExists(request.getProductId(), request.getColorId(), request.getSizeId());
+            }
+
+            // Convert all to entities
+            List<ProductColorSize> productColorSizes = requests.stream()
+                    .map(productColorSizeMapper::toEntity)
+                    .collect(Collectors.toList());
+
+            // Save all product color sizes
+            List<ProductColorSize> savedProductColorSizes = productColorSizeRepository.saveAll(productColorSizes);
+
+            // Convert back to responses
+            List<ProductColorSizeResponse> responses = savedProductColorSizes.stream()
+                    .map(productColorSizeMapper::toResponse)
+                    .collect(Collectors.toList());
+
+            log.info("ProductColorSizeServiceImpl | createMultipleProductColorSizes | Created {} product color sizes",
+                    responses.size());
+            return responses;
+        } catch (ProductColorSizeAlreadyExistsException e) {
+            throw e; // Re-throw domain exceptions to be handled by global exception handler
+        } catch (DataAccessException e) {
+            log.error("ProductColorSizeServiceImpl | createMultipleProductColorSizes | Database error: {}",
+                    e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("ProductColorSizeServiceImpl | createMultipleProductColorSizes | Unexpected error: {}",
+                    e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
     public ProductColorSizeResponse updateProductColorSize(String id, UpdateProductColorSizeRequest request) {
         log.info("ProductColorSizeServiceImpl | updateProductColorSize | Updating product color size with id: {}", id);
         try {
