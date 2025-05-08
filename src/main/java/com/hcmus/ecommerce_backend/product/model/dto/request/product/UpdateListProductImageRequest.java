@@ -1,4 +1,4 @@
-package com.hcmus.ecommerce_backend.product.model.dto.request;
+package com.hcmus.ecommerce_backend.product.model.dto.request.product;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

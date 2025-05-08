@@ -5,8 +5,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductColorSizeRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductColorSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.CreateProductColorSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateProductColorSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductColorSizeResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.Color;
 import com.hcmus.ecommerce_backend.product.model.entity.Product;

@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hcmus.ecommerce_backend.product.exception.ProductColorSizeAlreadyExistsException;
 import com.hcmus.ecommerce_backend.product.exception.ProductColorSizeNotFoundException;
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductColorSizeRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductColorSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.CreateProductColorSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateProductColorSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductColorSizeResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.ProductColorSize;
 import com.hcmus.ecommerce_backend.product.model.mapper.ProductColorSizeMapper;

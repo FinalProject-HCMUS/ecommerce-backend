@@ -2,8 +2,8 @@ package com.hcmus.ecommerce_backend.product.service.impl;
 
 import com.hcmus.ecommerce_backend.product.exception.ColorAlreadyExistsException;
 import com.hcmus.ecommerce_backend.product.exception.ColorNotFoundException;
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateColorRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateColorRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.color.CreateColorRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.color.UpdateColorRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ColorResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.Color;
 import com.hcmus.ecommerce_backend.product.model.mapper.ColorMapper;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,6 +93,44 @@ public class ColorServiceImpl implements ColorService {
             throw e;
         }
     }
+
+    @Override
+    @Transactional
+    public List<ColorResponse> createMultipleColors(List<CreateColorRequest> requests) {
+        log.info("ColorServiceImpl | createMultipleColors | Creating {} colors", requests.size());
+        try {
+            // Check if any color names already exist
+            for (CreateColorRequest request : requests) {
+                checkColorNameExists(request.getName());
+            }
+
+            // Convert all to entities
+            List<Color> colors = requests.stream()
+                    .map(colorMapper::toEntity)
+                    .collect(Collectors.toList());
+
+            // Save all colors
+            List<Color> savedColors = colorRepository.saveAll(colors);
+
+            // Convert back to responses
+            List<ColorResponse> responses = savedColors.stream()
+                    .map(colorMapper::toResponse)
+                    .collect(Collectors.toList());
+
+            log.info("ColorServiceImpl | createMultipleColors | Created {} colors", responses.size());
+            return responses;
+        } catch (ColorAlreadyExistsException e) {
+            throw e; // Re-throw domain exceptions to be handled by global exception handler
+        } catch (DataAccessException e) {
+            log.error("ColorServiceImpl | createMultipleColors | Database error creating multiple colors: {}",
+                    e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("ColorServiceImpl | createMultipleColors | Unexpected error creating multiple colors: {}",
+                    e.getMessage(), e);
+            throw e;
+        }
+    }
     
     @Override
     @Transactional
@@ -156,7 +193,7 @@ public class ColorServiceImpl implements ColorService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private Color findColorById(String id) {
+    protected Color findColorById(String id) {
         return colorRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("ColorServiceImpl | findColorById | Color not found with id: {}", id);
@@ -169,7 +206,7 @@ public class ColorServiceImpl implements ColorService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private boolean doesColorExistById(String id) {
+    protected boolean doesColorExistById(String id) {
         return colorRepository.existsById(id);
     }
     
@@ -179,7 +216,7 @@ public class ColorServiceImpl implements ColorService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private void checkColorNameExists(String name) {
+    protected void checkColorNameExists(String name) {
         if (colorRepository.existsByName(name)) {
             log.error("ColorServiceImpl | checkColorNameExists | Color already exists with name: {}", name);
             throw new ColorAlreadyExistsException(name);

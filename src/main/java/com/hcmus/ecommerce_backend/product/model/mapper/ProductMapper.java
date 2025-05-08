@@ -1,8 +1,8 @@
 package com.hcmus.ecommerce_backend.product.model.mapper;
 
 import com.hcmus.ecommerce_backend.category.model.entity.Category;
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.CreateProductRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateProductRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.Product;
 import org.mapstruct.Mapper;

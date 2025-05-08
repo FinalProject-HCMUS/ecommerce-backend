@@ -2,8 +2,8 @@ package com.hcmus.ecommerce_backend.product.service.impl;
 
 import com.hcmus.ecommerce_backend.product.exception.SizeAlreadyExistsException;
 import com.hcmus.ecommerce_backend.product.exception.SizeNotFoundException;
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateSizeRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.size.CreateSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.size.UpdateSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.SizeResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.Size;
 import com.hcmus.ecommerce_backend.product.model.mapper.SizeMapper;
@@ -17,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -93,6 +96,44 @@ public class SizeServiceImpl implements SizeService {
 
     @Override
     @Transactional
+    public List<SizeResponse> createMultipleSizes(List<CreateSizeRequest> requests) {
+        log.info("SizeServiceImpl | createMultipleSizes | Creating {} sizes", requests.size());
+        try {
+            // Check if any size names already exist
+            for (CreateSizeRequest request : requests) {
+                checkSizeNameExists(request.getName());
+            }
+
+            // Convert all to entities
+            List<Size> sizes = requests.stream()
+                    .map(sizeMapper::toEntity)
+                    .collect(Collectors.toList());
+
+            // Save all sizes
+            List<Size> savedSizes = sizeRepository.saveAll(sizes);
+
+            // Convert back to responses
+            List<SizeResponse> responses = savedSizes.stream()
+                    .map(sizeMapper::toResponse)
+                    .collect(Collectors.toList());
+
+            log.info("SizeServiceImpl | createMultipleSizes | Created {} sizes", responses.size());
+            return responses;
+        } catch (SizeAlreadyExistsException e) {
+            throw e; // Re-throw domain exceptions to be handled by global exception handler
+        } catch (DataAccessException e) {
+            log.error("SizeServiceImpl | createMultipleSizes | Database error creating multiple sizes: {}",
+                    e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("SizeServiceImpl | createMultipleSizes | Unexpected error creating multiple sizes: {}",
+                    e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
     public SizeResponse updateSize(String id, UpdateSizeRequest request) {
         log.info("SizeServiceImpl | updateSize | Updating size with id: {}", id);
         try {
@@ -145,7 +186,7 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private Size findSizeById(String id) {
+    protected Size findSizeById(String id) {
         return sizeRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("SizeServiceImpl | findSizeById | Size not found with id: {}", id);
@@ -154,12 +195,12 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private boolean doesSizeExistById(String id) {
+    protected boolean doesSizeExistById(String id) {
         return sizeRepository.existsById(id);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private void checkSizeNameExists(String name) {
+    protected void checkSizeNameExists(String name) {
         if (sizeRepository.existsByName(name)) {
             log.error("SizeServiceImpl | checkSizeNameExists | Size already exists with name: {}", name);
             throw new SizeAlreadyExistsException(name);

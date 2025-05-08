@@ -1,7 +1,8 @@
 package com.hcmus.ecommerce_backend.product.controller;
 
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateSizeRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.size.CreateMultipleSizesRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.size.CreateSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.size.UpdateSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.SizeResponse;
 import com.hcmus.ecommerce_backend.product.service.SizeService;
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
@@ -24,6 +25,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/sizes")
@@ -83,7 +86,27 @@ public class SizeController {
         log.info("SizeController | createSize | request: {}", request);
         SizeResponse createdSize = sizeService.createSize(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(CustomResponse.successOf(createdSize));
+                .body(CustomResponse.createdOf(createdSize));
+    }
+
+    @Operation(summary = "Create multiple sizes", description = "Creates multiple sizes at once with the provided information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Sizes successfully created"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class))),
+        @ApiResponse(responseCode = "409", description = "One or more sizes already exist",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class)))
+    })
+    @PostMapping("/batch")
+    public ResponseEntity<CustomResponse<List<SizeResponse>>> createMultipleSizes(
+            @Parameter(description = "List of sizes for creation", required = true)
+            @Valid @RequestBody CreateMultipleSizesRequest request) {
+        log.info("SizeController | createMultipleSizes | request with {} sizes", request.getSizes().size());
+        List<SizeResponse> createdSizes = sizeService.createMultipleSizes(request.getSizes());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CustomResponse.createdOf(createdSizes));
     }
 
     @Operation(summary = "Update a size", description = "Updates an existing size with the provided information")

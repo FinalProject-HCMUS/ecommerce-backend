@@ -1,9 +1,9 @@
 package com.hcmus.ecommerce_backend.product.controller;
 
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductImageRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateListProductImageRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductImageRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.CreateProductImageRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateListProductImageRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductImageResponse;
 import com.hcmus.ecommerce_backend.product.service.ProductImageService;
 import io.swagger.v3.oas.annotations.Operation;

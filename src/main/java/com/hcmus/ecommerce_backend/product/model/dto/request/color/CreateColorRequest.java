@@ -1,4 +1,4 @@
-package com.hcmus.ecommerce_backend.product.model.dto.request;
+package com.hcmus.ecommerce_backend.product.model.dto.request.color;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Request object for updating an existing color")
-public class UpdateColorRequest {
+@Schema(description = "Request object for creating a new color")
+public class CreateColorRequest {
 
     @NotBlank(message = "Color name is required")
     @Size(min = 2, max = 50, message = "Color name must be between 2 and 50 characters")
@@ -24,4 +24,5 @@ public class UpdateColorRequest {
     @Size(min = 7, max = 7, message = "Color code must be exactly 7 characters (e.g., #FFFFFF)")
     @Schema(description = "Hex code of the color", example = "#FF5733", required = true)
     private String code;
+
 }

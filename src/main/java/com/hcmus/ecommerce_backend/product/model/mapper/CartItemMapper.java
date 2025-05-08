@@ -1,8 +1,8 @@
 package com.hcmus.ecommerce_backend.product.model.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateCartItemRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateCartItemRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.cart_item.CreateCartItemRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.cart_item.UpdateCartItemRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemResponse;
 import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemWithProductResponse;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductResponse;

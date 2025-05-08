@@ -2,8 +2,8 @@ package com.hcmus.ecommerce_backend.product.controller;
 
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
 import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.CreateProductRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateProductRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductResponse;
 import com.hcmus.ecommerce_backend.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;

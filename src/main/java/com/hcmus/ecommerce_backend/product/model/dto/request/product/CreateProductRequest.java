@@ -1,4 +1,4 @@
-package com.hcmus.ecommerce_backend.product.model.dto.request;
+package com.hcmus.ecommerce_backend.product.model.dto.request.product;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Request object for updating an existing product")
-public class UpdateProductRequest {
+@Schema(description = "Request object for creating a new product")
+public class CreateProductRequest {
 
     @NotBlank(message = "Product name is required")
     @Size(min = 2, max = 100, message = "Product name must be between 2 and 100 characters")
@@ -40,7 +40,7 @@ public class UpdateProductRequest {
     @Schema(description = "Selling price of the product", example = "1099.99", requiredMode = Schema.RequiredMode.REQUIRED)
     private Double price;
 
-    @Schema(description = "Discount percentage", example = "10.0")
+    @Schema(description = "Discount percentage", example = "0.1 (10%)")
     private Double discountPercent;
 
     @NotNull(message = "Enable status is required")
@@ -54,7 +54,7 @@ public class UpdateProductRequest {
     @Schema(description = "Main image URL of the product", example = "https://example.com/iphone15.jpg")
     private String mainImageUrl;
 
-    @NotNull(message = "Category ID is required")
+    @NotBlank(message = "Category ID is required")
     @Schema(description = "ID of the category this product belongs to", example = "550e8400-e29b-41d4-a716-446655440000", requiredMode = Schema.RequiredMode.REQUIRED)
     private String categoryId;
 }

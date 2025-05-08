@@ -4,8 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateSizeRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.size.CreateSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.size.UpdateSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.SizeResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.Size;
 

@@ -2,8 +2,8 @@ package com.hcmus.ecommerce_backend.product.controller;
 
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
 import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateCartItemRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateCartItemRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.cart_item.CreateCartItemRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.cart_item.UpdateCartItemRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemResponse;
 import com.hcmus.ecommerce_backend.product.model.dto.response.CartItemWithProductResponse;
 import com.hcmus.ecommerce_backend.product.service.CartItemService;

@@ -4,8 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateColorRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateColorRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.color.CreateColorRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.color.UpdateColorRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ColorResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.Color;
 

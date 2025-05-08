@@ -1,8 +1,8 @@
 package com.hcmus.ecommerce_backend.product.model.mapper;
 
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductImageRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateListProductImageRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductImageRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.CreateProductImageRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateListProductImageRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateProductImageRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductImageResponse;
 import com.hcmus.ecommerce_backend.product.model.entity.Product;
 import com.hcmus.ecommerce_backend.product.model.entity.ProductImage;

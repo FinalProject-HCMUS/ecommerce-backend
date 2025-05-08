@@ -1,7 +1,8 @@
 package com.hcmus.ecommerce_backend.product.controller;
 
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateColorRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateColorRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.color.CreateColorRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.color.CreateMultipleColorsRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.color.UpdateColorRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ColorResponse;
 import com.hcmus.ecommerce_backend.product.service.ColorService;
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
@@ -24,6 +25,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -84,7 +87,28 @@ public class ColorController {
         log.info("ColorController | createColor | request: {}", request);
         ColorResponse createdColor = colorService.createColor(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(CustomResponse.successOf(createdColor));
+                .body(CustomResponse.createdOf(createdColor));
+
+    }
+
+    @Operation(summary = "Create multiple colors", description = "Creates multiple colors at once with the provided information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Colors successfully created"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class))),
+        @ApiResponse(responseCode = "409", description = "One or more colors already exist",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = CustomResponse.class)))
+    })
+    @PostMapping("/batch")
+    public ResponseEntity<CustomResponse<List<ColorResponse>>> createMultipleColors(
+            @Parameter(description = "List of colors for creation", required = true)
+            @Valid @RequestBody CreateMultipleColorsRequest request) {
+        log.info("ColorController | createMultipleColors | request with {} colors", request.getColors().size());
+        List<ColorResponse> createdColors = colorService.createMultipleColors(request.getColors());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CustomResponse.createdOf(createdColors));
     }
 
     @Operation(summary = "Update a color", description = "Updates an existing color with the provided information")

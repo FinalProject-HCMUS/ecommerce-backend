@@ -2,8 +2,8 @@ package com.hcmus.ecommerce_backend.product.controller;
 
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
 import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
-import com.hcmus.ecommerce_backend.product.model.dto.request.CreateProductColorSizeRequest;
-import com.hcmus.ecommerce_backend.product.model.dto.request.UpdateProductColorSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.CreateProductColorSizeRequest;
+import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateProductColorSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductColorSizeResponse;
 import com.hcmus.ecommerce_backend.product.service.ProductColorSizeService;
 import io.swagger.v3.oas.annotations.Operation;

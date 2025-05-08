@@ -1,4 +1,4 @@
-package com.hcmus.ecommerce_backend.product.model.dto.request;
+package com.hcmus.ecommerce_backend.product.model.dto.request.size;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -14,9 +14,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Request object for creating a new size")
-public class CreateSizeRequest {
-    
+@Schema(description = "Request object for updating an existing size")
+public class UpdateSizeRequest {
     @NotBlank(message = "Size name is required")
     @Size(min = 1, max = 50, message = "Size name must be between 1 and 50 characters")
     @Schema(description = "Name of the size", example = "M", required = true)

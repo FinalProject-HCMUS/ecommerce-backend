@@ -1,4 +1,4 @@
-package com.hcmus.ecommerce_backend.product.model.dto.request;
+package com.hcmus.ecommerce_backend.product.model.dto.request.product;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Request object for updating an existing image")
-public class UpdateProductImageRequest {
+@Schema(description = "Request object for creating a new product image")
+public class CreateProductImageRequest {
     
     @NotBlank(message = "Image URL is required")
     @Schema(description = "URL of the product image", example = "https://example.com/image.jpg", required = true)
