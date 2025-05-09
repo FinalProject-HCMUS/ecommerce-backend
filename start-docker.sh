@@ -36,7 +36,6 @@ POSTGRES_PORT=5432
 # Spring Boot Configuration
 SERVER_PORT=8080
 SPRING_PROFILES_ACTIVE=dev
-SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
 EOF
   info "Default .env file created"
@@ -67,8 +66,6 @@ sleep 5
 info "Starting services..."
 docker compose up -d
 
-info "Creating ecommerce database if it doesn't exist..."
-docker exec ecommerce-backend-postgres-1 sh -c 'psql -U "$POSTGRES_USER" -d postgres -c "CREATE DATABASE ecommerce;" || echo "Database already exists"'
 
 # Check the exit status of the last command
 if [ $? -ne 0 ]; then
@@ -77,7 +74,6 @@ if [ $? -ne 0 ]; then
 else
   info "Services started successfully"
   info "E-commerce application is running at http://localhost:${SERVER_PORT:-8080}"
-  info "PostgreSQL is available at localhost:${POSTGRES_PORT:-5432}"
 fi
 
 # Display container status
