@@ -23,7 +23,6 @@ public class CreateCategoryRequest {
     @Schema(description = "Description of the category", example = "Electronic devices and gadgets")
     private String description;
 
-    @NotBlank(message = "Stock is required")
-    @Schema(description = "Stock of the category", example = "100", required = true)
+    @Schema(description = "Stock of the category", example = "100")
     private int stock;
 }

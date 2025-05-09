@@ -8,10 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -34,6 +31,7 @@ public class Category extends BaseEntity {
     @Column(name = "description")
     private String description;
 
+    @Builder.Default
     @Column(name = "stock", nullable = false)
-    private int stock;
+    private int stock = 0;
 }
