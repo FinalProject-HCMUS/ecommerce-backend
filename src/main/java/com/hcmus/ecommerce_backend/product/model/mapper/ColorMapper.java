@@ -11,7 +11,8 @@ import com.hcmus.ecommerce_backend.product.model.entity.Color;
 
 @Mapper(componentModel = "spring")
 public interface ColorMapper {
-    
+
+    @Mapping(source = "code", target = "code")
     ColorResponse toResponse(Color color);
 
     @Mapping(target = "id", ignore = true)
