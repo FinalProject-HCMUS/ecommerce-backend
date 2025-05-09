@@ -21,6 +21,9 @@ public class ColorResponse {
     @Schema(description = "Name of the color", example = "Red")
     private String name;
 
+    @Schema(description = "Hexadecimal code representing the color", example = "#FF0000")
+    private String code;
+
     @Schema(description = "Date and time when the color was created")
     private LocalDateTime createdAt;
     

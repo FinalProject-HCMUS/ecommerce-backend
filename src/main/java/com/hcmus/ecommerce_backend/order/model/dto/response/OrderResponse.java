@@ -53,6 +53,9 @@ public class OrderResponse {
     
     @Schema(description = "ID of the customer", example = "550e8400-e29b-41d4-a716-446655440000")
     private String customerId;
+
+    @Schema(description = "Shipping address", example = "123 Main St, Springfield, USA")
+    private String address;
     
     @Schema(description = "List of order tracks")
     private List<OrderTrackResponse> orderTracks;
