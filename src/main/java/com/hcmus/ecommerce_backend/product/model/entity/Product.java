@@ -6,10 +6,7 @@ import com.hcmus.ecommerce_backend.category.model.entity.Category;
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -34,8 +31,9 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private double cost;
 
+    @Builder.Default
     @Column(nullable = false)
-    private int total;
+    private int total = 0;
 
     @Column(nullable = false)
     private double price;

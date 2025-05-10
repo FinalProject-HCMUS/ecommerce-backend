@@ -30,9 +30,7 @@ public class CreateProductRequest {
     @Schema(description = "Cost of the product", example = "900.0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Double cost;
 
-    @NotNull(message = "Total quantity is required")
-    @Positive(message = "Total quantity must be greater than 0")
-    @Schema(description = "Total quantity in stock", example = "100", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Total quantity in stock", example = "100")
     private Integer total;
 
     @NotNull(message = "Price is required")
