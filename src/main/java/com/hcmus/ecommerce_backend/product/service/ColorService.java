@@ -12,6 +12,8 @@ import java.util.List;
 public interface ColorService {
     
     Page<ColorResponse> getAllColors(Pageable pageable);
+
+    Page<ColorResponse> searchColors(Pageable pageable, String keyword);
     
     ColorResponse getColorById(String id);
     

@@ -54,6 +54,26 @@ public class ColorController {
         return ResponseEntity.ok(CustomResponse.successOf(colors));
     }
 
+    @Operation(summary = "Search colors", description = "Searches for colors by name with pagination and sorting")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved filtered colors")
+    @GetMapping("/search")
+    public ResponseEntity<CustomResponse<Page<ColorResponse>>> searchColors(
+            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Sorting criteria in the format: property(,asc|desc).")
+            @RequestParam(required = false) String[] sort,
+            @Parameter(description = "Keyword to search in color name")
+            @RequestParam(required = false) String keyword) {
+
+        log.info("ColorController | searchColors | page: {}, size: {}, sort: {}, keyword: {}",
+                page, size, sort != null ? String.join(", ", sort) : "unsorted", keyword);
+
+        Pageable pageable = CreatePageable.build(page, size, sort);
+        Page<ColorResponse> colors = colorService.searchColors(pageable, keyword);
+
+        return ResponseEntity.ok(CustomResponse.successOf(colors));
+    }
+
     @Operation(summary = "Get color by ID", description = "Retrieves a specific color by its ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Color found"),

@@ -49,6 +49,32 @@ public class ColorServiceImpl implements ColorService {
             throw e;
         }
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ColorResponse> searchColors(Pageable pageable, String keyword) {
+        log.info("ColorServiceImpl | searchColors | Searching colors with keyword: {}", keyword);
+        try {
+            Page<Color> colorPage;
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                colorPage = colorRepository.findByNameContainingIgnoreCase(keyword.trim(), pageable);
+            } else {
+                colorPage = colorRepository.findAll(pageable);
+            }
+
+            Page<ColorResponse> colorResponsePage = colorPage.map(colorMapper::toResponse);
+            log.info("ColorServiceImpl | searchColors | Found {} colors matching keyword '{}'",
+                    colorResponsePage.getTotalElements(), keyword);
+            return colorResponsePage;
+        } catch (DataAccessException e) {
+            log.error("ColorServiceImpl | searchColors | Database error searching colors: {}", e.getMessage(), e);
+            return Page.empty(pageable);
+        } catch (Exception e) {
+            log.error("ColorServiceImpl | searchColors | Unexpected error searching colors: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
     
     @Override
     public ColorResponse getColorById(String id) {
