@@ -1,5 +1,6 @@
 package com.hcmus.ecommerce_backend.common.exception.handler;
 
+import com.hcmus.ecommerce_backend.auth.exception.UserNotActivatedException;
 import com.hcmus.ecommerce_backend.blog.exception.BlogAlreadyExistsException;
 import com.hcmus.ecommerce_backend.blog.exception.BlogNotFoundException;
 import com.hcmus.ecommerce_backend.category.exception.CategoryAlreadyExistsException;
@@ -600,5 +601,22 @@ public class GlobalExceptionHandler {
                     .build();
 
             return new ResponseEntity<>(customError, HttpStatus.CONFLICT);
+        }
+
+        /**
+         * Handles UserNotActivatedException thrown when a user account is not activated.
+         *
+         * @param ex The UserNotActivatedException instance.
+         * @return ResponseEntity with CustomError containing details of the exception.
+         */
+        @ExceptionHandler(UserNotActivatedException.class)
+        protected ResponseEntity<Object> handleUserNotActivatedException(final UserNotActivatedException ex) {
+            CustomError customError = CustomError.builder()
+                    .httpStatus(HttpStatus.FORBIDDEN)
+                    .header(CustomError.Header.AUTH_ERROR.getName())
+                    .message(ex.getMessage())
+                    .build();
+
+            return new ResponseEntity<>(customError, HttpStatus.FORBIDDEN);
         }
 }

@@ -2,6 +2,7 @@ package com.hcmus.ecommerce_backend.auth.service.impl;
 
 import com.hcmus.ecommerce_backend.auth.client.OutboundIdentityClient;
 import com.hcmus.ecommerce_backend.auth.client.OutboundUserClient;
+import com.hcmus.ecommerce_backend.auth.exception.UserNotActivatedException;
 import com.hcmus.ecommerce_backend.auth.model.dto.request.ExchangeTokenRequest;
 import com.hcmus.ecommerce_backend.auth.model.dto.response.OutboundUserResponse;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         protected String REDIRECT_URI;
         @NonFinal
         protected String GRANT_TYPE = "authorization_code";
+
         @Override
         @Cacheable(value = "userTokens", key = "#loginRequest.email")
         public TokenResponse login(LoginRequest loginRequest) {
@@ -64,6 +66,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 if (Boolean.FALSE.equals(
                                 passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))) {
                         throw new PasswordNotValidException();
+                }
+
+                if (!user.isEnabled()) {
+                        log.warn("Login attempt with unverified account: {}", loginRequest.getEmail());
+                        throw new UserNotActivatedException();
                 }
 
                 Token token = tokenGenerationService.generateToken(user.getClaims());
