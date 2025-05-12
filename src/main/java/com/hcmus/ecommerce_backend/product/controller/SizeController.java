@@ -37,19 +37,38 @@ public class SizeController {
 
     private final SizeService sizeService;
 
-    @Operation(summary = "Get all sizes", description = "Retrieves a paginated list of sizes with sorting capabilities")
+    @Operation(summary = "Get all sizes", description = "Retrieves a paginated list of sizes with filtering and sorting capabilities")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated sizes")
     @GetMapping
     public ResponseEntity<CustomResponse<Page<SizeResponse>>> getAllSizes(
-            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Zero-based page index (0..N)")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "The size of the page to be returned")
+            @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
                     "Default sort order is ascending. " +
-                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
-        log.info("SizeController | getAllSizes | page: {}, size: {}, sort: {}",
-                page, size, sort != null ? String.join(", ", sort) : "unsorted");
+                    "Multiple sort criteria are supported.")
+            @RequestParam(required = false) String[] sort,
+            @Parameter(description = "Keyword to search in size name")
+            @RequestParam(required = false) String keyword,
+            @Parameter(description = "Filter by minimum height (cm)")
+            @RequestParam(required = false) Integer minHeight,
+            @Parameter(description = "Filter by maximum height (cm)")
+            @RequestParam(required = false) Integer maxHeight,
+            @Parameter(description = "Filter by minimum weight (kg)")
+            @RequestParam(required = false) Integer minWeight,
+            @Parameter(description = "Filter by maximum weight (kg)")
+            @RequestParam(required = false) Integer maxWeight) {
+
+        log.info("SizeController | getAllSizes | page: {}, size: {}, sort: {}, keyword: {}, " +
+                "minHeight: {}, maxHeight: {}, minWeight: {}, maxWeight: {}",
+                page, size, sort != null ? String.join(", ", sort) : "unsorted",
+                keyword, minHeight, maxHeight, minWeight, maxWeight);
+
         Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<SizeResponse> sizes = sizeService.getAllSizes(pageable);
+        Page<SizeResponse> sizes = sizeService.searchSizes(pageable, keyword,
+                                                      minHeight, maxHeight,
+                                                      minWeight, maxWeight);
         return ResponseEntity.ok(CustomResponse.successOf(sizes));
     }
 

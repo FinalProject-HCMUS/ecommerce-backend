@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface CategoryService {
     
-    Page<CategoryResponse> getAllCategories(Pageable pageable);
+    Page<CategoryResponse> searchCategories(Pageable pageable, String keyword);
     
     CategoryResponse getCategoryById(String id);
     

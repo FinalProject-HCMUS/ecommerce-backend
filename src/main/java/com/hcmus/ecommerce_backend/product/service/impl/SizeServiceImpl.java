@@ -31,22 +31,39 @@ public class SizeServiceImpl implements SizeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<SizeResponse> getAllSizes(Pageable pageable) {
-        log.info("SizeServiceImpl | getAllSizes | Retrieving sizes with pagination - Page: {}, Size: {}, Sort: {}",
-                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+    public Page<SizeResponse> searchSizes(Pageable pageable, String keyword,
+                                     Integer minHeight, Integer maxHeight,
+                                     Integer minWeight, Integer maxWeight) {
+        log.info("SizeServiceImpl | searchSizes | Retrieving sizes with filtering - " +
+                "Page: {}, Size: {}, Sort: {}, Keyword: {}, MinHeight: {}, MaxHeight: {}, MinWeight: {}, MaxWeight: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort(),
+                keyword, minHeight, maxHeight, minWeight, maxWeight);
+
         try {
-            Page<Size> sizePage = sizeRepository.findAll(pageable);
+            // Sanitize empty keyword to null for consistent query handling
+            String sanitizedKeyword = (keyword != null && keyword.trim().isEmpty()) ? null : keyword;
+
+            // Log actual values being used for the query
+            log.debug("SizeServiceImpl | searchSizes | Executing query with parameters: " +
+                    "keyword={}, minHeight={}, maxHeight={}, minWeight={}, maxWeight={}",
+                    sanitizedKeyword, minHeight, maxHeight, minWeight, maxWeight);
+
+            Page<Size> sizePage = sizeRepository.searchSizes(
+                    sanitizedKeyword, minHeight, maxHeight, minWeight, maxWeight, pageable);
+
             Page<SizeResponse> sizeResponsePage = sizePage.map(sizeMapper::toResponse);
-            log.info("SizeServiceImpl | getAllSizes | Found {} sizes on page {} of {}",
+
+            log.info("SizeServiceImpl | searchSizes | Found {} sizes on page {} of {}",
                     sizeResponsePage.getNumberOfElements(),
                     sizeResponsePage.getNumber() + 1,
                     sizeResponsePage.getTotalPages());
+
             return sizeResponsePage;
         } catch (DataAccessException e) {
-            log.error("SizeServiceImpl | getAllSizes | Database error retrieving paginated sizes: {}", e.getMessage(), e);
+            log.error("SizeServiceImpl | searchSizes | Database error retrieving filtered sizes: {}", e.getMessage(), e);
             return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("SizeServiceImpl | getAllSizes | Unexpected error retrieving paginated sizes: {}", e.getMessage(), e);
+            log.error("SizeServiceImpl | searchSizes | Unexpected error retrieving filtered sizes: {}", e.getMessage(), e);
             throw e;
         }
     }

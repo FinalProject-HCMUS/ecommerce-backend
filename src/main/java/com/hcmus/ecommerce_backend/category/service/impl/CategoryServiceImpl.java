@@ -32,22 +32,26 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     @Transactional(readOnly = true)
-    public Page<CategoryResponse> getAllCategories(Pageable pageable) {
-        log.info("CategoryServiceImpl | getAllCategories | Retrieving categories with pagination - Page: {}, Size: {}, Sort: {}",
-                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+    public Page<CategoryResponse> searchCategories(Pageable pageable, String keyword) {
+        log.info("CategoryServiceImpl | searchCategories | Searching categories with keyword: {}", keyword);
         try {
-            Page<Category> categoryPage = categoryRepository.findAll(pageable);
+            Page<Category> categoryPage;
+
+            if (keyword == null || keyword.isEmpty()) {
+                categoryPage = categoryRepository.findAll(pageable);
+            } else {
+                categoryPage = categoryRepository.findByNameContainingIgnoreCase(keyword, pageable);
+            }
+
             Page<CategoryResponse> categoryResponsePage = categoryPage.map(categoryMapper::toResponse);
-            log.info("CategoryServiceImpl | getAllCategories | Found {} categories on page {} of {}",
-                    categoryResponsePage.getNumberOfElements(),
-                    categoryResponsePage.getNumber() + 1,
-                    categoryResponsePage.getTotalPages());
+            log.info("CategoryServiceImpl | searchCategories | Found {} categories matching keyword '{}'",
+                    categoryResponsePage.getNumberOfElements(), keyword);
             return categoryResponsePage;
         } catch (DataAccessException e) {
-            log.error("CategoryServiceImpl | getAllCategories | Database error retrieving paginated categories: {}", e.getMessage(), e);
+            log.error("CategoryServiceImpl | searchCategories | Database error searching categories: {}", e.getMessage(), e);
             return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("CategoryServiceImpl | getAllCategories | Unexpected error retrieving paginated categories: {}", e.getMessage(), e);
+            log.error("CategoryServiceImpl | searchCategories | Unexpected error searching categories: {}", e.getMessage(), e);
             throw e;
         }
     }

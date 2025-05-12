@@ -10,8 +10,9 @@ import com.hcmus.ecommerce_backend.product.model.dto.response.SizeResponse;
 import java.util.List;
 
 public interface SizeService {
-    
-    Page<SizeResponse> getAllSizes(Pageable pageable);
+
+    Page<SizeResponse> searchSizes(Pageable pageable, String keyword, Integer minHeight,
+                                   Integer maxHeight, Integer minWeight, Integer maxWeight);
 
     SizeResponse getSizeById(String id);
 

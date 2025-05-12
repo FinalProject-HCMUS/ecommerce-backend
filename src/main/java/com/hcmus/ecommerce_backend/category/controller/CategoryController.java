@@ -36,7 +36,7 @@ public class CategoryController {
     
     private final CategoryService categoryService;
     
-    @Operation(summary = "Get all categories", description = "Retrieves a paginated list of categories with sorting capabilities")
+    @Operation(summary = "Get all categories", description = "Retrieves a paginated list of categories with filtering and sorting capabilities")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated categories")
     @GetMapping
     public ResponseEntity<CustomResponse<Page<CategoryResponse>>> getAllCategories(
@@ -44,11 +44,14 @@ public class CategoryController {
             @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
                     "Default sort order is ascending. " +
-                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
-        log.info("CategoryController | getAllCategories | page: {}, size: {}, sort: {}",
-                page, size, sort != null ? String.join(", ", sort) : "unsorted");
+                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort,
+            @Parameter(description = "Keyword to search in category name") @RequestParam(required = false) String keyword) {
+
+        log.info("CategoryController | getAllCategories | page: {}, size: {}, sort: {}, keyword: {}",
+                page, size, sort != null ? String.join(", ", sort) : "unsorted", keyword);
+
         Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<CategoryResponse> categories = categoryService.getAllCategories(pageable);
+        Page<CategoryResponse> categories = categoryService.searchCategories(pageable, keyword);
         return ResponseEntity.ok(CustomResponse.successOf(categories));
     }
 
