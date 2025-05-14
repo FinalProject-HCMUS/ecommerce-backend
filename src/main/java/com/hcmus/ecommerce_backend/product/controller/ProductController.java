@@ -52,14 +52,19 @@ public class ProductController {
             @Parameter(description = "Minimum price (inclusive)") @RequestParam(required = false) Double fromprice,
             @Parameter(description = "Maximum price (inclusive)") @RequestParam(required = false) Double toprice,
             @Parameter(description = "Filter by color") @RequestParam(required = false) String color,
-            @Parameter(description = "Filter by size (e.g., S, M, L, XL)") @RequestParam(required = false) String size) {
-    
-        log.info("ProductController | getAllProducts | page: {}, perpage: {}, sort: {}, filters: keysearch={}, category={}, fromprice={}, toprice={}, color={}, size={}",
-                page, perpage, sort != null ? String.join(", ", sort) : "unsorted", keysearch, category, fromprice, toprice, color, size);
-    
+            @Parameter(description = "Filter by size (e.g., S, M, L, XL)") @RequestParam(required = false) String size,
+            @Parameter(description = "Filter by enabled status (true/false)") @RequestParam(required = false) Boolean enabled,
+            @Parameter(description = "Filter by stock availability (true/false)") @RequestParam(required = false) Boolean inStock) {
+
+        log.info("ProductController | getAllProducts | page: {}, perpage: {}, sort: {}, filters: keysearch={}, category={}, " +
+                "fromprice={}, toprice={}, color={}, size={}, enabled={}, inStock={}",
+                page, perpage, sort != null ? String.join(", ", sort) : "unsorted",
+                keysearch, category, fromprice, toprice, color, size, enabled, inStock);
+
         Pageable pageable = CreatePageable.build(page, perpage, sort);
-        Page<ProductResponse> products = productService.getAllProducts(pageable, keysearch, category, fromprice, toprice, color, size);
-    
+        Page<ProductResponse> products = productService.getAllProducts(pageable, keysearch, category,
+                fromprice, toprice, color, size, enabled, inStock);
+
         return ResponseEntity.ok(CustomResponse.successOf(products));
     }
 

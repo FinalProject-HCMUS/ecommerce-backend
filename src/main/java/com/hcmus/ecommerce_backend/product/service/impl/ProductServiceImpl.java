@@ -38,9 +38,12 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     
     @Override
-    public Page<ProductResponse> getAllProducts(Pageable pageable, String keysearch, String category, Double fromprice, Double toprice, String color, String size) {
-        log.info("ProductServiceImpl | getAllProducts | Applying filters: keysearch={}, category={}, fromprice={}, toprice={}, color={}, size={}",
-                keysearch, category, fromprice, toprice, color, size);
+    public Page<ProductResponse> getAllProducts(Pageable pageable, String keysearch, String category,
+                                               Double fromprice, Double toprice, String color, String size,
+                                               Boolean enabled, Boolean inStock) {
+        log.info("ProductServiceImpl | getAllProducts | Applying filters: keysearch={}, category={}, " +
+                "fromprice={}, toprice={}, color={}, size={}, enabled={}, inStock={}",
+                keysearch, category, fromprice, toprice, color, size, enabled, inStock);
 
         try {
             Page<Product> productPage = productRepository.findAll((root, query, criteriaBuilder) -> {
@@ -66,6 +69,16 @@ public class ProductServiceImpl implements ProductService {
 
                 if (toprice != null) {
                     predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), toprice));
+                }
+
+                // Filter by enabled status
+                if (enabled != null) {
+                    predicates.add(criteriaBuilder.equal(root.get("enable"), enabled));
+                }
+
+                // Filter by stock availability
+                if (inStock != null) {
+                    predicates.add(criteriaBuilder.equal(root.get("inStock"), inStock));
                 }
 
                 // Join with product_color_sizes to filter by color and size
