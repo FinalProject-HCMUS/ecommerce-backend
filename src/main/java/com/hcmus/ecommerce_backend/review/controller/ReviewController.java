@@ -38,44 +38,34 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @Operation(summary = "Get all reviews with pagination", description = "Retrieves a paginated list of reviews with sorting capabilities")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated reviews")
-    @GetMapping("")
-    public ResponseEntity<CustomResponse<Page<ReviewResponse>>> getAllReviewsPaginated(
+    @Operation(summary = "Get all reviews with filters", description = "Retrieves a paginated list of reviews with filters and sorting capabilities")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved filtered reviews")
+    @GetMapping
+    public ResponseEntity<CustomResponse<Page<ReviewResponse>>> getAllReviews(
             @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
                     "Default sort order is ascending. " +
-                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
-
-        log.info("ReviewController | getAllReviewsPaginated | page: {}, size: {}, sort: {}",
-                page, size, sort != null ? String.join(", ", sort) : "unsorted");
-
-        Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<ReviewResponse> reviews = reviewService.getAllReviewsPaginated(pageable);
-
-        return ResponseEntity.ok(CustomResponse.successOf(reviews));
-    }
-
-    @Operation(summary = "Search reviews", description = "Search reviews by keyword and/or rating with pagination and sorting")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved search results")
-    @GetMapping("/search")
-    public ResponseEntity<CustomResponse<Page<ReviewResponse>>> searchReviews(
-            @Parameter(description = "Keyword to search in headline or comment") @RequestParam(required = false) String keyword,
+                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort,
+            @Parameter(description = "Keyword to search in review headline or comment") @RequestParam(required = false) String keyword,
             @Parameter(description = "Minimum rating (1-5)") @RequestParam(required = false) @Min(1) @Max(5) Integer minRating,
             @Parameter(description = "Maximum rating (1-5)") @RequestParam(required = false) @Min(1) @Max(5) Integer maxRating,
-            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
-                    "Default sort order is ascending. " +
-                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
+            @Parameter(description = "Filter by order detail ID") @RequestParam(required = false) String orderDetailId) {
 
-        log.info(
-                "ReviewController | searchReviews | keyword: {}, minRating: {}, maxRating: {}, page: {}, size: {}, sort: {}",
-                keyword, minRating, maxRating, page, size, sort != null ? String.join(", ", sort) : "unsorted");
+        log.info("ReviewController | getAllReviews | page: {}, size: {}, sort: {}, filters: keyword={}, " +
+                "minRating={}, maxRating={}, orderDetailId={}",
+                page, size, sort != null ? String.join(", ", sort) : "unsorted",
+                keyword, minRating, maxRating, orderDetailId);
 
         Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<ReviewResponse> reviews = reviewService.searchReviews(keyword, minRating, maxRating, pageable);
+
+        // If orderDetailId is provided, use it as a filter
+        Page<ReviewResponse> reviews;
+        if (orderDetailId != null && !orderDetailId.isEmpty()) {
+            reviews = reviewService.searchReviewsByOrderDetailId(orderDetailId, keyword, minRating, maxRating, pageable);
+        } else {
+            reviews = reviewService.searchReviews(keyword, minRating, maxRating, pageable);
+        }
 
         return ResponseEntity.ok(CustomResponse.successOf(reviews));
     }
@@ -91,51 +81,6 @@ public class ReviewController {
         log.info("ReviewController | getReviewById | id: {}", id);
         ReviewResponse review = reviewService.getReviewById(id);
         return ResponseEntity.ok(CustomResponse.successOf(review));
-    }
-
-    @Operation(summary = "Get reviews by order detail ID with pagination", description = "Retrieves a paginated list of reviews for a specific order detail")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated order detail reviews")
-    @GetMapping("/order-detail/{orderDetailId}/paginated")
-    public ResponseEntity<CustomResponse<Page<ReviewResponse>>> getReviewsByOrderDetailIdPaginated(
-            @Parameter(description = "ID of the order detail", required = true) @PathVariable String orderDetailId,
-            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
-                    "Default sort order is ascending. " +
-                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
-
-        log.info("ReviewController | getReviewsByOrderDetailIdPaginated | orderDetailId: {}, page: {}, size: {}, sort: {}",
-                orderDetailId, page, size, sort != null ? String.join(", ", sort) : "unsorted");
-
-        Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<ReviewResponse> reviews = reviewService.getReviewsByOrderDetailIdPaginated(orderDetailId, pageable);
-
-        return ResponseEntity.ok(CustomResponse.successOf(reviews));
-    }
-
-    @Operation(summary = "Search reviews by order detail ID", description = "Search reviews for a specific order detail with filters and pagination")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved search results")
-    @GetMapping("/order-detail/{orderDetailId}/search")
-    public ResponseEntity<CustomResponse<Page<ReviewResponse>>> searchReviewsByOrderDetailId(
-            @Parameter(description = "ID of the order detail", required = true) @PathVariable String orderDetailId,
-            @Parameter(description = "Keyword to search in headline or comment") @RequestParam(required = false) String keyword,
-            @Parameter(description = "Minimum rating (1-5)") @RequestParam(required = false) @Min(1) @Max(5) Integer minRating,
-            @Parameter(description = "Maximum rating (1-5)") @RequestParam(required = false) @Min(1) @Max(5) Integer maxRating,
-            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
-                    "Default sort order is ascending. " +
-                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
-
-        log.info(
-                "ReviewController | searchReviewsByOrderDetailId | orderDetailId: {}, keyword: {}, minRating: {}, maxRating: {}, page: {}, size: {}, sort: {}",
-                orderDetailId, keyword, minRating, maxRating, page, size, sort != null ? String.join(", ", sort) : "unsorted");
-
-        Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<ReviewResponse> reviews = reviewService.searchReviewsByOrderDetailId(orderDetailId, keyword, minRating,
-                maxRating, pageable);
-
-        return ResponseEntity.ok(CustomResponse.successOf(reviews));
     }
 
     @Operation(summary = "Get reviews by rating range", description = "Retrieves reviews within a specific rating range")

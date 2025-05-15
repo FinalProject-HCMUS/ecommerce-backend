@@ -1,5 +1,12 @@
 package com.hcmus.ecommerce_backend.review.service.impl;
 
+    import com.hcmus.ecommerce_backend.order.model.entity.OrderDetail;
+    import com.hcmus.ecommerce_backend.order.model.mapper.OrderDetailMapper;
+    import com.hcmus.ecommerce_backend.product.model.entity.Color;
+    import com.hcmus.ecommerce_backend.product.model.entity.ProductColorSize;
+    import com.hcmus.ecommerce_backend.product.model.entity.Size;
+    import com.hcmus.ecommerce_backend.product.model.mapper.ColorMapper;
+    import com.hcmus.ecommerce_backend.product.model.mapper.SizeMapper;
     import com.hcmus.ecommerce_backend.review.exception.ReviewAlreadyExistsException;
     import com.hcmus.ecommerce_backend.review.exception.ReviewNotFoundException;
     import com.hcmus.ecommerce_backend.review.model.dto.request.CreateReviewRequest;
@@ -28,32 +35,9 @@ package com.hcmus.ecommerce_backend.review.service.impl;
 
         private final ReviewRepository reviewRepository;
         private final ReviewMapper reviewMapper;
-
-        @Override
-        public Page<ReviewResponse> getAllReviewsPaginated(Pageable pageable) {
-            log.info(
-                    "ReviewServiceImpl | getAllReviewsPaginated | Retrieving reviews with pagination - Page: {}, Size: {}, Sort: {}",
-                    pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
-            try {
-                Page<Review> reviewPage = reviewRepository.findAll(pageable);
-                Page<ReviewResponse> reviewResponsePage = reviewPage.map(reviewMapper::toResponse);
-
-                log.info("ReviewServiceImpl | getAllReviewsPaginated | Found {} reviews on page {} of {}",
-                        reviewResponsePage.getNumberOfElements(),
-                        reviewResponsePage.getNumber() + 1,
-                        reviewResponsePage.getTotalPages());
-
-                return reviewResponsePage;
-            } catch (DataAccessException e) {
-                log.error("ReviewServiceImpl | getAllReviewsPaginated | Database error retrieving paginated reviews: {}",
-                        e.getMessage(), e);
-                throw e;
-            } catch (Exception e) {
-                log.error("ReviewServiceImpl | getAllReviewsPaginated | Unexpected error retrieving paginated reviews: {}",
-                        e.getMessage(), e);
-                throw e;
-            }
-        }
+        private final OrderDetailMapper orderDetailMapper;
+        private final ColorMapper colorMapper;
+        private final SizeMapper sizeMapper;
 
         @Override
         public Page<ReviewResponse> searchReviews(String keyword, Integer minRating, Integer maxRating, Pageable pageable) {
@@ -62,79 +46,18 @@ package com.hcmus.ecommerce_backend.review.service.impl;
                     keyword, minRating, maxRating, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
 
             try {
-                // If all search parameters are null, use standard findAll method
-                Page<Review> reviewPage;
-                if ((keyword == null || keyword.trim().isEmpty()) && minRating == null && maxRating == null) {
-                    reviewPage = reviewRepository.findAll(pageable);
-                } else {
-                    // Process keyword
-                    String processedKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+                // Process keyword
+                String processedKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
 
-                    reviewPage = reviewRepository.searchReviews(
-                            processedKeyword,
-                            minRating,
-                            maxRating,
-                            pageable);
-                }
+                Page<Object[]> results = reviewRepository.findReviewsWithDetails(
+                        processedKeyword, minRating, maxRating, null, pageable);
 
-                Page<ReviewResponse> reviewResponsePage = reviewPage.map(reviewMapper::toResponse);
-
-                log.info("ReviewServiceImpl | searchReviews | Found {} reviews on page {} of {}",
-                        reviewResponsePage.getNumberOfElements(),
-                        reviewResponsePage.getNumber() + 1,
-                        reviewResponsePage.getTotalPages());
-
-                return reviewResponsePage;
+                return results.map(this::mapToFullReviewResponse);
             } catch (DataAccessException e) {
                 log.error("ReviewServiceImpl | searchReviews | Database error searching reviews: {}", e.getMessage(), e);
                 throw e;
             } catch (Exception e) {
                 log.error("ReviewServiceImpl | searchReviews | Unexpected error searching reviews: {}", e.getMessage(), e);
-                throw e;
-            }
-        }
-
-        @Override
-        public ReviewResponse getReviewById(String id) {
-            log.info("ReviewServiceImpl | getReviewById | id: {}", id);
-            try {
-                Review review = findReviewById(id);
-                log.info("ReviewServiceImpl | getReviewById | Review found with id: {}", review.getId());
-                return reviewMapper.toResponse(review);
-            } catch (ReviewNotFoundException e) {
-                throw e; // Re-throw domain exceptions to be handled by global exception handler
-            } catch (DataAccessException e) {
-                log.error("ReviewServiceImpl | getReviewById | Database error for id {}: {}", id, e.getMessage(), e);
-                throw e;
-            } catch (Exception e) {
-                log.error("ReviewServiceImpl | getReviewById | Unexpected error for id {}: {}", id, e.getMessage(), e);
-                throw e;
-            }
-        }
-
-        @Override
-        public Page<ReviewResponse> getReviewsByOrderDetailIdPaginated(String orderDetailId, Pageable pageable) {
-            log.info("ReviewServiceImpl | getReviewsByOrderDetailIdPaginated | orderDetailId: {}, page: {}, size: {}, sort: {}",
-                    orderDetailId, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
-            try {
-                Page<Review> reviewPage = reviewRepository.findByOrderDetailId(orderDetailId, pageable);
-                Page<ReviewResponse> reviewResponsePage = reviewPage.map(reviewMapper::toResponse);
-
-                log.info(
-                        "ReviewServiceImpl | getReviewsByOrderDetailIdPaginated | Found {} reviews on page {} of {} for order detail {}",
-                        reviewResponsePage.getNumberOfElements(),
-                        reviewResponsePage.getNumber() + 1,
-                        reviewResponsePage.getTotalPages(),
-                        orderDetailId);
-
-                return reviewResponsePage;
-            } catch (DataAccessException e) {
-                log.error("ReviewServiceImpl | getReviewsByOrderDetailIdPaginated | Database error for orderDetailId {}: {}",
-                        orderDetailId, e.getMessage(), e);
-                throw e;
-            } catch (Exception e) {
-                log.error("ReviewServiceImpl | getReviewsByOrderDetailIdPaginated | Unexpected error for orderDetailId {}: {}",
-                        orderDetailId, e.getMessage(), e);
                 throw e;
             }
         }
@@ -148,31 +71,13 @@ package com.hcmus.ecommerce_backend.review.service.impl;
                     pageable.getSort());
 
             try {
-                // If all search parameters are null, use standard findByOrderDetailId method
-                Page<Review> reviewPage;
-                if ((keyword == null || keyword.trim().isEmpty()) && minRating == null && maxRating == null) {
-                    reviewPage = reviewRepository.findByOrderDetailId(orderDetailId, pageable);
-                } else {
-                    // Process keyword
-                    String processedKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+                // Process keyword
+                String processedKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
 
-                    reviewPage = reviewRepository.searchReviewsByOrderDetailId(
-                            orderDetailId,
-                            processedKeyword,
-                            minRating,
-                            maxRating,
-                            pageable);
-                }
+                Page<Object[]> results = reviewRepository.findReviewsWithDetails(
+                        processedKeyword, minRating, maxRating, orderDetailId, pageable);
 
-                Page<ReviewResponse> reviewResponsePage = reviewPage.map(reviewMapper::toResponse);
-
-                log.info("ReviewServiceImpl | searchReviewsByOrderDetailId | Found {} reviews on page {} of {} for order detail {}",
-                        reviewResponsePage.getNumberOfElements(),
-                        reviewResponsePage.getNumber() + 1,
-                        reviewResponsePage.getTotalPages(),
-                        orderDetailId);
-
-                return reviewResponsePage;
+                return results.map(this::mapToFullReviewResponse);
             } catch (DataAccessException e) {
                 log.error(
                         "ReviewServiceImpl | searchReviewsByOrderDetailId | Database error searching reviews for orderDetailId {}: {}",
@@ -184,6 +89,47 @@ package com.hcmus.ecommerce_backend.review.service.impl;
                         orderDetailId, e.getMessage(), e);
                 throw e;
             }
+        }
+
+        @Override
+        public ReviewResponse getReviewById(String id) {
+            log.info("ReviewServiceImpl | getReviewById | id: {}", id);
+            try {
+                Object[] result = reviewRepository.findReviewsWithDetails(null, null, null, null, Pageable.unpaged())
+                        .stream()
+                        .filter(row -> ((Review)row[0]).getId().equals(id))
+                        .findFirst()
+                        .orElseThrow(() -> new ReviewNotFoundException(id));
+
+                return mapToFullReviewResponse(result);
+            } catch (ReviewNotFoundException e) {
+                throw e;
+            } catch (DataAccessException e) {
+                log.error("ReviewServiceImpl | getReviewById | Database error for id {}: {}", id, e.getMessage(), e);
+                throw e;
+            } catch (Exception e) {
+                log.error("ReviewServiceImpl | getReviewById | Unexpected error for id {}: {}", id, e.getMessage(), e);
+                throw e;
+            }
+        }
+
+        // Helper method to map the join query result to a full ReviewResponse
+        private ReviewResponse mapToFullReviewResponse(Object[] row) {
+            Review review = (Review) row[0];
+            OrderDetail orderDetail = (OrderDetail) row[1];
+            ProductColorSize productColorSize = (ProductColorSize) row[2];
+            Color color = (Color) row[3];
+            Size size = (Size) row[4];
+
+            // Create a base review response from the review entity
+            ReviewResponse response = reviewMapper.toResponse(review);
+
+            // Add related entity responses
+            response.setOrderDetail(orderDetailMapper.toResponse(orderDetail));
+            response.setColor(colorMapper.toResponse(color));
+            response.setSize(sizeMapper.toResponse(size));
+
+            return response;
         }
 
         @Override

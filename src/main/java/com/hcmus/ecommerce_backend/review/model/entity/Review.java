@@ -31,4 +31,7 @@ public class Review extends BaseEntity {
 
     @Column(name = "order_detail_id")
     private String orderDetailId;
+
+    @Column(name = "user_name")
+    private String userName;
 }

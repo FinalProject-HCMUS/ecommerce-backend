@@ -9,13 +9,9 @@ package com.hcmus.ecommerce_backend.review.service;
 
     public interface ReviewService {
 
-        Page<ReviewResponse> getAllReviewsPaginated(Pageable pageable);
-
         Page<ReviewResponse> searchReviews(String keyword, Integer minRating, Integer maxRating, Pageable pageable);
 
         ReviewResponse getReviewById(String id);
-
-        Page<ReviewResponse> getReviewsByOrderDetailIdPaginated(String orderDetailId, Pageable pageable);
 
         ReviewResponse createReview(CreateReviewRequest request);
 

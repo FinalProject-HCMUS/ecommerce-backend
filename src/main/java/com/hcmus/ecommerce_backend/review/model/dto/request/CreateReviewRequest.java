@@ -34,4 +34,8 @@ public class CreateReviewRequest {
     @NotBlank(message = "Order detail ID is required")
     @Schema(description = "ID of the order detail associated with the review", example = "123e4567-e89b-12d3-a456-426614174000")
     private String orderDetailId;
+
+    @NotBlank(message = "User name is required")
+    @Schema(description = "Name of the user who wrote the review", example = "John Doe")
+    private String userName;
 }
