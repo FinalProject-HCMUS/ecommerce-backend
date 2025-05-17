@@ -33,6 +33,7 @@ public interface OrderDetailMapper {
     @Mapping(source = "createdBy", target = "createdBy", qualifiedByName = "mapToString")
     @Mapping(source = "updatedAt", target = "updatedAt", qualifiedByName = "mapToLocalDateTimeFlexible")
     @Mapping(source = "updatedBy", target = "updatedBy", qualifiedByName = "mapToString")
+    @Mapping(source = "itemId", target = "itemId", qualifiedByName = "mapToString")
     @Mapping(source = "orderId", target = "orderId", qualifiedByName = "mapToString")
     OrderDetailWithProductResponse mapToOrderDetailWithProductResponse(Map<String, Object> orderDetail);
 

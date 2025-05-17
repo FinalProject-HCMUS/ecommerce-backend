@@ -35,6 +35,9 @@ public class OrderDetailWithProductResponse {
     @Schema(description = "ID of the order", example = "550e8400-e29b-41d4-a716-446655440000")
     private String orderId;
 
+    @Schema(description = "ID of the item (ProductColorSize)", example = "550e8400-e29b-41d4-a716-446655440000")
+    private String itemId;
+
     @Schema(description = "Date and time when the order detail was created")
     private LocalDateTime createdAt;
     
