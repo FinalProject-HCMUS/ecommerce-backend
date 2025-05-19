@@ -16,7 +16,9 @@ import com.hcmus.ecommerce_backend.order.model.dto.response.OrderDetailResponse;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderDetailWithProductResponse;
 import com.hcmus.ecommerce_backend.order.model.entity.Order;
 import com.hcmus.ecommerce_backend.order.model.entity.OrderDetail;
+import com.hcmus.ecommerce_backend.product.model.dto.response.ColorResponse;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductResponse;
+import com.hcmus.ecommerce_backend.product.model.dto.response.SizeResponse;
 
 @Mapper(componentModel = "spring")
 public interface OrderDetailMapper {
@@ -35,6 +37,10 @@ public interface OrderDetailMapper {
     @Mapping(source = "updatedBy", target = "updatedBy", qualifiedByName = "mapToString")
     @Mapping(source = "itemId", target = "itemId", qualifiedByName = "mapToString")
     @Mapping(source = "orderId", target = "orderId", qualifiedByName = "mapToString")
+    @Mapping(source = "id", target = "id", qualifiedByName = "mapToString")
+    @Mapping(source = "color", target = "color", qualifiedByName = "mapToColorResponse")
+    @Mapping(source = "size", target = "size", qualifiedByName = "mapToSizeResponse")
+    @Mapping(source = "limitedQuantity", target = "limitedQuantity", qualifiedByName = "mapToInteger")
     OrderDetailWithProductResponse mapToOrderDetailWithProductResponse(Map<String, Object> orderDetail);
 
     @Named("mapToProductResponse")
@@ -65,6 +71,53 @@ public interface OrderDetailMapper {
                         .build();
             } catch (Exception e) {
                 System.err.println("Error parsing product JSON: " + e.getMessage());
+            }
+        }
+        return null;
+    }
+
+    @Named("mapToColorResponse")
+    default ColorResponse mapToColorResponse(Object color) {
+        if (color instanceof String) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> colorMap = objectMapper.readValue((String) color, Map.class);
+                return ColorResponse.builder()
+                    .id((String) colorMap.get("colorId"))
+                    .name((String) colorMap.get("colorName"))
+                    .code((String) colorMap.get("colorCode"))
+                    .createdAt(mapToLocalDateTimeFlexible(colorMap.get("colorCreatedAt")))
+                    .updatedAt(mapToLocalDateTimeFlexible(colorMap.get("colorUpdatedAt")))
+                    .createdBy((String) colorMap.get("colorCreatedBy"))
+                    .updatedBy((String) colorMap.get("colorUpdatedBy"))
+                    .build();
+            } catch (Exception e) {
+                System.err.println("Error parsing color JSON: " + e.getMessage());
+            }
+        }
+        return null;
+    }
+
+    @Named("mapToSizeResponse")
+    default SizeResponse mapToSizeResponse(Object size) {
+        if (size instanceof String) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> sizeMap = objectMapper.readValue((String) size, Map.class);
+                return SizeResponse.builder()
+                    .id((String) sizeMap.get("sizeId"))
+                    .name((String) sizeMap.get("sizeName"))
+                    .minHeight(((Number) sizeMap.get("minHeight")).intValue())
+                    .maxHeight(((Number) sizeMap.get("maxHeight")).intValue())
+                    .minWeight(((Number) sizeMap.get("minWeight")).intValue())
+                    .maxWeight(((Number) sizeMap.get("maxWeight")).intValue())
+                    .createdAt(mapToLocalDateTimeFlexible(sizeMap.get("sizeCreatedAt")))
+                    .updatedAt(mapToLocalDateTimeFlexible(sizeMap.get("sizeUpdatedAt")))
+                    .createdBy((String) sizeMap.get("sizeCreatedBy"))
+                    .updatedBy((String) sizeMap.get("sizeUpdatedBy"))
+                    .build();
+            } catch (Exception e) {
+                System.err.println("Error parsing size JSON: " + e.getMessage());
             }
         }
         return null;

@@ -2,7 +2,9 @@ package com.hcmus.ecommerce_backend.order.model.dto.response;
 
 import java.time.LocalDateTime;
 
+import com.hcmus.ecommerce_backend.product.model.dto.response.ColorResponse;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductResponse;
+import com.hcmus.ecommerce_backend.product.model.dto.response.SizeResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -37,6 +39,18 @@ public class OrderDetailWithProductResponse {
 
     @Schema(description = "ID of the item (ProductColorSize)", example = "550e8400-e29b-41d4-a716-446655440000")
     private String itemId;
+
+    @Schema(description = "ID of the order detail", example = "550e8400-e29b-41d4-a716-446655440000")
+    private String id;
+
+    @Schema(description = "Color of the item", implementation = ColorResponse.class)
+    private ColorResponse color;
+
+    @Schema(description = "Size of the item", implementation = SizeResponse.class)
+    private SizeResponse size;
+
+    @Schema(description = "Limited quantity of this product color size", example = "10")
+    private Integer limitedQuantity;
 
     @Schema(description = "Date and time when the order detail was created")
     private LocalDateTime createdAt;

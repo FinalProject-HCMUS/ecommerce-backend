@@ -36,11 +36,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, String
             'productCreatedAt', p.created_at,
             'productUpdatedAt', p.updated_at,
             'productCreatedBy', p.created_by,
-            'productUpdatedBy', p.updated_by,
-            'colorId', col.id,
-            'colorName', col.name,
-            'sizeId', s.id,
-            'sizeName', s.name
+            'productUpdatedBy', p.updated_by
         ) AS product,
         od.id AS id,
         od.product_cost AS productCost,
@@ -52,7 +48,29 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, String
         od.created_at AS createdAt,
         od.created_by AS createdBy,
         od.updated_at AS updatedAt,
-        od.updated_by AS updatedBy
+        od.updated_by AS updatedBy,
+        json_build_object(
+            'colorId', col.id, 
+            'colorName', col.name, 
+            'colorCode', col.code,
+            'colorCreatedAt', col.created_at,
+            'colorUpdatedAt', col.updated_at,
+            'colorCreatedBy', col.created_by,
+            'colorUpdatedBy', col.updated_by
+        ) AS color,
+        json_build_object(
+            'sizeId', s.id,
+            'sizeName', s.name,
+            'minHeight', s.min_height,
+            'maxHeight', s.max_height,
+            'minWeight', s.min_weight,
+            'maxWeight', s.max_weight,
+            'sizeCreatedAt', s.created_at,
+            'sizeUpdatedAt', s.updated_at,
+            'sizeCreatedBy', s.created_by,
+            'sizeUpdatedBy', s.updated_by
+        ) AS size,
+        pcs.quantity AS limitedQuantity
     FROM order_detail od
     JOIN product_color_sizes pcs ON od.item_id = pcs.id
     JOIN products p ON pcs.product_id = p.id

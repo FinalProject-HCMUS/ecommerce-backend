@@ -41,7 +41,7 @@ public class UpdateOrderDetailRequest {
     private String itemId; // References Product_Color_Size entity
 
     @Schema(description = "Indicates if the order detail has been reviewed", example = "false")
-    private boolean isReviewed;
+    private Boolean isReviewed;
 
     @NotBlank(message = "Order ID is required")
     @Schema(description = "ID of the order", example = "550e8400-e29b-41d4-a716-446655440000")
