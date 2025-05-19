@@ -6,6 +6,8 @@ import lombok.experimental.SuperBuilder;
 
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "messages")
 @Getter
@@ -25,6 +27,15 @@ public class Message extends BaseEntity {
 
     @Column(name = "user_id")
     private String userId; // References Users entity
+
+    @Column(name = "message_type")
+    private String messageType; // e.g., "text", "image"
+
+    @Column(name = "is_read")
+    private boolean isRead;
+
+    @Column(name = "read_at")
+    private LocalDateTime readAt;
 
     @ManyToOne
     @JoinColumn(name = "conversation_id", referencedColumnName = "id")

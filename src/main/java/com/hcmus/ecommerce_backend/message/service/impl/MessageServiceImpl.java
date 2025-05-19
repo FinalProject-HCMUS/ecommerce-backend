@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,6 +84,24 @@ public class MessageServiceImpl implements MessageService {
         } catch (Exception e) {
             log.error("MessageServiceImpl | searchMessages | Unexpected error searching messages: {}",
                     e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse markMessageAsRead(String id) {
+        log.info("MessageServiceImpl | markMessageAsRead | id: {}", id);
+        try {
+            Message message = findMessageById(id);
+            message.setRead(true);
+            message.setReadAt(LocalDateTime.now());
+            Message savedMessage = messageRepository.save(message);
+            return messageMapper.toResponse(savedMessage);
+        } catch (MessageNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("MessageServiceImpl | markMessageAsRead | Error marking message as read: {}", e.getMessage(), e);
             throw e;
         }
     }

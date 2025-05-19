@@ -12,6 +12,8 @@ public interface MessageService {
     Page<MessageResponse> getAllMessagesPaginated(Pageable pageable);
     
     Page<MessageResponse> searchMessages(String keyword, Pageable pageable);
+
+    MessageResponse markMessageAsRead(String id);
     
     MessageResponse getMessageById(String id);
     

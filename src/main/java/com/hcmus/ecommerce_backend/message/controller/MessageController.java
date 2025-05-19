@@ -208,4 +208,15 @@ public class MessageController {
         
         return ResponseEntity.ok(CustomResponse.SUCCESS);
     }
+
+    @Operation(summary = "Mark a message as read", description = "Updates a message's read status")
+    @PutMapping("/{id}/read")
+    public ResponseEntity<CustomResponse<MessageResponse>> markMessageAsRead(
+            @Parameter(description = "ID of the message to mark as read", required = true) @PathVariable String id) {
+
+        log.info("MessageController | markMessageAsRead | id: {}", id);
+        MessageResponse message = messageService.markMessageAsRead(id);
+
+        return ResponseEntity.ok(CustomResponse.successOf(message));
+    }
 }
