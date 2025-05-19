@@ -28,7 +28,7 @@ public class ConversationServiceImpl implements ConversationService {
     
     private final ConversationRepository conversationRepository;
     private final ConversationMapper conversationMapper;
-    
+
     @Override
     public Page<ConversationResponse> getAllConversationsPaginated(Pageable pageable) {
         log.info("ConversationServiceImpl | getAllConversationsPaginated | Retrieving conversations with pagination - Page: {}, Size: {}, Sort: {}",
@@ -141,7 +141,7 @@ public class ConversationServiceImpl implements ConversationService {
             Conversation conversation = conversationMapper.toEntity(request);
             Conversation savedConversation = conversationRepository.save(conversation);
             log.info("ConversationServiceImpl | createConversation | Created conversation with id: {} for customer: {}",
-                    savedConversation.getId(), savedConversation.getCustomerId());
+                    savedConversation.getId(), savedConversation.getCustomer().getId());
             return conversationMapper.toResponse(savedConversation);
         } catch (ConversationAlreadyExistsException e) {
             throw e; // Re-throw domain exceptions to be handled by global exception handler
@@ -212,7 +212,7 @@ public class ConversationServiceImpl implements ConversationService {
     }
     
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private Conversation findConversationById(String id) {
+    protected Conversation findConversationById(String id) {
         return conversationRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("ConversationServiceImpl | findConversationById | Conversation not found with id: {}", id);

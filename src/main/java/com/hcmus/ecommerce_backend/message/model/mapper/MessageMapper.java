@@ -9,10 +9,15 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface MessageMapper {
     
+    @Mapping(target = "conversationId", source = "conversation.id")
     MessageResponse toResponse(Message message);
     
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "conversation.id", source = "conversationId")
+    @Mapping(target = "conversation", ignore = true)
+    @Mapping(target = "contentUrl", source = "contentUrl")
+    @Mapping(target = "messageType", source = "messageType")
+    @Mapping(target = "isRead", constant = "false")
+    @Mapping(target = "readAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

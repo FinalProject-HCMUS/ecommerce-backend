@@ -31,6 +31,9 @@ public class Message extends BaseEntity {
     @Column(name = "message_type")
     private String messageType; // e.g., "text", "image"
 
+    @Column(name = "content_url")
+    private String contentUrl;
+
     @Column(name = "is_read")
     private boolean isRead;
 

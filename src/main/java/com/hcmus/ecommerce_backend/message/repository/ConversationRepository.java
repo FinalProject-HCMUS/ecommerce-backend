@@ -22,7 +22,9 @@ public interface ConversationRepository extends JpaRepository<Conversation, Stri
     
     @Query("SELECT c FROM Conversation c WHERE " +
           "(:keyword IS NULL OR " +
-          "LOWER(c.customerId) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+          "LOWER(c.customer.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+          "LOWER(c.customer.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+          "LOWER(c.customer.id) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<Conversation> searchConversations(@Param("keyword") String keyword, Pageable pageable);
     
     boolean existsByCustomerId(String customerId);

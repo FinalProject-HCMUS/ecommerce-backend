@@ -26,6 +26,12 @@ public class MessageResponse {
     
     @Schema(description = "ID of the conversation this message belongs to", example = "550e8400-e29b-41d4-a716-446655440000")
     private String conversationId;
+
+    @Schema(description = "Type of the message", example = "TEXT")
+    private String messageType;
+
+    @Schema(description = "URL of the image content if message type is IMAGE", example = "https://storage.example.com/images/abc123.jpg")
+    private String contentUrl;
     
     @Schema(description = "Date and time when the message was created")
     private LocalDateTime createdAt;

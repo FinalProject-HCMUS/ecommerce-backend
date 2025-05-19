@@ -21,6 +21,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.hcmus.ecommerce_backend.security.CustomAuthenticationEntryPoint;
 import com.hcmus.ecommerce_backend.security.filter.CustomBearerTokenAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -50,6 +52,9 @@ public class SecurityConfig {
                         .requestMatchers("/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
 
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/ws/info/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/ws/**").permitAll()
 
                         // Public GET endpoints
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
@@ -88,16 +93,33 @@ public class SecurityConfig {
 
     private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(List.of("*"));
+        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:5500"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true); // Important for SockJS
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/ws/**", configuration);
         return source;
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://127.0.0.1:5500", "http://localhost:5500")
+                        .allowedMethods("*")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+            }
+        };
     }
 }

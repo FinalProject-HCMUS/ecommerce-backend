@@ -2,6 +2,7 @@ package com.hcmus.ecommerce_backend.message.model.entity;
 
 import com.hcmus.ecommerce_backend.common.model.entity.BaseEntity;
 
+import com.hcmus.ecommerce_backend.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,8 +26,9 @@ public class Conversation extends BaseEntity {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "customer_id")
-    private String customerId; // References Users entity
+    @OneToOne
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
+    private User customer; // The customer involved in the conversation
 
     @Column(name = "is_admin_read")
     private boolean isAdminRead; // Indicates if the admin has read the conversation

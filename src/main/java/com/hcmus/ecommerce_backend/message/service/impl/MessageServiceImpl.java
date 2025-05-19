@@ -232,12 +232,14 @@ public class MessageServiceImpl implements MessageService {
                         log.warn("MessageServiceImpl | createMessage | Conversation not found with id: {}", request.getConversationId());
                         return new ConversationNotFoundException(request.getConversationId());
                     });
-            
+
             Message message = messageMapper.toEntity(request);
+            message.setConversation(conversation);
+
             Message savedMessage = messageRepository.save(message);
-            
+
             // Update conversation read status
-            if (conversation.getCustomerId().equals(request.getUserId())) {
+            if (conversation.getCustomer().getId().equals(request.getUserId())) {
                 conversation.setCustomerRead(true);
                 conversation.setAdminRead(false);
             } else {
@@ -245,10 +247,10 @@ public class MessageServiceImpl implements MessageService {
                 conversation.setCustomerRead(false);
             }
             conversationRepository.save(conversation);
-            
+
             log.info("MessageServiceImpl | createMessage | Created message with id: {} in conversation: {}",
                     savedMessage.getId(), savedMessage.getConversation().getId());
-            
+
             return messageMapper.toResponse(savedMessage);
         } catch (ConversationNotFoundException e) {
             throw e;
@@ -285,7 +287,7 @@ public class MessageServiceImpl implements MessageService {
     }
     
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private Message findMessageById(String id) {
+    protected Message findMessageById(String id) {
         return messageRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("MessageServiceImpl | findMessageById | Message not found with id: {}", id);
