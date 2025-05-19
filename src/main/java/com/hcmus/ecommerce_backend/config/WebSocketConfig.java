@@ -10,13 +10,12 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 
 @Configuration
 @EnableWebSocketMessageBroker
-@CrossOrigin(origins = {"http://127.0.0.1:5500", "http://localhost:5500"})
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://127.0.0.1:5500", "http://localhost:5500")
+                .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
 
