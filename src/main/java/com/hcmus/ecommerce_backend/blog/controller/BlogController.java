@@ -34,7 +34,7 @@ public class BlogController {
 
     private final BlogService blogService;
 
-    @Operation(summary = "Get all blogs", description = "Retrieves a paginated list of blogs with sorting capabilities")
+    @Operation(summary = "Get all blogs", description = "Retrieves a paginated list of blogs with search and sorting capabilities")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated blogs")
     @GetMapping
     public ResponseEntity<CustomResponse<Page<BlogResponse>>> getAllBlogs(
@@ -42,11 +42,12 @@ public class BlogController {
             @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
                     "Default sort order is ascending. " +
-                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
-        log.info("BlogController | getAllBlogs | page: {}, size: {}, sort: {}",
-                page, size, sort != null ? String.join(", ", sort) : "unsorted");
+                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort,
+            @Parameter(description = "Keyword to search in blog title or content") @RequestParam(required = false) String keysearch) {
+        log.info("BlogController | getAllBlogs | page: {}, size: {}, sort: {}, keysearch: {}",
+                page, size, sort != null ? String.join(", ", sort) : "unsorted", keysearch);
         Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<BlogResponse> blogs = blogService.getAllBlogs(pageable);
+        Page<BlogResponse> blogs = blogService.getAllBlogs(pageable, keysearch);
         return ResponseEntity.ok(CustomResponse.successOf(blogs));
     }
 

@@ -38,11 +38,23 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BlogResponse> getAllBlogs(Pageable pageable) {
-        log.info("BlogServiceImpl | getAllBlogs | Retrieving blogs with pagination - Page: {}, Size: {}, Sort: {}",
-                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+    public Page<BlogResponse> getAllBlogs(Pageable pageable, String keysearch) {
+        log.info("BlogServiceImpl | getAllBlogs | Retrieving blogs with pagination - Page: {}, Size: {}, Sort: {}, KeySearch: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort(), keysearch);
         try {
-            Page<Blog> blogPage = blogRepository.findAll(pageable);
+            Page<Blog> blogPage;
+
+            if (keysearch != null && !keysearch.trim().isEmpty()) {
+                blogPage = blogRepository.findAll((root, query, criteriaBuilder) -> {
+                    return criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), "%" + keysearch.toLowerCase() + "%"),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("content")), "%" + keysearch.toLowerCase() + "%")
+                    );
+                }, pageable);
+            } else {
+                blogPage = blogRepository.findAll(pageable);
+            }
+
             Page<BlogResponse> blogResponsePage = blogPage.map(blogMapper::toResponse);
             log.info("BlogServiceImpl | getAllBlogs | Found {} blogs on page {} of {}",
                     blogResponsePage.getNumberOfElements(),

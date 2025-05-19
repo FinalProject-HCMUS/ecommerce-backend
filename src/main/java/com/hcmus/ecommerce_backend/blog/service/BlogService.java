@@ -9,7 +9,7 @@ import com.hcmus.ecommerce_backend.blog.model.dto.response.BlogResponse;
 
 public interface BlogService {
     
-    Page<BlogResponse> getAllBlogs(Pageable pageable);
+    Page<BlogResponse> getAllBlogs(Pageable pageable, String keysearch);
     
     BlogResponse getBlogById(String id);
     
