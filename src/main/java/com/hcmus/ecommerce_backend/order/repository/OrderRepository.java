@@ -50,6 +50,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
         SELECT SUM(o.sub_total)
         FROM orders o
         WHERE EXTRACT(YEAR FROM o.delivery_date) = :year
+        AND o.is_paid = true
     """, nativeQuery = true)
     Double sumSubTotalByYear(@Param("year") int year);
 
@@ -58,6 +59,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
         FROM orders o
         WHERE EXTRACT(DAY FROM o.delivery_date) = :day
         AND TO_CHAR(o.delivery_date, 'MM-YYYY') = :monthYear
+        AND o.is_paid = true
     """, nativeQuery = true)
     Double sumSubTotalByDayAndMonth(@Param("day") int day, @Param("monthYear") String monthYear);
     
@@ -66,6 +68,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
         FROM orders o
         WHERE EXTRACT(MONTH FROM o.delivery_date) = :month
         AND EXTRACT(YEAR FROM o.delivery_date) = :year
+        AND o.is_paid = true
     """, nativeQuery = true)
     Double sumSubTotalByMonthAndYear(@Param("month") int month, @Param("year") int year);
 }
