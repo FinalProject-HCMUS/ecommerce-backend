@@ -38,7 +38,8 @@ public interface OrderRepository extends JpaRepository<Order, String> {
             SUM(od.quantity * p.price) AS revenue
         FROM orders o
         JOIN order_detail od ON o.id = od.order_id
-        JOIN products p ON od.product_id = p.id
+        JOIN product_color_Sizes pcs ON od.item_id = pcs.id
+        JOIN products p ON pcs.product_id = p.id
         WHERE o.status NOT IN ('DELIVERED', 'REFUND') 
         AND (:date IS NULL OR TO_CHAR(o.created_at, 'MM-YYYY') = :date)
         GROUP BY o.id, o.first_name, o.last_name, o.created_at, o.payment_method
@@ -50,6 +51,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
         SELECT SUM(o.sub_total)
         FROM orders o
         WHERE EXTRACT(YEAR FROM o.delivery_date) = :year
+        AND o.is_paid = true
     """, nativeQuery = true)
     Double sumSubTotalByYear(@Param("year") int year);
 
@@ -58,6 +60,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
         FROM orders o
         WHERE EXTRACT(DAY FROM o.delivery_date) = :day
         AND TO_CHAR(o.delivery_date, 'MM-YYYY') = :monthYear
+        AND o.is_paid = true
     """, nativeQuery = true)
     Double sumSubTotalByDayAndMonth(@Param("day") int day, @Param("monthYear") String monthYear);
     
@@ -66,6 +69,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
         FROM orders o
         WHERE EXTRACT(MONTH FROM o.delivery_date) = :month
         AND EXTRACT(YEAR FROM o.delivery_date) = :year
+        AND o.is_paid = true
     """, nativeQuery = true)
     Double sumSubTotalByMonthAndYear(@Param("month") int month, @Param("year") int year);
 }

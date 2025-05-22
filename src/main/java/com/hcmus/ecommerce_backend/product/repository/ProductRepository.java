@@ -36,7 +36,8 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
                p.price AS price, SUM(od.quantity) AS quantitySold, 
                (SUM(od.quantity) * p.price) AS revenue
         FROM products p
-        JOIN order_detail od ON p.id = od.product_id
+        JOIN product_color_sizes pcs ON p.id = pcs.product_id
+        JOIN order_detail od ON pcs.id = od.item_id
         JOIN orders o ON od.order_id = o.id
         WHERE 
             o.delivery_date IS NOT NULL AND
