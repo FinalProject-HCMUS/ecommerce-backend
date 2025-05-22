@@ -22,9 +22,9 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 
     @Query("SELECT o FROM Order o WHERE " +
            "(:keyword IS NULL OR " +
-           "LOWER(o.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(o.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(o.phoneNumber) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "LOWER(o.firstName) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')) OR " +
+           "LOWER(o.lastName) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')) OR " +
+           "LOWER(o.phoneNumber) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))) " +
            "AND (:status IS NULL OR o.status = :status)")
     Page<Order> searchOrders(@Param("keyword") String keyword, 
                              @Param("status") Status status,
