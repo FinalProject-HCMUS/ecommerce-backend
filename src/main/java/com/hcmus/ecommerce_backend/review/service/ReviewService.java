@@ -9,7 +9,9 @@ package com.hcmus.ecommerce_backend.review.service;
 
     public interface ReviewService {
 
-        Page<ReviewResponse> searchReviews(String keyword, Integer minRating, Integer maxRating, Pageable pageable);
+        Page<ReviewResponse> searchReviews(String keyword, Integer minRating, Integer maxRating, String productId, Pageable pageable);
+
+        Page<ReviewResponse> searchReviewsByOrderDetailId(String orderDetailId, String keyword, Integer minRating, Integer maxRating, Pageable pageable);
 
         ReviewResponse getReviewById(String id);
 
@@ -19,5 +21,4 @@ package com.hcmus.ecommerce_backend.review.service;
 
         List<ReviewResponse> getReviewsByRatingRange(Integer minRating, Integer maxRating);
 
-        Page<ReviewResponse> searchReviewsByOrderDetailId(String orderDetailId, String keyword, Integer minRating, Integer maxRating, Pageable pageable);
     }

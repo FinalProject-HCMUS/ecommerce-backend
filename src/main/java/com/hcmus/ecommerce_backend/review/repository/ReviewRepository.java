@@ -49,21 +49,23 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
             Pageable pageable);
 
     @Query("SELECT r, od, pcs, c, s FROM Review r " +
-            "JOIN OrderDetail od ON r.orderDetailId = od.id " +
-            "JOIN ProductColorSize pcs ON od.itemId = pcs.id " +
-            "JOIN Color c ON pcs.color.id = c.id " +
-            "JOIN Size s ON pcs.size.id = s.id " +
-            "WHERE " +
-            "(:keyword IS NULL OR " +
-            "LOWER(r.comment) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')) OR " +
-            "LOWER(r.headline) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))) " +
-            "AND (:minRating IS NULL OR r.rating >= :minRating) " +
-            "AND (:maxRating IS NULL OR r.rating <= :maxRating) " +
-            "AND (:orderDetailId IS NULL OR r.orderDetailId = :orderDetailId)")
-    Page<Object[]> findReviewsWithDetails(
-            @Param("keyword") String keyword,
-            @Param("minRating") Integer minRating,
-            @Param("maxRating") Integer maxRating,
-            @Param("orderDetailId") String orderDetailId,
-            Pageable pageable);
+                    "JOIN OrderDetail od ON r.orderDetailId = od.id " +
+                    "JOIN ProductColorSize pcs ON od.itemId = pcs.id " +
+                    "JOIN Color c ON pcs.color.id = c.id " +
+                    "JOIN Size s ON pcs.size.id = s.id " +
+                    "WHERE " +
+                    "(:keyword IS NULL OR " +
+                    "LOWER(r.comment) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')) OR " +
+                    "LOWER(r.headline) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))) " +
+                    "AND (:minRating IS NULL OR r.rating >= :minRating) " +
+                    "AND (:maxRating IS NULL OR r.rating <= :maxRating) " +
+                    "AND (:orderDetailId IS NULL OR r.orderDetailId = :orderDetailId) " +
+                    "AND (:productId IS NULL OR pcs.product.id = :productId)")
+            Page<Object[]> findReviewsWithDetails(
+                    @Param("keyword") String keyword,
+                    @Param("minRating") Integer minRating,
+                    @Param("maxRating") Integer maxRating,
+                    @Param("orderDetailId") String orderDetailId,
+                    @Param("productId") String productId,
+                    Pageable pageable);
 }

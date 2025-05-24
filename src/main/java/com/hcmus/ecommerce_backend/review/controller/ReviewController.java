@@ -50,12 +50,13 @@ public class ReviewController {
             @Parameter(description = "Keyword to search in review headline or comment") @RequestParam(required = false) String keyword,
             @Parameter(description = "Minimum rating (1-5)") @RequestParam(required = false) @Min(1) @Max(5) Integer minRating,
             @Parameter(description = "Maximum rating (1-5)") @RequestParam(required = false) @Min(1) @Max(5) Integer maxRating,
-            @Parameter(description = "Filter by order detail ID") @RequestParam(required = false) String orderDetailId) {
+            @Parameter(description = "Filter by order detail ID") @RequestParam(required = false) String orderDetailId,
+            @Parameter(description = "Filter by product ID") @RequestParam(required = false) String productId) {
 
         log.info("ReviewController | getAllReviews | page: {}, size: {}, sort: {}, filters: keyword={}, " +
-                "minRating={}, maxRating={}, orderDetailId={}",
+                "minRating={}, maxRating={}, orderDetailId={}, productId={}",
                 page, size, sort != null ? String.join(", ", sort) : "unsorted",
-                keyword, minRating, maxRating, orderDetailId);
+                keyword, minRating, maxRating, orderDetailId, productId);
 
         Pageable pageable = CreatePageable.build(page, size, sort);
 
@@ -64,7 +65,7 @@ public class ReviewController {
         if (orderDetailId != null && !orderDetailId.isEmpty()) {
             reviews = reviewService.searchReviewsByOrderDetailId(orderDetailId, keyword, minRating, maxRating, pageable);
         } else {
-            reviews = reviewService.searchReviews(keyword, minRating, maxRating, pageable);
+            reviews = reviewService.searchReviews(keyword, minRating, maxRating, productId, pageable);
         }
 
         return ResponseEntity.ok(CustomResponse.successOf(reviews));

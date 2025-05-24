@@ -40,17 +40,17 @@ package com.hcmus.ecommerce_backend.review.service.impl;
         private final SizeMapper sizeMapper;
 
         @Override
-        public Page<ReviewResponse> searchReviews(String keyword, Integer minRating, Integer maxRating, Pageable pageable) {
+        public Page<ReviewResponse> searchReviews(String keyword, Integer minRating, Integer maxRating, String productId, Pageable pageable) {
             log.info(
-                    "ReviewServiceImpl | searchReviews | keyword: {}, minRating: {}, maxRating: {}, page: {}, size: {}, sort: {}",
-                    keyword, minRating, maxRating, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+                    "ReviewServiceImpl | searchReviews | keyword: {}, minRating: {}, maxRating: {}, productId: {}, page: {}, size: {}, sort: {}",
+                    keyword, minRating, maxRating, productId, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
 
             try {
                 // Process keyword
                 String processedKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
 
                 Page<Object[]> results = reviewRepository.findReviewsWithDetails(
-                        processedKeyword, minRating, maxRating, null, pageable);
+                        processedKeyword, minRating, maxRating, null, productId, pageable);
 
                 return results.map(this::mapToFullReviewResponse);
             } catch (DataAccessException e) {
@@ -75,7 +75,7 @@ package com.hcmus.ecommerce_backend.review.service.impl;
                 String processedKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
 
                 Page<Object[]> results = reviewRepository.findReviewsWithDetails(
-                        processedKeyword, minRating, maxRating, orderDetailId, pageable);
+                        processedKeyword, minRating, maxRating, orderDetailId, null, pageable);
 
                 return results.map(this::mapToFullReviewResponse);
             } catch (DataAccessException e) {
@@ -95,7 +95,7 @@ package com.hcmus.ecommerce_backend.review.service.impl;
         public ReviewResponse getReviewById(String id) {
             log.info("ReviewServiceImpl | getReviewById | id: {}", id);
             try {
-                Object[] result = reviewRepository.findReviewsWithDetails(null, null, null, null, Pageable.unpaged())
+                Object[] result = reviewRepository.findReviewsWithDetails(null, null, null, null, null, Pageable.unpaged())
                         .stream()
                         .filter(row -> ((Review)row[0]).getId().equals(id))
                         .findFirst()
@@ -112,6 +112,7 @@ package com.hcmus.ecommerce_backend.review.service.impl;
                 throw e;
             }
         }
+
 
         // Helper method to map the join query result to a full ReviewResponse
         private ReviewResponse mapToFullReviewResponse(Object[] row) {
