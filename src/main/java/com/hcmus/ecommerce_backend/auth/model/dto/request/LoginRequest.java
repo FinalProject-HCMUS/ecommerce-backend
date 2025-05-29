@@ -22,12 +22,12 @@ public class LoginRequest {
 
     @NotBlank
     @Email(message = "Invalid email format")
-    @Schema(description = "Email of the user", example = "user@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Email of the user", example = "test@gmail.com", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
 
     @NotBlank
     @Size(min = 6, message = "Password must be at least 6 characters long")
-    @Schema(description = "Password of the user", example = "password123", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Password of the user", example = "12345678", requiredMode = Schema.RequiredMode.REQUIRED)
     private String password;
 
 }

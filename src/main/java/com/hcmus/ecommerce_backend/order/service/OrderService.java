@@ -1,5 +1,6 @@
 package com.hcmus.ecommerce_backend.order.service;
 
+import com.hcmus.ecommerce_backend.order.model.dto.request.CheckoutRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.CreateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.UpdateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderResponse;
@@ -25,4 +26,6 @@ public interface OrderService {
     OrderResponse updateOrder(String id, UpdateOrderRequest request);
 
     void deleteOrder(String id);
+
+    OrderResponse checkout(CheckoutRequest request);
 }

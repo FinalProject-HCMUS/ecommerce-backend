@@ -1,6 +1,7 @@
 package com.hcmus.ecommerce_backend.order.controller;
 
 import com.hcmus.ecommerce_backend.common.model.dto.CustomResponse;
+import com.hcmus.ecommerce_backend.order.model.dto.request.CheckoutRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.CreateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.UpdateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderResponse;
@@ -37,6 +38,23 @@ import com.hcmus.ecommerce_backend.common.utils.CreatePageable;
 public class OrderController {
 
     private final OrderService orderService;
+
+    @Operation(summary = "Checkout order", description = "Create a new order with order details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Order successfully created"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = CustomResponse.class)))
+    })
+    @PostMapping("/checkout")
+    public ResponseEntity<CustomResponse<OrderResponse>> checkout(
+            @Parameter(description = "Order information and order details", required = true)
+            @Valid @RequestBody CheckoutRequest request) {
+        log.info("OrderController | checkout | request: {}", request);
+        OrderResponse createdOrder = orderService.checkout(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CustomResponse.successOf(createdOrder));
+    }
 
     @Operation(summary = "Get all orders", description = "Retrieves a paginated list of orders with sorting capabilities")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated orders")
