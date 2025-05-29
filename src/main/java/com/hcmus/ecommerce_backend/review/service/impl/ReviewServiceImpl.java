@@ -1,13 +1,20 @@
 package com.hcmus.ecommerce_backend.review.service.impl;
 
-    import com.hcmus.ecommerce_backend.order.model.entity.OrderDetail;
+    import com.google.firestore.v1.StructuredQuery.Order;
+    import com.hcmus.ecommerce_backend.order.exception.OrderDetailNotFoundException;
+import com.hcmus.ecommerce_backend.order.model.entity.OrderDetail;
     import com.hcmus.ecommerce_backend.order.model.mapper.OrderDetailMapper;
-    import com.hcmus.ecommerce_backend.product.model.entity.Color;
-    import com.hcmus.ecommerce_backend.product.model.entity.ProductColorSize;
+import com.hcmus.ecommerce_backend.order.repository.OrderDetailRepository;
+import com.hcmus.ecommerce_backend.product.exception.ProductColorSizeNotFoundException;
+import com.hcmus.ecommerce_backend.product.model.entity.Color;
+import com.hcmus.ecommerce_backend.product.model.entity.Product;
+import com.hcmus.ecommerce_backend.product.model.entity.ProductColorSize;
     import com.hcmus.ecommerce_backend.product.model.entity.Size;
     import com.hcmus.ecommerce_backend.product.model.mapper.ColorMapper;
     import com.hcmus.ecommerce_backend.product.model.mapper.SizeMapper;
-    import com.hcmus.ecommerce_backend.review.exception.ReviewAlreadyExistsException;
+import com.hcmus.ecommerce_backend.product.repository.ProductColorSizeRepository;
+import com.hcmus.ecommerce_backend.product.repository.ProductRepository;
+import com.hcmus.ecommerce_backend.review.exception.ReviewAlreadyExistsException;
     import com.hcmus.ecommerce_backend.review.exception.ReviewNotFoundException;
     import com.hcmus.ecommerce_backend.review.model.dto.request.CreateReviewRequest;
     import com.hcmus.ecommerce_backend.review.model.dto.response.ReviewResponse;
@@ -34,6 +41,9 @@ package com.hcmus.ecommerce_backend.review.service.impl;
     public class ReviewServiceImpl implements ReviewService {
 
         private final ReviewRepository reviewRepository;
+        private final OrderDetailRepository orderDetailRepository;
+        private final ProductColorSizeRepository productColorSizeRepository;
+        private final ProductRepository productRepository;
         private final ReviewMapper reviewMapper;
         private final OrderDetailMapper orderDetailMapper;
         private final ColorMapper colorMapper;
@@ -147,6 +157,26 @@ package com.hcmus.ecommerce_backend.review.service.impl;
 
                 Review review = reviewMapper.toEntity(request);
                 Review savedReview = reviewRepository.save(review);
+                
+                // Update the order detail to mark it as reviewed
+                OrderDetail orderDetail = orderDetailRepository.findById(request.getOrderDetailId())
+                        .orElseThrow(() -> new OrderDetailNotFoundException(request.getOrderDetailId()));
+                orderDetail.setReviewed(true);
+                orderDetailRepository.save(orderDetail);
+
+                // Update product review count and average rating
+                ProductColorSize productColorSize = productColorSizeRepository.findById(orderDetail.getItemId())
+                        .orElseThrow(() -> new ProductColorSizeNotFoundException(orderDetail.getItemId()));
+                Product product = productColorSize.getProduct();
+                product.setReviewCount(product.getReviewCount() + 1);
+                if (product.getReviewCount() > 0) {
+                    double newAverageRating = ((product.getAverageRating() * (product.getReviewCount() - 1)) + review.getRating()) / product.getReviewCount();
+                    product.setAverageRating(newAverageRating);
+                } else {
+                    product.setAverageRating(0.0); // Nếu không còn review, đặt averageRating về 0
+                }
+                productRepository.save(product);
+
                 log.info("ReviewServiceImpl | createReview | Created review with id: {} for order detail: {}",
                         savedReview.getId(), savedReview.getOrderDetailId());
                 return reviewMapper.toResponse(savedReview);
@@ -173,6 +203,28 @@ package com.hcmus.ecommerce_backend.review.service.impl;
                     log.error("ReviewServiceImpl | deleteReview | Review not found with id: {}", id);
                     throw new ReviewNotFoundException(id);
                 }
+                
+                Review review = reviewRepository.findById(id)
+                    .orElseThrow(() -> new ReviewNotFoundException(id));
+
+                // Update the order detail to mark it as reviewed
+                OrderDetail orderDetail = orderDetailRepository.findById(review.getOrderDetailId())
+                        .orElseThrow(() -> new OrderDetailNotFoundException(review.getOrderDetailId()));
+                orderDetail.setReviewed(false);
+                orderDetailRepository.save(orderDetail);
+
+                // Update product review count and average rating
+                ProductColorSize productColorSize = productColorSizeRepository.findById(orderDetail.getItemId())
+                        .orElseThrow(() -> new ProductColorSizeNotFoundException(orderDetail.getItemId()));
+                Product product = productColorSize.getProduct();
+                product.setReviewCount(product.getReviewCount() - 1);
+                if (product.getReviewCount() > 0) {
+                    double newAverageRating = ((product.getAverageRating() * (product.getReviewCount() + 1)) - review.getRating()) / product.getReviewCount();
+                    product.setAverageRating(newAverageRating);
+                } else {
+                    product.setAverageRating(0.0); 
+                }
+                productRepository.save(product);
 
                 // Then delete in the current transaction
                 reviewRepository.deleteById(id);
