@@ -14,8 +14,6 @@ import java.util.Optional;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, String> {
 
-    Review findByProductId(String productId);
-
     Page<Review> findByOrderDetailId(String orderDetailId, Pageable pageable);
 
     boolean existsByOrderDetailId(String orderDetailId);

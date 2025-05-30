@@ -11,14 +11,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hcmus.ecommerce_backend.category.model.entity.Category;
+import com.hcmus.ecommerce_backend.category.repository.CategoryRepository;
 import com.hcmus.ecommerce_backend.product.exception.ProductColorSizeAlreadyExistsException;
 import com.hcmus.ecommerce_backend.product.exception.ProductColorSizeNotFoundException;
 import com.hcmus.ecommerce_backend.product.model.dto.request.product.CreateProductColorSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.request.product.UpdateProductColorSizeRequest;
 import com.hcmus.ecommerce_backend.product.model.dto.response.ProductColorSizeResponse;
+import com.hcmus.ecommerce_backend.product.model.entity.Product;
 import com.hcmus.ecommerce_backend.product.model.entity.ProductColorSize;
 import com.hcmus.ecommerce_backend.product.model.mapper.ProductColorSizeMapper;
 import com.hcmus.ecommerce_backend.product.repository.ProductColorSizeRepository;
+import com.hcmus.ecommerce_backend.product.repository.ProductRepository;
 import com.hcmus.ecommerce_backend.product.service.ProductColorSizeService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,8 @@ public class ProductColorSizeServiceImpl implements ProductColorSizeService{
     
     private final ProductColorSizeRepository productColorSizeRepository;
     private final ProductColorSizeMapper productColorSizeMapper;
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -134,6 +140,12 @@ public class ProductColorSizeServiceImpl implements ProductColorSizeService{
         try {
             ProductColorSize productColorSize = findProductColorSizeById(id);
 
+            // calculate the difference in quantity
+            int oldQuantity = productColorSize.getQuantity();
+            int newQuantity = request.getQuantity();
+            int quantityDifference = newQuantity - oldQuantity;
+            
+            // Check if the color and size combination already exists for another product
             if (!productColorSize.getColor().getId().equals(request.getColorId()) ||
                 !productColorSize.getSize().getId().equals(request.getSizeId())) {
                 checkProductColorSizeExists(productColorSize.getProduct().getId(), request.getColorId(), request.getSizeId());
@@ -141,6 +153,18 @@ public class ProductColorSizeServiceImpl implements ProductColorSizeService{
 
             productColorSizeMapper.updateEntity(request, productColorSize);
             ProductColorSize updatedProductColorSize = productColorSizeRepository.save(productColorSize);
+
+            // update the quantity in ProductColorSize
+            Product product = productColorSize.getProduct();
+            product.setTotal(product.getTotal() + quantityDifference);
+            productRepository.save(product);
+
+            // update the stock in Category
+
+            Category category = product.getCategory();
+            category.setStock(category.getStock() + quantityDifference);
+            categoryRepository.save(category);
+
             return productColorSizeMapper.toResponse(updatedProductColorSize);
         } catch (ProductColorSizeNotFoundException | ProductColorSizeAlreadyExistsException e) {
             throw e;
