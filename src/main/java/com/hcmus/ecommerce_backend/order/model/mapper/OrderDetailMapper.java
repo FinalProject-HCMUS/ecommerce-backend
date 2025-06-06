@@ -41,6 +41,7 @@ public interface OrderDetailMapper {
     @Mapping(source = "color", target = "color", qualifiedByName = "mapToColorResponse")
     @Mapping(source = "size", target = "size", qualifiedByName = "mapToSizeResponse")
     @Mapping(source = "limitedQuantity", target = "limitedQuantity", qualifiedByName = "mapToInteger")
+    @Mapping(source = "isReviewed", target = "isReviewed", qualifiedByName = "mapToBoolean")
     OrderDetailWithProductResponse mapToOrderDetailWithProductResponse(Map<String, Object> orderDetail);
 
     @Named("mapToProductResponse")
@@ -171,6 +172,15 @@ public interface OrderDetailMapper {
             System.err.println("Error parsing LocalDateTime (flexible): " + value + ", error: " + e.getMessage());
         }
         return null;
+    }
+
+    @Named("mapToBoolean")
+    default Boolean mapToBoolean(Object value) {
+        try {
+            return value != null ? Boolean.valueOf(value.toString()) : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Mapping(target = "createdAt", ignore = true)

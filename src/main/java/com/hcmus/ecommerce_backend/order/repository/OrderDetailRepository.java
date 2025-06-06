@@ -70,7 +70,8 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, String
             'sizeCreatedBy', s.created_by,
             'sizeUpdatedBy', s.updated_by
         ) AS size,
-        pcs.quantity AS limitedQuantity
+        pcs.quantity AS limitedQuantity,
+        od.is_reviewed AS isReviewed
     FROM order_detail od
     JOIN product_color_sizes pcs ON od.item_id = pcs.id
     JOIN products p ON pcs.product_id = p.id
