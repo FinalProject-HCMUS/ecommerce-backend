@@ -57,4 +57,15 @@ public class SystemSettingController {
         List<SystemSettingResponse> updatedSettings = systemSettingService.updateSystemSettings(request);
         return ResponseEntity.ok(updatedSettings);
     }
+
+    @Operation(summary = "Get all distinct service names", description = "Retrieves a list of all distinct service names from system settings")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved service names"),
+    })
+    @GetMapping("/service-names")
+    public ResponseEntity<List<String>> getAllServiceNames() {
+        log.info("SystemSettingController | getAllServiceNames | Retrieving all distinct service names");
+        List<String> serviceNames = systemSettingService.getAllServiceNames();
+        return ResponseEntity.ok(serviceNames);
+    }
 }

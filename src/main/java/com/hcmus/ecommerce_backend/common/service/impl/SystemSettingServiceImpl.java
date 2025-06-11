@@ -75,4 +75,11 @@ public class SystemSettingServiceImpl implements SystemSettingService {
                 .map(systemSettingMapper::toResponse)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getAllServiceNames() {
+        log.info("SystemSettingServiceImpl | getAllServiceNames | Retrieving all distinct service names");
+        return systemSettingRepository.findDistinctServiceNames();
+    }
 }
