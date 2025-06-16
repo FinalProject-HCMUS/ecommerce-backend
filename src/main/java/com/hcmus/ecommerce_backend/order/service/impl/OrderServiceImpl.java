@@ -2,10 +2,12 @@ package com.hcmus.ecommerce_backend.order.service.impl;
 
 import com.hcmus.ecommerce_backend.category.model.entity.Category;
 import com.hcmus.ecommerce_backend.category.repository.CategoryRepository;
+import com.hcmus.ecommerce_backend.common.service.EmailService;
 import com.hcmus.ecommerce_backend.order.exception.InsufficientInventoryException;
 import com.hcmus.ecommerce_backend.order.exception.OrderNotFoundException;
 import com.hcmus.ecommerce_backend.order.model.InventoryItem;
 import com.hcmus.ecommerce_backend.order.model.dto.request.*;
+import com.hcmus.ecommerce_backend.order.model.dto.response.OrderDetailWithProductResponse;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderResponse;
 import com.hcmus.ecommerce_backend.order.model.entity.Order;
 import com.hcmus.ecommerce_backend.order.model.enums.PaymentMethod;
@@ -21,6 +23,8 @@ import com.hcmus.ecommerce_backend.product.model.entity.ProductColorSize;
 import com.hcmus.ecommerce_backend.product.repository.CartItemRepository;
 import com.hcmus.ecommerce_backend.product.repository.ProductColorSizeRepository;
 import com.hcmus.ecommerce_backend.product.repository.ProductRepository;
+import com.hcmus.ecommerce_backend.user.model.entity.User;
+import com.hcmus.ecommerce_backend.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,6 +52,8 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final CartItemRepository cartItemRepository;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -110,6 +114,30 @@ public class OrderServiceImpl implements OrderService {
                           .collect(Collectors.toList()));
 
             log.info("OrderServiceImpl | checkout | Completed checkout for order: {}", savedOrder.getId());
+
+            Optional<User> userOptional = userRepository.findById(updatedOrder.getCustomerId());
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+
+                // Get order details information for email
+                List<OrderDetailWithProductResponse> orderDetails = orderDetailService.getOrderDetailsWithProductByOrderId(updatedOrder.getId());
+
+                // Send order confirmation email
+                emailService.sendOrderConfirmationEmail(
+                        user.getEmail(),
+                        user.getFirstName() + " " + user.getLastName(),
+                        updatedOrder.getId(),
+                        updatedOrder.getTotal(),
+                        orderDetails,
+                        updatedOrder.getAddress(),
+                        updatedOrder.getSubTotal(),
+                        updatedOrder.getShippingCost(),
+                        updatedOrder.getPaymentMethod(),
+                        updatedOrder.getCreatedAt()
+                );
+                log.info("OrderServiceImpl | checkout | Order confirmation email sent for order: {}", updatedOrder.getId());
+            }
+
             return orderMapper.toResponse(updatedOrder);
         } catch (Exception e) {
             log.error("OrderServiceImpl | checkout | Error during checkout: {}", e.getMessage(), e);
