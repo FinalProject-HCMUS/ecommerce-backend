@@ -1,6 +1,5 @@
 package com.hcmus.ecommerce_backend.message.service.impl;
 
-import com.hcmus.ecommerce_backend.message.exception.ConversationAlreadyExistsException;
 import com.hcmus.ecommerce_backend.message.exception.ConversationNotFoundException;
 import com.hcmus.ecommerce_backend.message.model.dto.request.CreateConversationRequest;
 import com.hcmus.ecommerce_backend.message.model.dto.request.UpdateConversationRequest;
@@ -9,6 +8,9 @@ import com.hcmus.ecommerce_backend.message.model.entity.Conversation;
 import com.hcmus.ecommerce_backend.message.model.mapper.ConversationMapper;
 import com.hcmus.ecommerce_backend.message.repository.ConversationRepository;
 import com.hcmus.ecommerce_backend.message.service.ConversationService;
+import com.hcmus.ecommerce_backend.user.exception.UserNotFoundException;
+import com.hcmus.ecommerce_backend.user.model.entity.User;
+import com.hcmus.ecommerce_backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -25,23 +27,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ConversationServiceImpl implements ConversationService {
-    
+
     private final ConversationRepository conversationRepository;
     private final ConversationMapper conversationMapper;
+    private final UserRepository userRepository;
 
     @Override
     public Page<ConversationResponse> getAllConversationsPaginated(Pageable pageable) {
         log.info("ConversationServiceImpl | getAllConversationsPaginated | Retrieving conversations with pagination - Page: {}, Size: {}, Sort: {}",
                 pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         try {
-            Page<Conversation> conversationPage = conversationRepository.findAll(pageable);
+            Page<Conversation> conversationPage = conversationRepository.findAllSortedByLatestMessage(pageable);
             Page<ConversationResponse> conversationResponsePage = conversationPage.map(conversationMapper::toResponse);
-            
+
             log.info("ConversationServiceImpl | getAllConversationsPaginated | Found {} conversations on page {} of {}",
                     conversationResponsePage.getNumberOfElements(),
                     conversationResponsePage.getNumber() + 1,
                     conversationResponsePage.getTotalPages());
-            
+
             return conversationResponsePage;
         } catch (DataAccessException e) {
             log.error("ConversationServiceImpl | getAllConversationsPaginated | Database error retrieving paginated conversations: {}",
@@ -53,7 +56,7 @@ public class ConversationServiceImpl implements ConversationService {
             throw e;
         }
     }
-    
+
     @Override
     public Page<ConversationResponse> searchConversations(String keyword, Pageable pageable) {
         log.info("ConversationServiceImpl | searchConversations | keyword: {}, page: {}, size: {}, sort: {}",
@@ -61,21 +64,22 @@ public class ConversationServiceImpl implements ConversationService {
         try {
             // If search parameter is null, use standard findAll method
             Page<Conversation> conversationPage;
-            if (keyword == null || keyword.trim().isEmpty()) {
+            if (keyword == null || keyword.trim()
+                    .isEmpty()) {
                 conversationPage = conversationRepository.findAll(pageable);
             } else {
                 // Process keyword
                 String processedKeyword = keyword.trim();
-                conversationPage = conversationRepository.searchConversations(processedKeyword, pageable);
+                conversationPage = conversationRepository.searchConversationsSortedByLatestMessage(processedKeyword, pageable);
             }
-            
+
             Page<ConversationResponse> conversationResponsePage = conversationPage.map(conversationMapper::toResponse);
-            
+
             log.info("ConversationServiceImpl | searchConversations | Found {} conversations on page {} of {}",
                     conversationResponsePage.getNumberOfElements(),
                     conversationResponsePage.getNumber() + 1,
                     conversationResponsePage.getTotalPages());
-            
+
             return conversationResponsePage;
         } catch (DataAccessException e) {
             log.error("ConversationServiceImpl | searchConversations | Database error searching conversations: {}",
@@ -87,7 +91,7 @@ public class ConversationServiceImpl implements ConversationService {
             throw e;
         }
     }
-    
+
     @Override
     public ConversationResponse getConversationById(String id) {
         log.info("ConversationServiceImpl | getConversationById | id: {}", id);
@@ -106,7 +110,7 @@ public class ConversationServiceImpl implements ConversationService {
             throw e;
         }
     }
-    
+
     @Override
     public List<ConversationResponse> getConversationsByCustomerId(String customerId) {
         log.info("ConversationServiceImpl | getConversationsByCustomerId | customerId: {}", customerId);
@@ -125,26 +129,42 @@ public class ConversationServiceImpl implements ConversationService {
             throw e;
         }
     }
-    
+
     @Override
     @Transactional
     public ConversationResponse createConversation(CreateConversationRequest request) {
-        log.info("ConversationServiceImpl | createConversation | Creating conversation for customer: {}", request.getCustomerId());
+        log.info("ConversationServiceImpl | createConversation | Creating conversation for customer: {}",
+                request.getCustomerId());
         try {
-            // Check if conversation already exists for this customer
-            if (conversationRepository.existsByCustomerId(request.getCustomerId())) {
-                log.warn("ConversationServiceImpl | createConversation | A conversation already exists for customer: {}",
-                        request.getCustomerId());
-                throw new ConversationAlreadyExistsException(request.getCustomerId());
-            }
-            
-            Conversation conversation = conversationMapper.toEntity(request);
+            // First fetch the customer user to ensure it exists
+            User customer = userRepository.findById(request.getCustomerId())
+                    .orElseThrow(() -> {
+                        log.warn("ConversationServiceImpl | createConversation | User not found with id: {}",
+                                request.getCustomerId());
+                        return new UserNotFoundException("User not found with id: " + request.getCustomerId());
+                    });
+
+            Conversation conversation = Conversation.builder()
+                    .customer(customer)  // Set the customer properly
+                    .isAdminRead(false)
+                    .isCustomerRead(true)
+                    .build();
+
             Conversation savedConversation = conversationRepository.save(conversation);
+
+            // Make sure savedConversation.getCustomer() is not null before accessing getId()
+            if (savedConversation.getCustomer() == null) {
+                log.error("ConversationServiceImpl | createConversation | Customer is null in saved conversation");
+                throw new IllegalStateException("Customer is null in saved conversation");
+            }
+
             log.info("ConversationServiceImpl | createConversation | Created conversation with id: {} for customer: {}",
-                    savedConversation.getId(), savedConversation.getCustomer().getId());
+                    savedConversation.getId(), savedConversation.getCustomer()
+                            .getId());
+
             return conversationMapper.toResponse(savedConversation);
-        } catch (ConversationAlreadyExistsException e) {
-            throw e; // Re-throw domain exceptions to be handled by global exception handler
+        } catch (UserNotFoundException e) {
+            throw e;
         } catch (DataAccessException e) {
             log.error("ConversationServiceImpl | createConversation | Database error creating conversation for customer {}: {}",
                     request.getCustomerId(), e.getMessage(), e);
@@ -155,17 +175,17 @@ public class ConversationServiceImpl implements ConversationService {
             throw e;
         }
     }
-    
+
     @Override
     @Transactional
     public ConversationResponse updateConversation(String id, UpdateConversationRequest request) {
         log.info("ConversationServiceImpl | updateConversation | Updating conversation with id: {}", id);
         try {
             Conversation conversation = findConversationById(id);
-            
+
             // Update only the fields that are provided in the request
             conversationMapper.updateEntity(request, conversation);
-            
+
             // Apply conditional updates
             if (request.getIsAdminRead() != null) {
                 conversation.setAdminRead(request.getIsAdminRead());
@@ -173,23 +193,23 @@ public class ConversationServiceImpl implements ConversationService {
             if (request.getIsCustomerRead() != null) {
                 conversation.setCustomerRead(request.getIsCustomerRead());
             }
-            
+
             Conversation updatedConversation = conversationRepository.save(conversation);
             log.info("ConversationServiceImpl | updateConversation | Updated conversation with id: {}", id);
             return conversationMapper.toResponse(updatedConversation);
         } catch (ConversationNotFoundException e) {
             throw e; // Re-throw domain exceptions to be handled by global exception handler
         } catch (DataAccessException e) {
-            log.error("ConversationServiceImpl | updateConversation | Database error updating conversation with id '{}': {}", 
+            log.error("ConversationServiceImpl | updateConversation | Database error updating conversation with id '{}': {}",
                     id, e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("ConversationServiceImpl | updateConversation | Unexpected error updating conversation with id '{}': {}", 
+            log.error("ConversationServiceImpl | updateConversation | Unexpected error updating conversation with id '{}': {}",
                     id, e.getMessage(), e);
             throw e;
         }
     }
-    
+
     @Override
     @Transactional
     public void deleteConversation(String id) {
@@ -201,16 +221,16 @@ public class ConversationServiceImpl implements ConversationService {
         } catch (ConversationNotFoundException e) {
             throw e; // Re-throw domain exceptions to be handled by global exception handler
         } catch (DataAccessException e) {
-            log.error("ConversationServiceImpl | deleteConversation | Database error deleting conversation with id '{}': {}", 
+            log.error("ConversationServiceImpl | deleteConversation | Database error deleting conversation with id '{}': {}",
                     id, e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("ConversationServiceImpl | deleteConversation | Unexpected error deleting conversation with id '{}': {}", 
+            log.error("ConversationServiceImpl | deleteConversation | Unexpected error deleting conversation with id '{}': {}",
                     id, e.getMessage(), e);
             throw e;
         }
     }
-    
+
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     protected Conversation findConversationById(String id) {
         return conversationRepository.findById(id)

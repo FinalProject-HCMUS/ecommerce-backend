@@ -13,19 +13,22 @@ import java.util.Optional;
 
 @Repository
 public interface ConversationRepository extends JpaRepository<Conversation, String> {
-    
-    Page<Conversation> findAll(Pageable pageable);
+
+    @Query("SELECT c FROM Conversation c LEFT JOIN c.messages m " +
+            "GROUP BY c ORDER BY MAX(m.createdAt) DESC NULLS LAST")
+    Page<Conversation> findAllSortedByLatestMessage(Pageable pageable);
     
     List<Conversation> findByCustomerId(String customerId);
     
     Optional<Conversation> findByCustomerIdAndId(String customerId, String id);
-    
-    @Query("SELECT c FROM Conversation c WHERE " +
-          "(:keyword IS NULL OR " +
-          "LOWER(c.customer.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-          "LOWER(c.customer.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-          "LOWER(c.customer.id) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    Page<Conversation> searchConversations(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT c FROM Conversation c LEFT JOIN c.messages m WHERE " +
+            "(:keyword IS NULL OR " +
+            "LOWER(c.customer.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(c.customer.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(c.customer.id) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "GROUP BY c ORDER BY MAX(m.createdAt) DESC NULLS LAST")
+    Page<Conversation> searchConversationsSortedByLatestMessage(@Param("keyword") String keyword, Pageable pageable);
     
     boolean existsByCustomerId(String customerId);
 }

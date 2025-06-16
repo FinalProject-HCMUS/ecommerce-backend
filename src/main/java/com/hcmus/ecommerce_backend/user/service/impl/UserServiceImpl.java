@@ -1,6 +1,11 @@
 package com.hcmus.ecommerce_backend.user.service.impl;
 
 import com.hcmus.ecommerce_backend.common.service.EmailService;
+import com.hcmus.ecommerce_backend.message.model.dto.request.CreateConversationRequest;
+import com.hcmus.ecommerce_backend.message.model.dto.request.CreateMessageRequest;
+import com.hcmus.ecommerce_backend.message.model.dto.response.ConversationResponse;
+import com.hcmus.ecommerce_backend.message.service.ConversationService;
+import com.hcmus.ecommerce_backend.message.service.MessageService;
 import com.hcmus.ecommerce_backend.user.exception.*;
 import com.hcmus.ecommerce_backend.user.model.dto.request.*;
 import com.hcmus.ecommerce_backend.user.model.dto.response.UserResponse;
@@ -36,6 +41,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final ConversationService conversationService;
+    private final MessageService messageService;
 
     @Override
     public Page<UserResponse> getAllUsers(Pageable pageable) {
@@ -306,6 +313,40 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
         verificationTokenRepository.delete(verificationToken);
         log.info("Email confirmed successfully for user: {}", savedUser.getId());
+
+        try {
+            // Create new conversation
+            CreateConversationRequest conversationRequest = CreateConversationRequest.builder()
+                    .customerId(savedUser.getId())
+                    .build();
+
+            ConversationResponse conversation = conversationService.createConversation(conversationRequest);
+
+            // Send welcome messages (English)
+            CreateMessageRequest englishMessageRequest = CreateMessageRequest.builder()
+                    .content("Welcome to our platform! We're happy to have you here. If you have any questions, feel free to ask.")
+                    .userId("system")  // Use a system user ID for admin messages
+                    .conversationId(conversation.getId())
+                    .messageType("TEXT")
+                    .build();
+
+            messageService.createMessage(englishMessageRequest);
+
+            // Send welcome messages (Vietnamese)
+            CreateMessageRequest vietnameseMessageRequest = CreateMessageRequest.builder()
+                    .content("Chào mừng bạn đến với nền tảng của chúng tôi! Chúng tôi rất vui khi có bạn ở đây. Nếu bạn có bất kỳ câu hỏi nào, hãy tự nhiên hỏi.")
+                    .userId("system")  // Use a system user ID for admin messages
+                    .conversationId(conversation.getId())
+                    .messageType("TEXT")
+                    .build();
+
+            messageService.createMessage(vietnameseMessageRequest);
+
+            log.info("Created welcome conversation with ID: {} for user: {}", conversation.getId(), savedUser.getId());
+        } catch (Exception e) {
+            // Log error but don't fail the email confirmation process
+            log.error("Failed to create welcome conversation for user {}: {}", savedUser.getId(), e.getMessage(), e);
+        }
         return true;
     }
 

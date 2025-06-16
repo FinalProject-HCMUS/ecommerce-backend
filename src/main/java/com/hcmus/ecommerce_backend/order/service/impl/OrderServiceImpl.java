@@ -113,35 +113,52 @@ public class OrderServiceImpl implements OrderService {
                           .map(CheckoutOrderDetailRequest::getItemId)
                           .collect(Collectors.toList()));
 
+            // 7. Send order confirmation email
+            sendOrderConfirmationEmailAfterCheckout(updatedOrder);
+
             log.info("OrderServiceImpl | checkout | Completed checkout for order: {}", savedOrder.getId());
-
-            Optional<User> userOptional = userRepository.findById(updatedOrder.getCustomerId());
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-
-                // Get order details information for email
-                List<OrderDetailWithProductResponse> orderDetails = orderDetailService.getOrderDetailsWithProductByOrderId(updatedOrder.getId());
-
-                // Send order confirmation email
-                emailService.sendOrderConfirmationEmail(
-                        user.getEmail(),
-                        user.getFirstName() + " " + user.getLastName(),
-                        updatedOrder.getId(),
-                        updatedOrder.getTotal(),
-                        orderDetails,
-                        updatedOrder.getAddress(),
-                        updatedOrder.getSubTotal(),
-                        updatedOrder.getShippingCost(),
-                        updatedOrder.getPaymentMethod(),
-                        updatedOrder.getCreatedAt()
-                );
-                log.info("OrderServiceImpl | checkout | Order confirmation email sent for order: {}", updatedOrder.getId());
-            }
 
             return orderMapper.toResponse(updatedOrder);
         } catch (Exception e) {
             log.error("OrderServiceImpl | checkout | Error during checkout: {}", e.getMessage(), e);
             throw e;
+        }
+    }
+
+    /**
+     * Sends order confirmation email after successful checkout
+     */
+    private void sendOrderConfirmationEmailAfterCheckout(Order order) {
+        try {
+            Optional<User> userOptional = userRepository.findById(order.getCustomerId());
+            if (userOptional.isEmpty()) {
+                log.warn("OrderServiceImpl | sendOrderConfirmationEmailAfterCheckout | User not found for order: {}", order.getId());
+                return;
+            }
+
+            User user = userOptional.get();
+
+            // Get order details information for email
+            List<OrderDetailWithProductResponse> orderDetails = orderDetailService.getOrderDetailsWithProductByOrderId(order.getId());
+
+            // Send order confirmation email
+            emailService.sendOrderConfirmationEmail(
+                    user.getEmail(),
+                    user.getFirstName() + " " + user.getLastName(),
+                    order.getId(),
+                    order.getTotal(),
+                    orderDetails,
+                    order.getAddress(),
+                    order.getSubTotal(),
+                    order.getShippingCost(),
+                    order.getPaymentMethod(),
+                    order.getCreatedAt()
+            );
+
+            log.info("OrderServiceImpl | sendOrderConfirmationEmailAfterCheckout | Order confirmation email sent for order: {}", order.getId());
+        } catch (Exception e) {
+            // Log error but don't fail the checkout process if email sending fails
+            log.error("OrderServiceImpl | sendOrderConfirmationEmailAfterCheckout | Error sending confirmation email: {}", e.getMessage(), e);
         }
     }
 
