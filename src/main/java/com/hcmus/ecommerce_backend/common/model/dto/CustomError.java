@@ -20,6 +20,8 @@ public class CustomError {
 
     private String header;
 
+    private String exceptionName;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String message;
 
