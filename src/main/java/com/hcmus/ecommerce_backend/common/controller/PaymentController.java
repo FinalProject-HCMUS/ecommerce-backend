@@ -1,15 +1,17 @@
 package com.hcmus.ecommerce_backend.common.controller;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
 
+import com.hcmus.ecommerce_backend.common.model.entity.SystemSetting;
+import com.hcmus.ecommerce_backend.common.repository.SystemSettingRepository;
 import com.hcmus.ecommerce_backend.common.service.PaymentService;
 import com.hcmus.ecommerce_backend.order.model.dto.request.CheckoutRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderResponse;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class PaymentController {
     private final PaymentService paymentService;
+    private final SystemSettingRepository systemSettingRepository;
 
     @PostMapping("/create")
     @Operation(summary = "Create VNPay payment URL", description = "Creates a VNPay payment URL for the given order")
@@ -57,13 +60,71 @@ public class PaymentController {
     }
 
     @GetMapping("/return")
-    public ResponseEntity<String> handleReturn(@RequestParam Map<String, String> params) {
+    public ResponseEntity<Void> handleReturn(@RequestParam Map<String, String> params) {
         log.info("VNPayController | handleReturn | VNPay response: {}", params);
-        boolean isValid = paymentService.validatePaymentResponse(params);
-        if (isValid) {
-            return ResponseEntity.ok("Payment successful");
-        } else {
-            return ResponseEntity.badRequest().body("Invalid payment response");
+        boolean isValid;
+        String statusCode;
+        
+        try {
+            isValid = paymentService.validatePaymentResponse(params);
+            statusCode = isValid ? "success" : "failure";
+        } catch (Exception e) {
+            log.error("VNPayController | handleReturn | Error processing payment: {}", e.getMessage(), e);
+            statusCode = "error";
+            isValid = false;
         }
+        
+        // URL frontend cứng
+        String frontendUrl = getFrontendUrlFromSystemSetting();
+        
+        // Tạo URL redirect đến frontend
+        String redirectUrl = frontendUrl + "/confirm-vnpay/" + statusCode;
+        
+        // Thêm mã giao dịch vào URL nếu có
+        // if (params.containsKey("vnp_TxnRef")) {
+        //     String txnRef = params.get("vnp_TxnRef");
+        //     redirectUrl += "?txnRef=" + txnRef;
+        // }
+        
+        log.info("VNPayController | handleReturn | Redirecting to: {}", redirectUrl);
+        
+        // Redirect bằng cách đặt header Location
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", redirectUrl);
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
+
+    /**
+     * Lấy URL frontend từ bảng SystemSetting
+     * Nếu không tìm thấy, quay lại lấy từ application.yml
+     * Nếu vẫn không tìm thấy, dùng giá trị mặc định
+     */
+    private String getFrontendUrlFromSystemSetting() {
+        try {
+            // Tìm setting với serviceName là MySetting và key là frontend-url
+            Optional<SystemSetting> setting = systemSettingRepository.findByKey("frontend-url");
+            
+            if (setting.isPresent() && setting.get().getServiceName().equals("MySetting")) {
+                log.info("Using frontend URL from SystemSetting: {}", setting.get().getValue());
+                return setting.get().getValue();
+            }
+            
+            // Thử lấy từ các setting của service MySetting
+            List<SystemSetting> mySettings = systemSettingRepository.findByServiceName("MySetting");
+            Optional<SystemSetting> frontendUrlSetting = mySettings.stream()
+                    .filter(s -> s.getKey().equals("frontend-url") || s.getKey().equals("FrontendUrl"))
+                    .findFirst();
+            
+            if (frontendUrlSetting.isPresent()) {
+                log.info("Using frontend URL from MySetting service: {}", frontendUrlSetting.get().getValue());
+                return frontendUrlSetting.get().getValue();
+            }
+        } catch (Exception e) {
+            log.error("Error retrieving frontend URL from SystemSetting: {}", e.getMessage(), e);
+        }
+        
+        // Nếu không tìm thấy ở đâu, dùng giá trị mặc định
+        log.info("Using default frontend URL: http://localhost:3000");
+        return "http://localhost:3000";
+    }   
 }

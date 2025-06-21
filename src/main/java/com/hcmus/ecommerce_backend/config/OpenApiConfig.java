@@ -30,7 +30,7 @@ public class OpenApiConfig {
                         .description("RESTful API documentation for the E-Commerce Backend application.")
                         .version("1.0.0")
                         .contact(new Contact()
-                                .name("HCMUS E-Commerce Team")
+                                .name("HCMUS`x E-Commerce Team")
                                 .email("contact@example.com")
                                 .url("https://github.com/FinalProject-HCMUS/ecommerce-backend"))
                         .license(new License()
