@@ -278,11 +278,30 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderResponse> getAllOrders(Pageable pageable) {
-        log.info("OrderServiceImpl | getAllOrders | Retrieving orders with pagination - Page: {}, Size: {}, Sort: {}",
-                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+    public Page<OrderResponse> getAllOrders(String keyword, Status status, PaymentMethod paymentMethod, 
+                                        String customerId, Pageable pageable) {
+        log.info("OrderServiceImpl | getAllOrders | Retrieving orders with filters - keyword: {}, status: {}, " +
+                "paymentMethod: {}, customerId: {}, page: {}, size: {}, sort: {}",
+                keyword, status, paymentMethod, customerId, pageable.getPageNumber(), pageable.getPageSize(), 
+                pageable.getSort());
+        
         try {
-            Page<Order> orderPage = orderRepository.findAll(pageable);
+            // Nếu tất cả các tham số filter đều null, sử dụng findAll
+            Page<Order> orderPage;
+            if ((keyword == null || keyword.trim().isEmpty()) && 
+                    status == null && 
+                    paymentMethod == null && 
+                    customerId == null) {
+                orderPage = orderRepository.findAll(pageable);
+            } else {
+                orderPage = orderRepository.findOrdersWithFilters(
+                        keyword == null || keyword.trim().isEmpty() ? null : keyword.trim(),
+                        status,
+                        paymentMethod,
+                        customerId,
+                        pageable);
+            }
+
             Page<OrderResponse> orderResponsePage = orderPage.map(orderMapper::toResponse);
 
             log.info("OrderServiceImpl | getAllOrders | Found {} orders on page {} of {}",

@@ -4,6 +4,7 @@ import com.hcmus.ecommerce_backend.order.model.dto.request.CheckoutRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.CreateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.UpdateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderResponse;
+import com.hcmus.ecommerce_backend.order.model.enums.PaymentMethod;
 import com.hcmus.ecommerce_backend.order.model.enums.Status;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface OrderService {
 
-    Page<OrderResponse> getAllOrders(Pageable pageable);
+    Page<OrderResponse> getAllOrders(String keyword, Status status, PaymentMethod paymentMethod, String customerId, Pageable pageable);
 
     Page<OrderResponse> searchOrders(String keyword, Status status, Pageable pageable);
 

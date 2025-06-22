@@ -1,6 +1,7 @@
 package com.hcmus.ecommerce_backend.order.repository;
 
 import com.hcmus.ecommerce_backend.order.model.entity.Order;
+import com.hcmus.ecommerce_backend.order.model.enums.PaymentMethod;
 import com.hcmus.ecommerce_backend.order.model.enums.Status;
 
 import org.springframework.data.domain.Page;
@@ -72,4 +73,16 @@ public interface OrderRepository extends JpaRepository<Order, String> {
         AND o.is_paid = true
     """, nativeQuery = true)
     Double sumSubTotalByMonthAndYear(@Param("month") int month, @Param("year") int year);
+
+    @Query("SELECT o FROM Order o WHERE " +
+        "(:keyword IS NULL OR " +
+        "LOWER(o.id) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+        "LOWER(o.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+        "LOWER(o.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+        "LOWER(o.phoneNumber) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+        "AND (:status IS NULL OR o.status = :status) " +
+        "AND (:paymentMethod IS NULL OR o.paymentMethod = :paymentMethod) " + 
+        "AND (:customerId IS NULL OR o.customerId = :customerId)")
+    Page<Order> findOrdersWithFilters(String keyword, Status status, PaymentMethod paymentMethod, 
+                                    String customerId, Pageable pageable);
 }

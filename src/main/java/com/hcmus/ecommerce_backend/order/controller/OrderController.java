@@ -5,6 +5,7 @@ import com.hcmus.ecommerce_backend.order.model.dto.request.CheckoutRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.CreateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.request.UpdateOrderRequest;
 import com.hcmus.ecommerce_backend.order.model.dto.response.OrderResponse;
+import com.hcmus.ecommerce_backend.order.model.enums.PaymentMethod;
 import com.hcmus.ecommerce_backend.order.model.enums.Status;
 import com.hcmus.ecommerce_backend.order.service.OrderService;
 
@@ -56,21 +57,43 @@ public class OrderController {
                 .body(CustomResponse.successOf(createdOrder));
     }
 
-    @Operation(summary = "Get all orders", description = "Retrieves a paginated list of orders with sorting capabilities")
+    @Operation(summary = "Get all orders", description = "Retrieves a filtered and paginated list of orders with sorting capabilities")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated orders")
     @GetMapping
     public ResponseEntity<CustomResponse<Page<OrderResponse>>> getAllOrders(
-            @Parameter(description = "Zero-based page index (0..N)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "The size of the page to be returned") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Keyword to search by order ID, customer name, phone") 
+            @RequestParam(required = false) String keyword,
+            
+            @Parameter(description = "Filter by order status: NEW, CANCELLED, PROCESSING, PACKAGED, PICKED, SHIPPING, DELIVERED, REFUNDED", 
+                    schema = @Schema(type = "string", allowableValues = {
+                    "NEW", "CANCELLED", "PROCESSING", "PACKAGED", 
+                    "PICKED", "SHIPPING", "DELIVERED", "REFUNDED" })) 
+            @RequestParam(required = false) Status status,
+            
+            @Parameter(description = "Filter by payment method: COD, VN_PAY, MOMO", 
+                    schema = @Schema(type = "string", allowableValues = {
+                    "COD", "VN_PAY", "MOMO" })) 
+            @RequestParam(required = false) PaymentMethod paymentMethod,
+            
+            @Parameter(description = "Filter by customer ID") 
+            @RequestParam(required = false) String customerId,
+            
+            @Parameter(description = "Zero-based page index (0..N)") 
+            @RequestParam(defaultValue = "0") int page,
+            
+            @Parameter(description = "The size of the page to be returned") 
+            @RequestParam(defaultValue = "10") int size,
+            
             @Parameter(description = "Sorting criteria in the format: property(,asc|desc). " +
                     "Default sort order is ascending. " +
-                    "Multiple sort criteria are supported.") @RequestParam(required = false) String[] sort) {
+                    "Multiple sort criteria are supported.") 
+            @RequestParam(required = false) String[] sort) {
 
-        log.info("OrderController | getAllOrders | page: {}, size: {}, sort: {}",
-                page, size, sort != null ? String.join(", ", sort) : "unsorted");
+        log.info("OrderController | getAllOrders | filters: keyword={}, status={}, paymentMethod={}, customerId={}, page={}, size={}, sort={}",
+                keyword, status, paymentMethod, customerId, page, size, sort != null ? String.join(", ", sort) : "unsorted");
 
         Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<OrderResponse> orders = orderService.getAllOrders(pageable);
+        Page<OrderResponse> orders = orderService.getAllOrders(keyword, status, paymentMethod, customerId, pageable);
 
         return ResponseEntity.ok(CustomResponse.successOf(orders));
     }
