@@ -135,7 +135,7 @@ public class VNPayPaymentServiceImpl implements PaymentService {
                     .orderId(savedOrder.getId())
                     .build());
 
-            // 6. Remove items from customer's cart
+            //Remove items from customer's cart
             removeItemsFromCart(request.getCustomerId(),
                     request.getOrderDetails().stream()
                         .map(CheckoutOrderDetailRequest::getItemId)
@@ -292,12 +292,13 @@ public class VNPayPaymentServiceImpl implements PaymentService {
             vnp_Params.put("vnp_IpAddr", "127.0.0.1");
 
             // Thời gian tạo và hết hạn
-            Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"));
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+            formatter.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo")); 
             String createDate = formatter.format(cld.getTime());
             vnp_Params.put("vnp_CreateDate", createDate);
 
-            cld.add(Calendar.MINUTE, 15);
+            cld.add(Calendar.MINUTE, 60);
             String expireDate = formatter.format(cld.getTime());
             vnp_Params.put("vnp_ExpireDate", expireDate);
 
