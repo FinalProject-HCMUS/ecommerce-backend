@@ -56,6 +56,9 @@ public class OrderResponse {
 
     @Schema(description = "Shipping address", example = "123 Main St, Springfield, USA")
     private String address;
+
+    @Schema(description = "Indicates whether the order has been paid")
+    private Boolean isPaid;
     
     @Schema(description = "List of order tracks")
     private List<OrderTrackResponse> orderTracks;
