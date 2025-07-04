@@ -125,4 +125,30 @@ public class PaymentController {
         log.info("Using default frontend URL: http://localhost:3000");
         return "http://localhost:3000";
     }   
+
+    @PostMapping("/retry/{orderId}")
+    @Operation(summary = "Retry VNPay payment", description = "Creates a new VNPay payment URL for an existing failed order")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully created retry VNPay payment URL"),
+        @ApiResponse(responseCode = "404", description = "Order not found"),
+        @ApiResponse(responseCode = "400", description = "Order already paid or cannot retry"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<String> retryVNPayPayment(
+        @Parameter(description = "Order ID to retry payment", required = true)
+        @PathVariable String orderId) {
+        
+        log.info("VNPayController | retryVNPayPayment | Retrying VNPay payment for order: {}", orderId);
+        try {
+            // Tạo lại payment URL cho order đã tồn tại
+            String paymentUrl = paymentService.createRetryPaymentUrl(orderId);
+            
+            log.info("VNPayController | retryVNPayPayment | Retry VNPay payment URL created: {}", paymentUrl);
+            return ResponseEntity.ok(paymentUrl);
+        } catch (Exception e) {
+            log.error("VNPayController | retryVNPayPayment | Error creating retry VNPay payment URL: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error creating retry VNPay payment URL: " + e.getMessage());
+        }
+    }
 }

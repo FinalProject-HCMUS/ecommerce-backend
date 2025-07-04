@@ -430,4 +430,39 @@ public class VNPayPaymentServiceImpl implements PaymentService {
             throw new RuntimeException("Failed to calculate HMAC-SHA512", e);
         }
     }
+
+    @Override
+    public String createRetryPaymentUrl(String orderId) {
+        log.info("VNPayPaymentService | createRetryPaymentUrl | Creating retry payment URL for order: {}", orderId);
+        
+        try {
+            // 1. Tìm order theo ID
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
+            
+            // 2. Kiểm tra điều kiện để retry
+            if (order.getIsPaid()) {
+                throw new PaymentException("Order is already paid, cannot retry payment");
+            }
+            
+            if (order.getStatus() == Status.CANCELLED || order.getStatus() == Status.REFUNDED) {
+                throw new PaymentException("Order is cancelled or refunded, cannot retry payment");
+            }
+            
+            // 3. Kiểm tra nếu order không phải VNPay
+            if (order.getPaymentMethod() != PaymentMethod.VN_PAY) {
+                throw new PaymentException("Order payment method is not VNPay, cannot retry");
+            }
+            
+            // 4. Tạo payment URL mới
+            String paymentUrl = createPaymentUrl(order.getId(), order.getTotal());
+            
+            log.info("VNPayPaymentService | createRetryPaymentUrl | Retry payment URL created for order: {}", orderId);
+            return paymentUrl;
+            
+        } catch (Exception e) {
+            log.error("VNPayPaymentService | createRetryPaymentUrl | Error creating retry payment URL: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
 }

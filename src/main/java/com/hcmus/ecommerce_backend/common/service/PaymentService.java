@@ -9,4 +9,5 @@ public interface PaymentService {
     String createPaymentUrl(String orderId, double amount);
     boolean validatePaymentResponse(Map<String, String> params);
     OrderResponse checkoutVNPay(CheckoutRequest request);
+    String createRetryPaymentUrl(String orderId);
 }
