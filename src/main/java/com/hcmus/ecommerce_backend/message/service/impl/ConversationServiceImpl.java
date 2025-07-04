@@ -232,7 +232,7 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected Conversation findConversationById(String id) {
+    public Conversation findConversationById(String id) {
         return conversationRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("ConversationServiceImpl | findConversationById | Conversation not found with id: {}", id);

@@ -167,7 +167,7 @@ public class BlogServiceImpl implements BlogService {
     }
     
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected Blog findBlogById(String id) {
+    public Blog findBlogById(String id) {
         return blogRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("BlogServiceImpl | findBlogById | Blog not found with id: {}", id);
@@ -181,7 +181,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected void checkTitleBlogAndUserIdExists(String title, String userId) {
+    public void checkTitleBlogAndUserIdExists(String title, String userId) {
         if (blogRepository.existsByTitleAndUserId(title, userId)) {
             log.error("BlogServiceImpl | checkTitleBlogAndUserIdExists | Blog already exists with title: {} and user id: {}", title, userId);
             throw new BlogAlreadyExistsException(title, userId);
@@ -189,7 +189,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected void validateUser(String userId) {
+    public void validateUser(String userId) {
         if (!userRepository.existsById(userId)) {
             log.error("BlogServiceImpl | validateUser | User not found with id: {}", userId);
             throw new UserNotFoundException(userId);

@@ -287,7 +287,7 @@ public class MessageServiceImpl implements MessageService {
     }
     
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected Message findMessageById(String id) {
+    public Message findMessageById(String id) {
         return messageRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("MessageServiceImpl | findMessageById | Message not found with id: {}", id);
