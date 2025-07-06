@@ -203,7 +203,7 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected Size findSizeById(String id) {
+    public Size findSizeById(String id) {
         return sizeRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("SizeServiceImpl | findSizeById | Size not found with id: {}", id);
@@ -212,12 +212,12 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected boolean doesSizeExistById(String id) {
+    public boolean doesSizeExistById(String id) {
         return sizeRepository.existsById(id);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected void checkSizeNameExists(String name) {
+    public void checkSizeNameExists(String name) {
         if (sizeRepository.existsByName(name)) {
             log.error("SizeServiceImpl | checkSizeNameExists | Size already exists with name: {}", name);
             throw new SizeAlreadyExistsException(name);

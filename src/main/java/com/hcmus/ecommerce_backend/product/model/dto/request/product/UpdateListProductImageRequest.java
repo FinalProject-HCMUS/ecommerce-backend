@@ -3,6 +3,7 @@ package com.hcmus.ecommerce_backend.product.model.dto.request.product;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Request object for processing product images")
+@Builder
 public class UpdateListProductImageRequest {
     @Schema(description = "ID of the product image", example = "c5504f81-a277-4f1f-a625-2d81025f3c08")
     private String id;

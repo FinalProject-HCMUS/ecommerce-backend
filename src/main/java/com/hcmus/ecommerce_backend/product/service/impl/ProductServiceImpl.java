@@ -216,7 +216,7 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected Product findProductById(String id) {
+    public Product findProductById(String id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("ProductServiceImpl | findProductById | Product not found with id: {}", id);
@@ -225,12 +225,12 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected boolean doesProductExistById(String id) {
+    public boolean doesProductExistById(String id) {
         return productRepository.existsById(id);
     }
     
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected void checkProductNameExists(String name) {
+    public void checkProductNameExists(String name) {
         if (productRepository.existsByName(name)) {
             log.error("ProductServiceImpl | checkProductNameExists | Product already exists with name: {}", name);
             throw new ProductAlreadyExistsException(name);
@@ -238,7 +238,7 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected void validateCategory(String categoryId) {
+    public void validateCategory(String categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
             log.error("ProductServiceImpl | validateCategory | Category not found with id: {}", categoryId);
             throw new CategoryNotFoundException(categoryId);

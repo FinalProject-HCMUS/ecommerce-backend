@@ -219,7 +219,7 @@ public class ColorServiceImpl implements ColorService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected Color findColorById(String id) {
+    public Color findColorById(String id) {
         return colorRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("ColorServiceImpl | findColorById | Color not found with id: {}", id);
@@ -232,7 +232,7 @@ public class ColorServiceImpl implements ColorService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected boolean doesColorExistById(String id) {
+    public boolean doesColorExistById(String id) {
         return colorRepository.existsById(id);
     }
     
@@ -242,7 +242,7 @@ public class ColorServiceImpl implements ColorService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected void checkColorNameExists(String name) {
+    public void checkColorNameExists(String name) {
         if (colorRepository.existsByName(name)) {
                 log.error("ColorServiceImpl | checkColorNameExists | Color already exists with name: {}", name);
                 throw new ColorAlreadyExistsException(name);

@@ -8,8 +8,4 @@ public class BlogAlreadyExistsException extends RuntimeException {
         super(DEFAULT_MESSAGE);
     }
     
-    public BlogAlreadyExistsException(String title, String userId) {
-        super("Blog already exists with title: " + title + "and user id: " + userId);
-    }
-    
 }

@@ -34,7 +34,7 @@ public class CloudinaryImageStorageService implements ImageStorageService {
 
     private String folder;
 
-    private Cloudinary getCloudinaryInstance() {
+    public Cloudinary getCloudinaryInstance() {
 
         if (cloudName == null || apiKey == null || apiSecret == null || folder == null) {
             SystemSetting cloudNameSetting = systemSettingRepository.findByKey(CloudinaryKeys.CLOUNDINARY_CLOUD_NAME.name()).orElse(null);
@@ -109,7 +109,7 @@ public class CloudinaryImageStorageService implements ImageStorageService {
         }
     }
     
-    private String extractPublicIdFromUrl(String imageUrl) {
+    public String extractPublicIdFromUrl(String imageUrl) {
         if (imageUrl == null) return null;
 
         // First check if the URL contains /upload/

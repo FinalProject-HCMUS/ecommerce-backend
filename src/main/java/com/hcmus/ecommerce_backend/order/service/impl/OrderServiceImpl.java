@@ -25,8 +25,6 @@ import com.hcmus.ecommerce_backend.product.repository.ProductColorSizeRepository
 import com.hcmus.ecommerce_backend.product.repository.ProductRepository;
 import com.hcmus.ecommerce_backend.user.model.entity.User;
 import com.hcmus.ecommerce_backend.user.repository.UserRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;

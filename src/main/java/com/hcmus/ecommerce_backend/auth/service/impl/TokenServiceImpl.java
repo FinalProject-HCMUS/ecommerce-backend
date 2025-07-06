@@ -36,7 +36,9 @@ public class TokenServiceImpl implements TokenService {
         public UsernamePasswordAuthenticationToken getAuthentication(final String token) {
                 log.debug("TokenServiceImpl | getAuthentication | token: {}", token);
                 try {
-                        tokenValidationService.verifyAndValidate(token);
+                        if(!tokenValidationService.verifyAndValidate(token)) {
+                                throw new JwtException("Invalid JWT token");
+                        }
                         final Jws<Claims> claimsJws = Jwts.parserBuilder()
                                         .setSigningKey(tokenConfigurationParameter.getPublicKey()).build()
                                         .parseClaimsJws(token);

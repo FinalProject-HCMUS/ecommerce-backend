@@ -1,8 +1,6 @@
 package com.hcmus.ecommerce_backend.common.model.dto;
 
 import com.google.auto.value.AutoValue.Builder;
-import com.hcmus.ecommerce_backend.common.model.enums.SettingDataType;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

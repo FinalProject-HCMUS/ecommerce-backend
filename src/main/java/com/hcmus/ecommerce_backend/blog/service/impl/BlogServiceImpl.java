@@ -1,13 +1,8 @@
 package com.hcmus.ecommerce_backend.blog.service.impl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 
@@ -149,7 +144,7 @@ public class BlogServiceImpl implements BlogService {
         log.info("BlogServiceImpl | deleteBlog | Deleting blog with id: {}", id);
         try {
             if (!blogRepository.existsById(id)) {
-                throw new BlogNotFoundException(id);
+                throw new BlogNotFoundException();
             }
             blogRepository.deleteById(id);
             log.info("BlogServiceImpl | deleteBlog | Deleted blog with id: {}", id);
@@ -171,7 +166,7 @@ public class BlogServiceImpl implements BlogService {
         return blogRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("BlogServiceImpl | findBlogById | Blog not found with id: {}", id);
-                    return new BlogNotFoundException(id);
+                    return new BlogNotFoundException();
                 });
     }
 
@@ -184,7 +179,7 @@ public class BlogServiceImpl implements BlogService {
     public void checkTitleBlogAndUserIdExists(String title, String userId) {
         if (blogRepository.existsByTitleAndUserId(title, userId)) {
             log.error("BlogServiceImpl | checkTitleBlogAndUserIdExists | Blog already exists with title: {} and user id: {}", title, userId);
-            throw new BlogAlreadyExistsException(title, userId);
+            throw new BlogAlreadyExistsException();
         }
     }
 

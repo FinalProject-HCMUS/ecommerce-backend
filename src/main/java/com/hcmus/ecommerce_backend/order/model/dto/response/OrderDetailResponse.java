@@ -44,4 +44,7 @@ public class OrderDetailResponse {
     
     @Schema(description = "User who last updated the order detail", example = "admin")
     private String updatedBy;
+
+    @Schema(description = "Indicates whether the order detail has been reviewed", example = "false")
+    private boolean isReviewed;
 }

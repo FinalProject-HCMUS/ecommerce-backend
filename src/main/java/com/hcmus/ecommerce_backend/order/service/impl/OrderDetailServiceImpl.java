@@ -1,6 +1,5 @@
 package com.hcmus.ecommerce_backend.order.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,9 +16,6 @@ import com.hcmus.ecommerce_backend.order.model.entity.OrderDetail;
 import com.hcmus.ecommerce_backend.order.model.mapper.OrderDetailMapper;
 import com.hcmus.ecommerce_backend.order.repository.OrderDetailRepository;
 import com.hcmus.ecommerce_backend.order.service.OrderDetailService;
-import com.hcmus.ecommerce_backend.product.model.dto.response.ProductResponse;
-import com.hcmus.ecommerce_backend.product.model.entity.Product;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

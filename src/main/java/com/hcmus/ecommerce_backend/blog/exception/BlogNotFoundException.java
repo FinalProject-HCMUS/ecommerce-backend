@@ -6,8 +6,4 @@ public class BlogNotFoundException extends RuntimeException {
     public BlogNotFoundException() {
         super(DEFAULT_MESSAGE);
     }
-    
-    public BlogNotFoundException(String id) {
-        super("Blog not found with id: " + id);
-    }
 }

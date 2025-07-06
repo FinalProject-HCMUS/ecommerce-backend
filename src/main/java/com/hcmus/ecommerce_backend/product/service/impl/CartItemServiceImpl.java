@@ -191,7 +191,7 @@ public class CartItemServiceImpl implements CartItemService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private CartItem findCartItemById(String id) {
+    public CartItem findCartItemById(String id) {
         return cartItemRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("CartItemServiceImpl | findCartItemById | Cart item not found with id: {}", id);
@@ -204,7 +204,7 @@ public class CartItemServiceImpl implements CartItemService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    private boolean doesCartItemExistById(String id) {
+    public boolean doesCartItemExistById(String id) {
         return cartItemRepository.existsById(id);
     }
 }

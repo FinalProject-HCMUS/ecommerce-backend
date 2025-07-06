@@ -1,6 +1,5 @@
 package com.hcmus.ecommerce_backend.statistics.service.impl;
 
-import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +21,30 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class StatisticServiceImpl implements StatisticService {
-    
+
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
 
     @Override
     public Map<String, Object> getSalesAnalysis(String type, String date) {
+        if (type == null) {
+            throw new IllegalArgumentException("Type parameter cannot be null");
+        }
+        if (date == null) {
+            throw new IllegalArgumentException("Date parameter cannot be null");
+        }
+
+        // Trim whitespace and validate non-empty strings
+        type = type.trim();
+        date = date.trim();
+
+        if (type.isEmpty()) {
+            throw new IllegalArgumentException("Type parameter cannot be empty");
+        }
+        if (date.isEmpty()) {
+            throw new IllegalArgumentException("Date parameter cannot be empty");
+        }
         log.info("StatisticServiceImpl | getSalesAnalysis | type: {}, date: {}", type, date);
 
         // Khởi tạo các danh sách kết quả
@@ -49,22 +65,27 @@ public class StatisticServiceImpl implements StatisticService {
 
                 // Tính toán doanh thu (Sub_total của order)
                 Double income = orderRepository.sumSubTotalByMonthAndYear(month, currentYear);
-                if (income == null) income = 0.0;
+                if (income == null)
+                    income = 0.0;
                 revenues.add(income);
             }
 
             // Tính tổng của năm hiện tại
             Double totalIncomeCurrentYear = orderRepository.sumSubTotalByYear(currentYear);
             Double totalExpenseCurrentYear = productRepository.sumPriceQuantityByYear(currentYear);
-            if (totalIncomeCurrentYear == null) totalIncomeCurrentYear = 0.0;
-            if (totalExpenseCurrentYear == null) totalExpenseCurrentYear = 0.0;
+            if (totalIncomeCurrentYear == null)
+                totalIncomeCurrentYear = 0.0;
+            if (totalExpenseCurrentYear == null)
+                totalExpenseCurrentYear = 0.0;
             Double totalBalanceCurrentYear = totalIncomeCurrentYear - totalExpenseCurrentYear;
 
             // Tính tổng của năm trước
             Double totalIncomePreviousYear = orderRepository.sumSubTotalByYear(previousYear);
             Double totalExpensePreviousYear = productRepository.sumPriceQuantityByYear(previousYear);
-            if (totalIncomePreviousYear == null) totalIncomePreviousYear = 0.0;
-            if (totalExpensePreviousYear == null) totalExpensePreviousYear = 0.0;
+            if (totalIncomePreviousYear == null)
+                totalIncomePreviousYear = 0.0;
+            if (totalExpensePreviousYear == null)
+                totalExpensePreviousYear = 0.0;
             Double totalBalancePreviousYear = totalIncomePreviousYear - totalExpensePreviousYear;
 
             // Tính % thay đổi so với năm trước
@@ -101,22 +122,29 @@ public class StatisticServiceImpl implements StatisticService {
 
                 // Tính toán doanh thu (Sub_total của order) cho từng ngày
                 Double dailyIncome = orderRepository.sumSubTotalByDayAndMonth(day, date);
-                if (dailyIncome == null) dailyIncome = 0.0;
+                if (dailyIncome == null)
+                    dailyIncome = 0.0;
                 revenues.add(dailyIncome);
             }
 
             // Tính tổng của tháng hiện tại
             Double totalIncomeCurrentMonth = orderRepository.sumSubTotalByMonthAndYear(currentMonth, currentYear);
-            Double totalExpenseCurrentMonth = productRepository.sumPriceQuantityByMonthAndYear(currentMonth, currentYear);
-            if (totalIncomeCurrentMonth == null) totalIncomeCurrentMonth = 0.0;
-            if (totalExpenseCurrentMonth == null) totalExpenseCurrentMonth = 0.0;
+            Double totalExpenseCurrentMonth = productRepository.sumPriceQuantityByMonthAndYear(currentMonth,
+                    currentYear);
+            if (totalIncomeCurrentMonth == null)
+                totalIncomeCurrentMonth = 0.0;
+            if (totalExpenseCurrentMonth == null)
+                totalExpenseCurrentMonth = 0.0;
             Double totalBalanceCurrentMonth = totalIncomeCurrentMonth - totalExpenseCurrentMonth;
 
             // Tính tổng của tháng trước
             Double totalIncomePreviousMonth = orderRepository.sumSubTotalByMonthAndYear(previousMonth, previousYear);
-            Double totalExpensePreviousMonth = productRepository.sumPriceQuantityByMonthAndYear(previousMonth, previousYear);
-            if (totalIncomePreviousMonth == null) totalIncomePreviousMonth = 0.0;
-            if (totalExpensePreviousMonth == null) totalExpensePreviousMonth = 0.0;
+            Double totalExpensePreviousMonth = productRepository.sumPriceQuantityByMonthAndYear(previousMonth,
+                    previousYear);
+            if (totalIncomePreviousMonth == null)
+                totalIncomePreviousMonth = 0.0;
+            if (totalExpensePreviousMonth == null)
+                totalExpensePreviousMonth = 0.0;
             Double totalBalancePreviousMonth = totalIncomePreviousMonth - totalExpensePreviousMonth;
 
             // Tính % thay đổi so với tháng trước đó
@@ -138,37 +166,36 @@ public class StatisticServiceImpl implements StatisticService {
         }
 
         List<String> revenuesConverted = revenues.stream()
-            .map(value -> String.format("%.2f", value))
-            .collect(Collectors.toList());
-                    
+                .map(value -> String.format("%.2f", value))
+                .collect(Collectors.toList());
+
         List<String> totalIncomeConverted = totalIncome.stream()
-            .map(value -> String.format("%.2f", value))
-            .collect(Collectors.toList());
-                    
+                .map(value -> String.format("%.2f", value))
+                .collect(Collectors.toList());
+
         List<String> totalExpenseConverted = totalExpense.stream()
-            .map(value -> String.format("%.2f", value))
-            .collect(Collectors.toList());
-                    
+                .map(value -> String.format("%.2f", value))
+                .collect(Collectors.toList());
+
         List<String> totalBalanceConverted = totalBalance.stream()
-            .map(value -> String.format("%.2f", value))
-            .collect(Collectors.toList());
+                .map(value -> String.format("%.2f", value))
+                .collect(Collectors.toList());
 
         // Trả về kết quả
         return Map.of(
-            "labels", labels,
-            "revenues", revenuesConverted,
-            "totalIncome", totalIncomeConverted,
-            "totalExpense", totalExpenseConverted, 
-            "totalBalance", totalBalanceConverted
-        );
+                "labels", labels,
+                "revenues", revenuesConverted,
+                "totalIncome", totalIncomeConverted,
+                "totalExpense", totalExpenseConverted,
+                "totalBalance", totalBalanceConverted);
     }
 
     @Override
     public Map<String, Object> getBestSellers(String type, String date) {
         log.info("StatisticServiceImpl | getBestSellers | date: {}", date);
-    
+
         List<Map<String, Object>> bestSellers = productRepository.findBestSellersByTypeAndDate(type, date);
-    
+
         return Map.of("products", bestSellers);
     }
 
@@ -177,19 +204,18 @@ public class StatisticServiceImpl implements StatisticService {
         log.info("StatisticServiceImpl | getProductCategoryStatistics");
 
         List<Category> categories = categoryRepository.findAll();
-    
+
         List<String> categoryNames = categories.stream()
                 .map(Category::getName)
                 .toList();
-    
+
         List<Integer> categoryStocks = categories.stream()
                 .map(Category::getStock)
                 .toList();
-    
+
         return Map.of(
                 "categories", categoryNames,
-                "data", categoryStocks
-        );
+                "data", categoryStocks);
     }
 
     @Override
@@ -197,12 +223,12 @@ public class StatisticServiceImpl implements StatisticService {
         log.info("StatisticServiceImpl | getIncompleteOrders | date: {}", date);
 
         List<Map<String, Object>> incompleteOrders = orderRepository.findIncompleteOrders(date);
-    
+
         if (incompleteOrders.isEmpty()) {
             log.info("StatisticServiceImpl | getIncompleteOrders | No incomplete orders found for date: {}", date);
             return Map.of("orders", List.of());
         }
-    
+
         log.info("StatisticServiceImpl | getIncompleteOrders | Found {} incomplete orders", incompleteOrders.size());
         return Map.of("orders", incompleteOrders);
     }

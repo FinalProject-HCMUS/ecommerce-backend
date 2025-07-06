@@ -61,8 +61,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         @Cacheable(value = "userTokens", key = "#loginRequest.email")
         public TokenResponse login(LoginRequest loginRequest) {
                 final User user = userRepository.findByEmail(loginRequest.getEmail())
-                                .orElseThrow(() -> new UserNotFoundException(
-                                                "Can't find with given email: " + loginRequest.getEmail()));
+                                .orElseThrow(() -> new UserNotFoundException());
                 if (Boolean.FALSE.equals(
                                 passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))) {
                         throw new PasswordNotValidException();
@@ -90,7 +89,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 final User user = userRepository.findById(userId)
                                 .orElseThrow(UserNotFoundException::new);
 
-
                 Token token = tokenGenerationService.generateToken(user.getClaims(),
                                 tokenRefreshRequest.getRefreshToken());
 
@@ -101,15 +99,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         @Override
         public TokenResponse outboundAuthentication(String code) {
                 var accessToken = outboundIdentityClient.exchangeToken(
-                        ExchangeTokenRequest.builder()
-                                .code(code)
-                                .clientId(CLIENT_ID)
-                                .clientSecret(CLIENT_SECRET)
-                                .redirectUri(REDIRECT_URI)
-                                .grantType(GRANT_TYPE)
-                                .build()
-                );
-                OutboundUserResponse userResponse = outboundUserClient.getUserInfo("json", accessToken.getAccessToken());
+                                ExchangeTokenRequest.builder()
+                                                .code(code)
+                                                .clientId(CLIENT_ID)
+                                                .clientSecret(CLIENT_SECRET)
+                                                .redirectUri(REDIRECT_URI)
+                                                .grantType(GRANT_TYPE)
+                                                .build());
+                OutboundUserResponse userResponse = outboundUserClient.getUserInfo("json",
+                                accessToken.getAccessToken());
                 // Check if the user already exists in the database
                 User user = userRepository.findByEmail(userResponse.getEmail())
                                 .orElseGet(() -> {
@@ -129,21 +127,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         @Override
-            @CacheEvict(value = {"userTokens", "refreshedTokens", "tokenValidation", "tokenPayloads"}, allEntries = true)
+        @CacheEvict(value = { "userTokens", "refreshedTokens", "tokenValidation", "tokenPayloads" }, allEntries = true)
         public void logout(TokenInvalidateRequest tokenInvalidateRequest) {
-                tokenValidationService.verifyAndValidate(Set.of(tokenInvalidateRequest.getAccessToken(),
-                                tokenInvalidateRequest.getRefreshToken()));
+                try {
+                        tokenValidationService.verifyAndValidate(Set.of(tokenInvalidateRequest.getAccessToken(),
+                                        tokenInvalidateRequest.getRefreshToken()));
 
-                final String accessTokenId = tokenValidationService.getPayload(tokenInvalidateRequest.getAccessToken())
-                                .getId();
+                        final String accessTokenId = tokenValidationService
+                                        .getPayload(tokenInvalidateRequest.getAccessToken())
+                                        .getId();
 
-                tokenManagementService.checkForInvalidityOfToken(accessTokenId);
+                        tokenManagementService.checkForInvalidityOfToken(accessTokenId);
 
-                final String refreshTokenId = tokenValidationService
-                                .getPayload(tokenInvalidateRequest.getRefreshToken()).getId();
+                        final String refreshTokenId = tokenValidationService
+                                        .getPayload(tokenInvalidateRequest.getRefreshToken()).getId();
 
-                tokenManagementService.checkForInvalidityOfToken(refreshTokenId);
+                        tokenManagementService.checkForInvalidityOfToken(refreshTokenId);
 
-                tokenManagementService.invalidateTokens(Set.of(accessTokenId, refreshTokenId));
+                        tokenManagementService.invalidateTokens(Set.of(accessTokenId, refreshTokenId));
+                } catch (Exception e) {
+                        log.error("Error during logout: {}", e.getMessage());
+                        throw e; // Re-throw the exception to handle it in the controller
+                }
+
         }
 }

@@ -34,8 +34,17 @@ public class TokenValidationServiceImpl implements TokenValidationService {
 
     @Override
     public boolean verifyAndValidate(String jwt) {
+        if(jwt == null || jwt.isEmpty()) {
+            log.error("JWT is null or empty");
+            throw new RuntimeException("Tokens cannot be null or empty");
+        }
+        
         try {
-            tokenManagementService.checkForInvalidityOfToken(getId(jwt));
+            if(tokenManagementService.checkForInvalidityOfToken(getId(jwt))) {
+                log.error("Token is invalidated");
+                throw new TokenAlreadyInvalidatedException();
+            }
+            
             Jws<Claims> claimsJws = Jwts.parserBuilder()
                     .setSigningKey(tokenConfigurationParameter.getPublicKey())
                     .build()
@@ -71,7 +80,11 @@ public class TokenValidationServiceImpl implements TokenValidationService {
         } catch (TokenAlreadyInvalidatedException e) {
             log.error("Token is already invalidated", e);
             throw new TokenAlreadyInvalidatedException();
-        } catch (Exception e) {
+        } catch (UserNotFoundException e) {
+            log.error("User not found for the provided token", e);
+            throw e;
+        } 
+        catch (Exception e) {
             log.error("Error validating token", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error validating token", e);
         }

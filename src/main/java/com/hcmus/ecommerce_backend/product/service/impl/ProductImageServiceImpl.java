@@ -144,7 +144,7 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected ProductImage findProductImageById(String id) {
+    public ProductImage findProductImageById(String id) {
         return productImageRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("ProductImageServiceImpl | findProductImageById | Product image not found with id: {}", id);
@@ -153,7 +153,7 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected List<ProductImage> findProductImagesByProductId(String productId) {
+    public List<ProductImage> findProductImagesByProductId(String productId) {
         List<ProductImage> productImages = productImageRepository.findByProductId(productId);
         if (productImages.isEmpty()) {
             log.error("ProductImageServiceImpl | findProductImagesByProductId | Product images not found for productId: {}", productId);
@@ -193,12 +193,12 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected boolean doesProductImageExistById(String id) {
+    public boolean doesProductImageExistById(String id) {
         return !productImageRepository.existsById(id);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected void checkProductImageExists(String url, String productId) {
+    public void checkProductImageExists(String url, String productId) {
         if (productImageRepository.existsByUrlAndProductId(url, productId)) {
             log.error("ProductImageServiceImpl | checkProductImageExists | Product image already exists with URL: {} and productId: {}", url, productId);
             throw new ProductImageAlreadyExistsException(url, productId);

@@ -269,7 +269,7 @@ public class ReviewServiceImpl implements ReviewService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected Review findReviewById(String id) {
+    public Review findReviewById(String id) {
         return reviewRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("ReviewServiceImpl | findReviewById | Review not found with id: {}", id);
@@ -282,7 +282,7 @@ public class ReviewServiceImpl implements ReviewService {
      * Uses a separate transaction to avoid issues with the main transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    protected boolean doesReviewExistById(String id) {
+    public boolean doesReviewExistById(String id) {
         return reviewRepository.existsById(id);
     }
 }

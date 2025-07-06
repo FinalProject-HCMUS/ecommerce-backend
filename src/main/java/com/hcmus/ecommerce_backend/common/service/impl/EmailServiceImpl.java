@@ -111,8 +111,39 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendOrderConfirmationEmail(String email, String name, String orderId, Double total,
-                                           List<OrderDetailWithProductResponse> orderItems, String address, Double subTotal, Double shippingCost,
-                                           PaymentMethod paymentMethod, LocalDateTime orderDate) {
+            List<OrderDetailWithProductResponse> orderItems, String address, Double subTotal, Double shippingCost,
+            PaymentMethod paymentMethod, LocalDateTime orderDate) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email must not be null or empty");
+        }
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name must not be null or empty");
+        }
+        if (orderId == null || orderId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Order ID must not be null or empty");
+        }
+        if (total == null) {
+            throw new IllegalArgumentException("Total must not be null");
+        }
+        if (orderItems == null || orderItems.isEmpty()) {
+            throw new IllegalArgumentException("Order items must not be null or empty");
+        }
+        if (address == null || address.trim().isEmpty()) {
+            throw new IllegalArgumentException("Address must not be null or empty");
+        }
+        if (subTotal == null) {
+            throw new IllegalArgumentException("Subtotal must not be null");
+        }
+        if (shippingCost == null) {
+            throw new IllegalArgumentException("Shipping cost must not be null");
+        }
+        if (paymentMethod == null) {
+            throw new IllegalArgumentException("Payment method must not be null");
+        }
+        if (orderDate == null) {
+            throw new IllegalArgumentException("Order date must not be null");
+        }
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -135,7 +166,6 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("shopName", shopName);
             context.setVariable("supportEmail", supportEmail);
 
-            // Set social media links
             Map<String, String> socialLinks = new HashMap<>();
             socialLinks.put("facebook", "https://facebook.com/" + shopName.toLowerCase());
             socialLinks.put("instagram", "https://instagram.com/" + shopName.toLowerCase());
@@ -151,4 +181,5 @@ public class EmailServiceImpl implements EmailService {
             log.error("Failed to send order confirmation email: {}", e.getMessage(), e);
         }
     }
+
 }

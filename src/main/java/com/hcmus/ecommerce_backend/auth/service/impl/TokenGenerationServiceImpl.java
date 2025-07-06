@@ -59,6 +59,9 @@ public class TokenGenerationServiceImpl implements TokenGenerationService {
 
         @Override
         public Token generateToken(Map<String, Object> claims, String refreshToken) {
+                if(claims == null || claims.isEmpty()) {
+                        throw new IllegalArgumentException("Claims must not be null or empty");
+                }
                 final long currentTimeMillis = System.currentTimeMillis();
                 final Date accessTokenIssuedAt = new Date(currentTimeMillis);
                 final Date accessTokenExpiresAt = DateUtils.addMinutes(new Date(currentTimeMillis),
