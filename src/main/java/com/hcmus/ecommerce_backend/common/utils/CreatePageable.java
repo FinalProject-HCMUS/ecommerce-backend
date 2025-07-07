@@ -15,7 +15,7 @@ public class CreatePageable {
                 page, size, sortParams != null ? String.join(", ", sortParams) : "unsorted");
 
         if (sortParams == null || sortParams.length == 0) {
-            return PageRequest.of(page, size);
+            return PageRequest.of(page < 0 ? 0 : page, size < 1 ? 1 : size);
         }
         
         List<Sort.Order> orders = new ArrayList<>();
@@ -53,6 +53,6 @@ public class CreatePageable {
             }
         }
 
-        return PageRequest.of(page, size, Sort.by(orders));
+        return PageRequest.of(page < 0 ? 0 : page, size < 1 ? 1 : size, Sort.by(orders));
     }
 }

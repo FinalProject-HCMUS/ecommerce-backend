@@ -14,7 +14,34 @@ spring:
         format_sql: true
     defer-datasource-initialization: true
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+    exclude: 
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration
+  mail:
+    host: localhost
+    port: 25
+    username: test@example.com
+    password: testpassword
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+outbound:
+  identity:
+    client-id: ${CLIENT_ID:default-client-id}
+    client-secret: ${CLIENT_SECRET:default-client-secret}
+redirect-uri: ${REDIRECT_URI:http://localhost:8080/oauth2/callback}
+
+# Application specific properties for tests
+app:
+  frontend-url: http://localhost:3000
+  email:
+    shop-name: Test Shop
+    support-email: support@testshop.com
+  storage:
+    default-provider: CLOUDINARY
 
 logging:
   level:
@@ -27,6 +54,10 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
+    com:
+      hcmus:
+        ecommerce_backend: DEBUG
+
 management:
   endpoints:
     enabled: false

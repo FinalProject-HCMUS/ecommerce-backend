@@ -40,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
             if (keyword == null || keyword.isEmpty()) {
                 categoryPage = categoryRepository.findAll(pageable);
             } else {
-                categoryPage = categoryRepository.findByNameContainingIgnoreCase(keyword, pageable);
+                categoryPage = categoryRepository.searchByKeyword(keyword, pageable);
             }
 
             Page<CategoryResponse> categoryResponsePage = categoryPage.map(categoryMapper::toResponse);

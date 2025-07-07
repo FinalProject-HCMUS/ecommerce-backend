@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,8 +22,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.hcmus.ecommerce_backend.security.CustomAuthenticationEntryPoint;
 import com.hcmus.ecommerce_backend.security.filter.CustomBearerTokenAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -34,6 +33,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    // @Profile("!test")
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
             final CustomBearerTokenAuthenticationFilter customBearerTokenAuthenticationFilter,
             final CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
@@ -91,7 +91,22 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private CorsConfigurationSource corsConfigurationSource() {
+    // @Bean
+    // @Profile("test")
+    // public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
+    //     http
+    //             .csrf(csrf -> csrf.disable())
+    //             .authorizeHttpRequests(auth -> auth
+    //                     // Allow all requests in test profile
+    //                     .anyRequest().permitAll())
+    //             .sessionManagement(auth -> auth.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+    //     return http.build();
+    // }
+
+    @Bean
+    // @Profile("!test")
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(List.of("*"));
@@ -106,6 +121,9 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    
+
 
 //    @Bean
 //    public WebMvcConfigurer corsConfigurer() {

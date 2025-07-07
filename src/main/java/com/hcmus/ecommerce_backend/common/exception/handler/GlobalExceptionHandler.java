@@ -193,14 +193,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     protected ResponseEntity<?> handleRuntimeException(final RuntimeException runtimeException) {
         CustomError customError = CustomError.builder()
-                .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                .httpStatus(HttpStatus.BAD_REQUEST)
                 .header(CustomError.Header.API_ERROR.getName())
                 .exceptionName(runtimeException.getClass()
                         .getSimpleName())
                 .message(runtimeException.getMessage())
                 .build();
 
-        return new ResponseEntity<>(customError, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(customError, HttpStatus.BAD_REQUEST);
     }
 
     /**

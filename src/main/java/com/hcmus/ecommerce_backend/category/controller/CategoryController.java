@@ -51,7 +51,7 @@ public class CategoryController {
                 page, size, sort != null ? String.join(", ", sort) : "unsorted", keyword);
 
         Pageable pageable = CreatePageable.build(page, size, sort);
-        Page<CategoryResponse> categories = categoryService.searchCategories(pageable, keyword);
+        Page<CategoryResponse> categories = categoryService.searchCategories(pageable, keyword != null ? keyword.trim() : null);
         return ResponseEntity.ok(CustomResponse.successOf(categories));
     }
 

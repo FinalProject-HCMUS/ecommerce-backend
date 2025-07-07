@@ -124,7 +124,7 @@ class CategoryServiceImplTest {
         String keyword = "electronics";
         Page<Category> categoryPage = new PageImpl<>(Arrays.asList(testCategory));
         
-        when(categoryRepository.findByNameContainingIgnoreCase(keyword, pageable)).thenReturn(categoryPage);
+        when(categoryRepository.searchByKeyword(keyword, pageable)).thenReturn(categoryPage);
         when(categoryMapper.toResponse(testCategory)).thenReturn(testCategoryResponse);
 
         // Act
@@ -134,7 +134,7 @@ class CategoryServiceImplTest {
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
         assertEquals(testCategoryResponse.getName(), result.getContent().get(0).getName());
-        verify(categoryRepository).findByNameContainingIgnoreCase(keyword, pageable);
+        verify(categoryRepository).searchByKeyword(keyword, pageable);
         verify(categoryMapper).toResponse(testCategory);
     }
 
