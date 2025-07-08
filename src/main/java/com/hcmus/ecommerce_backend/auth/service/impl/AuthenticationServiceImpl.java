@@ -58,7 +58,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         protected String GRANT_TYPE = "authorization_code";
 
         @Override
-        @Cacheable(value = "userTokens", key = "#loginRequest.email")
         public TokenResponse login(LoginRequest loginRequest) {
                 final User user = userRepository.findByEmail(loginRequest.getEmail())
                                 .orElseThrow(() -> new UserNotFoundException());
