@@ -14,6 +14,6 @@ public interface SystemSettingRepository extends JpaRepository<SystemSetting, St
     
     List<SystemSetting> findByServiceName(String serviceName);
 
-    @Query("SELECT DISTINCT s.serviceName FROM SystemSetting s")
+    @Query(value = "SELECT DISTINCT s.service_name FROM system_settings s WHERE s.service_name IS NOT NULL", nativeQuery = true)
     List<String> findDistinctServiceNames();
 }
