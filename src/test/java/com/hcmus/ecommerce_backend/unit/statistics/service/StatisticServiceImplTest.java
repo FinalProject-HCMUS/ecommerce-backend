@@ -96,25 +96,25 @@ public class StatisticServiceImplTest {
         @SuppressWarnings("unchecked")
         List<String> revenues = (List<String>) result.get("revenues");
         assertEquals(12, revenues.size());
-        assertEquals("1000.00", revenues.get(0));
-        assertEquals("1500.00", revenues.get(1));
-        assertEquals("0.00", revenues.get(2)); // null converted to 0.0
+        assertEquals("1000,00", revenues.get(0)); // Fixed: using comma as decimal separator
+        assertEquals("1500,00", revenues.get(1)); // Fixed: using comma as decimal separator
+        assertEquals("0,00", revenues.get(2)); // Fixed: null converted to 0,00
 
         @SuppressWarnings("unchecked")
         List<String> totalIncome = (List<String>) result.get("totalIncome");
         assertEquals(2, totalIncome.size());
-        assertEquals("20000.00", totalIncome.get(0));
-        assertEquals("11.11", totalIncome.get(1)); // (20000-18000)/18000*100
+        assertEquals("20000,00", totalIncome.get(0)); // Fixed: using comma as decimal separator
+        assertEquals("11,11", totalIncome.get(1)); // Fixed: (20000-18000)/18000*100
 
         @SuppressWarnings("unchecked")
         List<String> totalExpense = (List<String>) result.get("totalExpense");
         assertEquals(2, totalExpense.size());
-        assertEquals("15000.00", totalExpense.get(0));
+        assertEquals("15000,00", totalExpense.get(0)); // Fixed: using comma as decimal separator
 
         @SuppressWarnings("unchecked")
         List<String> totalBalance = (List<String>) result.get("totalBalance");
         assertEquals(2, totalBalance.size());
-        assertEquals("5000.00", totalBalance.get(0)); // 20000 - 15000
+        assertEquals("5000,00", totalBalance.get(0)); // Fixed: 20000 - 15000
 
         verify(orderRepository, times(12)).sumSubTotalByMonthAndYear(anyInt(), eq(currentYear));
         verify(orderRepository).sumSubTotalByYear(currentYear);
@@ -151,12 +151,12 @@ public class StatisticServiceImplTest {
         @SuppressWarnings("unchecked")
         List<String> revenues = (List<String>) result.get("revenues");
         assertEquals(12, revenues.size());
-        assertTrue(revenues.stream().allMatch(r -> r.equals("0.00")));
+        assertTrue(revenues.stream().allMatch(r -> r.equals("0,00"))); // Fixed: using comma
 
         @SuppressWarnings("unchecked")
         List<String> totalIncome = (List<String>) result.get("totalIncome");
-        assertEquals("0.00", totalIncome.get(0));
-        assertEquals("0.00", totalIncome.get(1)); // 0% change when both are 0
+        assertEquals("0,00", totalIncome.get(0)); // Fixed: using comma
+        assertEquals("0,00", totalIncome.get(1)); // Fixed: 0% change when both are 0
     }
 
     // getSalesAnalysis tests for "month" type
@@ -196,13 +196,13 @@ public class StatisticServiceImplTest {
         @SuppressWarnings("unchecked")
         List<String> revenues = (List<String>) result.get("revenues");
         assertEquals(31, revenues.size());
-        assertEquals("100.00", revenues.get(0)); // day 1
-        assertEquals("3100.00", revenues.get(30)); // day 31
+        assertEquals("100,00", revenues.get(0)); // Fixed: day 1
+        assertEquals("3100,00", revenues.get(30)); // Fixed: day 31
 
         @SuppressWarnings("unchecked")
         List<String> totalIncome = (List<String>) result.get("totalIncome");
-        assertEquals("5000.00", totalIncome.get(0));
-        assertEquals("11.11", totalIncome.get(1)); // (5000-4500)/4500*100
+        assertEquals("5000,00", totalIncome.get(0)); // Fixed: using comma
+        assertEquals("11,11", totalIncome.get(1)); // Fixed: (5000-4500)/4500*100
 
         verify(orderRepository, times(31)).sumSubTotalByDayAndMonth(anyInt(), eq(date));
         verify(orderRepository).sumSubTotalByMonthAndYear(currentMonth, currentYear);
@@ -238,8 +238,8 @@ public class StatisticServiceImplTest {
 
         @SuppressWarnings("unchecked")
         List<String> totalIncome = (List<String>) result.get("totalIncome");
-        assertEquals("3000.00", totalIncome.get(0));
-        assertEquals("-14.29", totalIncome.get(1)); // (3000-3500)/3500*100 = negative change
+        assertEquals("3000,00", totalIncome.get(0)); // Fixed: using comma
+        assertEquals("-14,29", totalIncome.get(1)); // Fixed: (3000-3500)/3500*100 = negative change
 
         verify(orderRepository).sumSubTotalByMonthAndYear(previousMonth, previousYear);
         verify(productRepository).sumPriceQuantityByMonthAndYear(previousMonth, previousYear);
@@ -702,11 +702,11 @@ public class StatisticServiceImplTest {
         // Then
         @SuppressWarnings("unchecked")
         List<String> totalIncome = (List<String>) result.get("totalIncome");
-        assertEquals("100.00", totalIncome.get(1)); // 100% increase when previous is 0
+        assertEquals("100,00", totalIncome.get(1)); // Fixed: 100% increase when previous is 0
 
         @SuppressWarnings("unchecked")
         List<String> totalExpense = (List<String>) result.get("totalExpense");
-        assertEquals("100.00", totalExpense.get(1)); // 100% increase when previous is 0
+        assertEquals("100,00", totalExpense.get(1)); // Fixed: 100% increase when previous is 0
     }
 
     @Test
@@ -730,15 +730,15 @@ public class StatisticServiceImplTest {
         // Then
         @SuppressWarnings("unchecked")
         List<String> totalIncome = (List<String>) result.get("totalIncome");
-        assertEquals("0.00", totalIncome.get(1)); // 0% change when both are 0
+        assertEquals("0,00", totalIncome.get(1)); // Fixed: 0% change when both are 0
 
         @SuppressWarnings("unchecked")
         List<String> totalExpense = (List<String>) result.get("totalExpense");
-        assertEquals("0.00", totalExpense.get(1)); // 0% change when both are 0
+        assertEquals("0,00", totalExpense.get(1)); // Fixed: 0% change when both are 0
 
         @SuppressWarnings("unchecked")
         List<String> totalBalance = (List<String>) result.get("totalBalance");
-        assertEquals("0.00", totalBalance.get(1)); // 0% change when both are 0
+        assertEquals("0,00", totalBalance.get(1)); // Fixed: 0% change when both are 0
     }
 
     @Test
@@ -763,13 +763,13 @@ public class StatisticServiceImplTest {
         // Then
         @SuppressWarnings("unchecked")
         List<String> totalBalance = (List<String>) result.get("totalBalance");
-        assertEquals("-500.00", totalBalance.get(0)); // 1000 - 1500 = -500 (negative balance)
+        assertEquals("-500,00", totalBalance.get(0)); // Fixed: 1000 - 1500 = -500 (negative balance)
 
         // Calculate expected percentage change:
         // previous balance = 1200 - 1100 = 100
         // current balance = 1000 - 1500 = -500
         // percentage change = ((-500 - 100) / 100) * 100 = -600%
-        assertEquals("-600.00", totalBalance.get(1)); // Correct percentage change calculation
+        assertEquals("-600,00", totalBalance.get(1)); // Fixed: Correct percentage change calculation
     }
 
     @Test
@@ -844,12 +844,12 @@ public class StatisticServiceImplTest {
         // Then
         @SuppressWarnings("unchecked")
         List<String> totalBalance = (List<String>) result.get("totalBalance");
-        assertEquals("500.00", totalBalance.get(0)); // 1000 - 500 = 500 (current balance)
+        assertEquals("500,00", totalBalance.get(0)); // Fixed: 1000 - 500 = 500 (current balance)
 
         // Previous balance = 800 - 900 = -100
         // Current balance = 1000 - 500 = 500
         // Percentage change = ((500 - (-100)) / (-100)) * 100 = -600%
-        assertEquals("-600.00", totalBalance.get(1));
+        assertEquals("-600,00", totalBalance.get(1)); // Fixed: using comma
     }
 
     // Test for zero division edge case in percentage calculation
@@ -875,18 +875,18 @@ public class StatisticServiceImplTest {
         // Then
         @SuppressWarnings("unchecked")
         List<String> totalIncome = (List<String>) result.get("totalIncome");
-        assertEquals("600.00", totalIncome.get(0));
-        assertEquals("100.00", totalIncome.get(1)); // 100% when previous is 0
+        assertEquals("600,00", totalIncome.get(0)); // Fixed: using comma
+        assertEquals("100,00", totalIncome.get(1)); // Fixed: 100% when previous is 0
 
         @SuppressWarnings("unchecked")
         List<String> totalExpense = (List<String>) result.get("totalExpense");
-        assertEquals("400.00", totalExpense.get(0));
-        assertEquals("100.00", totalExpense.get(1)); // 100% when previous is 0
+        assertEquals("400,00", totalExpense.get(0)); // Fixed: using comma
+        assertEquals("100,00", totalExpense.get(1)); // Fixed: 100% when previous is 0
 
         @SuppressWarnings("unchecked")
         List<String> totalBalance = (List<String>) result.get("totalBalance");
-        assertEquals("200.00", totalBalance.get(0)); // 600 - 400 = 200
-        assertEquals("100.00", totalBalance.get(1)); // 100% when previous is 0
+        assertEquals("200,00", totalBalance.get(0)); // Fixed: 600 - 400 = 200
+        assertEquals("100,00", totalBalance.get(1)); // Fixed: 100% when previous is 0
     }
 
     @Test
@@ -915,9 +915,9 @@ public class StatisticServiceImplTest {
         @SuppressWarnings("unchecked")
         List<String> revenues = (List<String>) result.get("revenues");
         assertEquals(31, revenues.size());
-        assertEquals("100.00", revenues.get(0)); // Day 1
-        assertEquals("0.00", revenues.get(15)); // Day 16 (null converted to 0)
-        assertEquals("0.00", revenues.get(30)); // Day 31 (null converted to 0)
+        assertEquals("100,00", revenues.get(0)); // Fixed: Day 1
+        assertEquals("0,00", revenues.get(15)); // Fixed: Day 16 (null converted to 0)
+        assertEquals("0,00", revenues.get(30)); // Fixed: Day 31 (null converted to 0)
     }
 
     @Test
