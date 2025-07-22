@@ -79,17 +79,37 @@ public class ProductColorSizeServiceImpl implements ProductColorSizeService{
     @Override
     @Transactional
     public ProductColorSizeResponse createProductColorSize(CreateProductColorSizeRequest request) {
-        log.info("ProductColorSizeServiceImpl | createProductColorSize | Creating product color size");
+        log.info("ProductColorSizeServiceImpl | createProductColorSize | Creating product color size for productId: {}, quantity: {}", 
+                request.getProductId(), request.getQuantity());
         try {
             checkProductColorSizeExists(request.getProductId(), request.getColorId(), request.getSizeId());
 
             ProductColorSize productColorSize = productColorSizeMapper.toEntity(request);
             ProductColorSize savedProductColorSize = productColorSizeRepository.save(productColorSize);
+
+            // Update Product total quantity
+            Product product = savedProductColorSize.getProduct();
+            int addedQuantity = request.getQuantity();
+            product.setTotal(product.getTotal() + addedQuantity);
+            productRepository.save(product);
+            log.info("ProductColorSizeServiceImpl | createProductColorSize | Updated product total by {} to {}", 
+                    addedQuantity, product.getTotal());
+
+            // Update Category stock
+            Category category = product.getCategory();
+            category.setStock(category.getStock() + addedQuantity);
+            categoryRepository.save(category);
+            log.info("ProductColorSizeServiceImpl | createProductColorSize | Updated category stock by {} to {}", 
+                    addedQuantity, category.getStock());
+
             return productColorSizeMapper.toResponse(savedProductColorSize);
         } catch (ProductColorSizeAlreadyExistsException e) {
             throw e;
         } catch (DataAccessException e) {
             log.error("ProductColorSizeServiceImpl | createProductColorSize | Database error: {}", e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("ProductColorSizeServiceImpl | createProductColorSize | Unexpected error: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -112,12 +132,38 @@ public class ProductColorSizeServiceImpl implements ProductColorSizeService{
             // Save all product color sizes
             List<ProductColorSize> savedProductColorSizes = productColorSizeRepository.saveAll(productColorSizes);
 
+            // Group by product to efficiently update stocks
+            var productQuantityMap = savedProductColorSizes.stream()
+                    .collect(Collectors.groupingBy(
+                            pcs -> pcs.getProduct(),
+                            Collectors.summingInt(ProductColorSize::getQuantity)
+                    ));
+
+            // Update Product totals and Category stocks
+            for (var entry : productQuantityMap.entrySet()) {
+                Product product = entry.getKey();
+                int totalQuantityAdded = entry.getValue();
+
+                // Update Product total
+                product.setTotal(product.getTotal() + totalQuantityAdded);
+                productRepository.save(product);
+                log.info("ProductColorSizeServiceImpl | createMultipleProductColorSizes | Updated product {} total by {} to {}", 
+                        product.getId(), totalQuantityAdded, product.getTotal());
+
+                // Update Category stock
+                Category category = product.getCategory();
+                category.setStock(category.getStock() + totalQuantityAdded);
+                categoryRepository.save(category);
+                log.info("ProductColorSizeServiceImpl | createMultipleProductColorSizes | Updated category {} stock by {} to {}", 
+                        category.getId(), totalQuantityAdded, category.getStock());
+            }
+
             // Convert back to responses
             List<ProductColorSizeResponse> responses = savedProductColorSizes.stream()
                     .map(productColorSizeMapper::toResponse)
                     .collect(Collectors.toList());
 
-            log.info("ProductColorSizeServiceImpl | createMultipleProductColorSizes | Created {} product color sizes",
+            log.info("ProductColorSizeServiceImpl | createMultipleProductColorSizes | Successfully created {} product color sizes with stock updates",
                     responses.size());
             return responses;
         } catch (ProductColorSizeAlreadyExistsException e) {
@@ -154,22 +200,27 @@ public class ProductColorSizeServiceImpl implements ProductColorSizeService{
             productColorSizeMapper.updateEntity(request, productColorSize);
             ProductColorSize updatedProductColorSize = productColorSizeRepository.save(productColorSize);
 
-            // update the quantity in ProductColorSize
+            // update the quantity in Product
             Product product = productColorSize.getProduct();
             product.setTotal(product.getTotal() + quantityDifference);
             productRepository.save(product);
 
             // update the stock in Category
-
             Category category = product.getCategory();
             category.setStock(category.getStock() + quantityDifference);
             categoryRepository.save(category);
+
+            log.info("ProductColorSizeServiceImpl | updateProductColorSize | Updated product {} total by {} and category {} stock by {}", 
+                    product.getId(), quantityDifference, category.getId(), quantityDifference);
 
             return productColorSizeMapper.toResponse(updatedProductColorSize);
         } catch (ProductColorSizeNotFoundException | ProductColorSizeAlreadyExistsException e) {
             throw e;
         } catch (DataAccessException e) {
             log.error("ProductColorSizeServiceImpl | updateProductColorSize | Database error: {}", e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("ProductColorSizeServiceImpl | updateProductColorSize | Unexpected error: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -179,14 +230,34 @@ public class ProductColorSizeServiceImpl implements ProductColorSizeService{
     public void deleteProductColorSize(String id) {
         log.info("ProductColorSizeServiceImpl | deleteProductColorSize | Deleting product color size with id: {}", id);
         try {
-            if (!productColorSizeRepository.existsById(id)) {
-                throw new ProductColorSizeNotFoundException(id);
-            }
+            ProductColorSize productColorSize = findProductColorSizeById(id);
+            
+            // Get quantity before deletion for stock updates
+            int deletedQuantity = productColorSize.getQuantity();
+            Product product = productColorSize.getProduct();
+            Category category = product.getCategory();
+
+            // Delete the ProductColorSize
             productColorSizeRepository.deleteById(id);
+
+            // Update Product total (subtract deleted quantity)
+            product.setTotal(product.getTotal() - deletedQuantity);
+            productRepository.save(product);
+
+            // Update Category stock (subtract deleted quantity)
+            category.setStock(category.getStock() - deletedQuantity);
+            categoryRepository.save(category);
+
+            log.info("ProductColorSizeServiceImpl | deleteProductColorSize | Deleted ProductColorSize and updated product {} total by -{} and category {} stock by -{}", 
+                    product.getId(), deletedQuantity, category.getId(), deletedQuantity);
+
         } catch (ProductColorSizeNotFoundException e) {
             throw e;
         } catch (DataAccessException e) {
             log.error("ProductColorSizeServiceImpl | deleteProductColorSize | Database error: {}", e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("ProductColorSizeServiceImpl | deleteProductColorSize | Unexpected error: {}", e.getMessage(), e);
             throw e;
         }
     }
