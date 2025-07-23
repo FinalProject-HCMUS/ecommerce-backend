@@ -99,8 +99,8 @@ public class PaymentController {
      */
     private String getFrontendUrlFromSystemSetting() {
         try {
-            // Tìm setting với serviceName là MySetting và key là frontend-url
-            Optional<SystemSetting> setting = systemSettingRepository.findByKey("frontend-url");
+            // Tìm setting với serviceName là MySetting và key là FrontendUrl
+            Optional<SystemSetting> setting = systemSettingRepository.findByKey("FrontendUrl");
             
             if (setting.isPresent() && setting.get().getServiceName().equals("MySetting")) {
                 log.info("Using frontend URL from SystemSetting: {}", setting.get().getValue());
@@ -122,8 +122,8 @@ public class PaymentController {
         }
         
         // Nếu không tìm thấy ở đâu, dùng giá trị mặc định
-        log.info("Using default frontend URL: http://localhost:3000");
-        return "http://localhost:3000";
+        log.info("Using default frontend URL: https://finalproject-hcmus.github.io/ecommerce-customer/");
+        return "https://finalproject-hcmus.github.io/ecommerce-customer/";
     }   
 
     @PostMapping("/retry/{orderId}")
