@@ -122,8 +122,8 @@ public class PaymentController {
         }
         
         // Nếu không tìm thấy ở đâu, dùng giá trị mặc định
-        log.info("Using default frontend URL: https://finalproject-hcmus.github.io/ecommerce-customer/");
-        return "https://finalproject-hcmus.github.io/ecommerce-customer/";
+        log.info("Using default frontend URL: https://finalproject-hcmus.github.io/ecommerce-customer");
+        return "https://finalproject-hcmus.github.io/ecommerce-customer";
     }   
 
     @PostMapping("/retry/{orderId}")
